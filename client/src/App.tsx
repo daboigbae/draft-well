@@ -14,8 +14,8 @@ function ProtectedRoutes() {
   return (
     <AuthGuard>
       <Switch>
-        <Route path="/app/post/:id" component={Editor} />
-        <Route path="/app" component={PostList} />
+        <Route path="/post/:id" component={Editor} />
+        <Route path="/" component={PostList} />
         <Route component={NotFound} />
       </Switch>
     </AuthGuard>
