@@ -1,0 +1,168 @@
+Build a full-stack web app called “Linkedraft” that lets me write and manage LinkedIn posts. Use React (Vite), TypeScript, Tailwind CSS, and Firebase (Auth + Firestore). No external backend server—Firebase only.
+
+Core requirements
+
+Firebase Auth with Email/Password and Google Sign-In
+
+Protected routes (unauthenticated users see /login only)
+
+Firestore for all data; structure: users/{uid}/posts/{postId}
+
+CRUD for posts (Create, Read, Update, Delete)
+
+Fields per post:
+
+title (string, 120 max)
+
+body (rich text or markdown string)
+
+tags (string[]; simple comma input → array)
+
+status: "draft" | "scheduled" | "published"
+
+scheduledAt: timestamp | null
+
+createdAt, updatedAt: timestamps (server)
+
+Editor UX:
+
+Title input
+
+Markdown editor + live preview
+
+Character counter targetting LinkedIn’s ~3000 char limit, with soft warning at 2600
+
+Copy to clipboard button (“Copy post”)
+
+“Duplicate” action to clone a post
+
+“Export .txt” download
+
+Autosave (debounced 800ms) with optimistic UI
+
+List/Filters:
+
+Sidebar tabs: All, Drafts, Scheduled, Published
+
+Search by title/body
+
+Sort by updatedAt desc
+
+Nice to haves (include if quick):
+
+Tag chips and filter by tag
+
+Keyboard shortcuts: Cmd/Ctrl+S to save
+
+Word count
+
+Project setup
+
+Tech: React + Vite + TypeScript + Tailwind
+
+State/data fetching: React Query (TanStack Query)
+
+Forms: React Hook Form + Zod
+
+Components: simple Tailwind UI (no heavy design system)
+
+File structure:
+
+src/firebase.ts (init from env)
+
+src/lib/auth.ts (auth helpers)
+
+src/lib/posts.ts (CRUD helpers wrapping Firestore)
+
+src/routes: Login.tsx, AppLayout.tsx, Editor.tsx, PostList.tsx
+
+src/components: PostCard.tsx, EditorToolbar.tsx, TagInput.tsx, Counter.tsx
+
+Env variables (read from .env):
+
+VITE_FIREBASE_API_KEY
+
+VITE_FIREBASE_AUTH_DOMAIN
+
+VITE_FIREBASE_PROJECT_ID
+
+VITE_FIREBASE_STORAGE_BUCKET
+
+VITE_FIREBASE_MESSAGING_SENDER_ID
+
+VITE_FIREBASE_APP_ID
+
+Auth flow
+
+/login: Google button + email/password form
+
+On login, redirect to /app
+
+/app: split layout with sidebar (filters, search, “New Post”), main area (list or editor)
+
+Route /app/post/:id for editor; /app/new creates a draft doc then navigates
+
+Firestore rules (create a rules file and apply):
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return request.auth.uid == uid; }
+
+    match /users/{uid} {
+      allow read, write: if isSignedIn() && isOwner(uid);
+
+      match /posts/{postId} {
+        allow create: if isSignedIn() && isOwner(uid) &&
+          request.resource.data.keys().hasAll(['title','body','status','createdAt','updatedAt']) &&
+          request.resource.data.title is string &&
+          request.resource.data.body is string &&
+          request.resource.data.status in ['draft','scheduled','published'];
+
+        allow read, update, delete: if isSignedIn() && isOwner(uid);
+      }
+    }
+  }
+}
+
+
+Implementation notes
+
+Use serverTimestamp() for createdAt/updatedAt
+
+Debounce autosave and show “Saved • 2:14 PM” status
+
+Validate:
+
+title ≤ 120 chars
+
+body ≤ 3000 chars (warn at 2600, block at 3000)
+
+Editor can be a textarea with markdown preview (e.g., marked) to keep it light
+
+Add seed script/function to create 3 sample posts for the current user
+
+Add a simple “Schedule” date/time picker that sets status=“scheduled” and scheduledAt
+
+Deliverables
+
+Fully runnable in Replit (npm scripts: dev, build)
+
+Clear README with env setup steps
+
+Clean, responsive UI (desktop first; mobile okay)
+
+No dead code; typesafe CRUD helpers
+
+Acceptance tests
+
+I can sign up/sign in
+
+I can create a new post, type, autosave, see char counter, copy to clipboard, export .txt
+
+I can duplicate, edit, and delete posts
+
+Filters and search work; scheduled posts display scheduledAt
+
+Firestore rules block access across users
