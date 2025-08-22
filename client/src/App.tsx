@@ -4,21 +4,18 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "./components/ui/toaster";
 import { TooltipProvider } from "./components/ui/tooltip";
 import AuthGuard from "./components/AuthGuard";
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
 import PostList from "./pages/PostList";
 import Editor from "./pages/Editor";
 import NotFound from "./pages/not-found";
 
-function ProtectedRoutes() {
+function Router() {
   return (
-    <AuthGuard>
-      <Switch>
-        <Route path="/post/:id" component={Editor} />
-        <Route path="/" component={PostList} />
-        <Route component={NotFound} />
-      </Switch>
-    </AuthGuard>
+    <Switch>
+      <Route path="/app/post/:id" component={Editor} />
+      <Route path="/app" component={PostList} />
+      <Route path="/" component={() => <PostList />} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
@@ -26,12 +23,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Switch>
-          <Route path="/" component={Landing} />
-          <Route path="/login" component={Login} />
-          <Route path="/app/*" nest component={ProtectedRoutes} />
-          <Route component={NotFound} />
-        </Switch>
+        <AuthGuard>
+          <Router />
+        </AuthGuard>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
