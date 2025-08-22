@@ -56,8 +56,8 @@ export const getPost = async (userId: string, postId: string): Promise<Post | nu
     return {
       id: docSnap.id,
       ...data,
-      createdAt: data.createdAt?.toDate(),
-      updatedAt: data.updatedAt?.toDate(),
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
       scheduledAt: data.scheduledAt?.toDate() || null,
     } as Post;
   }
@@ -75,8 +75,8 @@ export const getPosts = async (userId: string): Promise<Post[]> => {
     return {
       id: doc.id,
       ...data,
-      createdAt: data.createdAt?.toDate(),
-      updatedAt: data.updatedAt?.toDate(),
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
       scheduledAt: data.scheduledAt?.toDate() || null,
     } as Post;
   });
@@ -96,8 +96,8 @@ export const getPostsByStatus = async (userId: string, status: PostStatus): Prom
     return {
       id: doc.id,
       ...data,
-      createdAt: data.createdAt?.toDate(),
-      updatedAt: data.updatedAt?.toDate(),
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
       scheduledAt: data.scheduledAt?.toDate() || null,
     } as Post;
   });
@@ -116,8 +116,8 @@ export const subscribeToUserPosts = (
       return {
         id: doc.id,
         ...data,
-        createdAt: data.createdAt?.toDate(),
-        updatedAt: data.updatedAt?.toDate(),
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
         scheduledAt: data.scheduledAt?.toDate() || null,
       } as Post;
     });
