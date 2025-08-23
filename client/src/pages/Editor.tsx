@@ -20,7 +20,7 @@ import { renderMarkdown, markdownToLinkedInText } from "../utils/markdown";
 import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
 import { useDebounce } from "@/hooks/use-debounce";
-import { getRating, RatingResponse } from "../lib/rating";
+import { getRating, RatingResponse, RatingData } from "../lib/rating";
 
 export default function Editor() {
   const params = useParams();
@@ -41,7 +41,7 @@ export default function Editor() {
   const [error, setError] = useState<string | null>(null);
   const [previewExpanded, setPreviewExpanded] = useState(false);
   const [showHashtagManager, setShowHashtagManager] = useState(false);
-  const [rating, setRating] = useState<RatingResponse | null>(null);
+  const [rating, setRating] = useState<RatingData | null>(null);
   const [loadingRating, setLoadingRating] = useState(false);
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
@@ -286,11 +286,19 @@ export default function Editor() {
       }
       console.log('=== END RATING RESPONSE ===');
       
-      setRating(ratingResult);
-      toast({
-        title: "Rating received",
-        description: `Your post received a rating of ${ratingResult?.rating || 'N/A'}/10`,
-      });
+      if (ratingResult.success && ratingResult.data) {
+        setRating(ratingResult.data);
+        toast({
+          title: "Rating received",
+          description: `Your post received a rating of ${ratingResult.data.rating}/10`,
+        });
+      } else {
+        toast({
+          title: "Rating failed",
+          description: ratingResult.error || "Failed to get rating for your post.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error('Rating error:', error);
       toast({

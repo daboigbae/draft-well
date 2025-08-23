@@ -1,9 +1,16 @@
 import { httpsCallable } from "firebase/functions";
 import { functions } from "../firebase";
 
-export interface RatingResponse {
+export interface RatingData {
   rating: number;
   suggestions: string[];
+}
+
+export interface RatingResponse {
+  success: boolean;
+  data?: RatingData;
+  error?: string;
+  message?: string;
 }
 
 export interface RatingRequest {
