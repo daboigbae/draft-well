@@ -33,10 +33,16 @@ export async function createCheckoutSession(planType: PlanType, userId: string) 
     throw new Error('Stripe failed to load');
   }
 
-  const { error } = await stripe.redirectToCheckout({ sessionId });
-  
-  if (error) {
-    throw new Error(error.message);
+  try {
+    const result = await stripe.redirectToCheckout({ sessionId });
+    
+    if (result.error) {
+      throw new Error(result.error.message || 'Failed to redirect to checkout');
+    }
+  } catch (error: any) {
+    // Fallback: direct redirect to Stripe checkout URL
+    const checkoutUrl = `https://checkout.stripe.com/c/pay/${sessionId}`;
+    window.location.href = checkoutUrl;
   }
 }
 
