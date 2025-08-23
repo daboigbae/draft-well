@@ -35,13 +35,69 @@ export default function ReleaseNotes() {
               </p>
             </div>
 
+            {/* Version 2.0.0 */}
+            <div className="mb-8" data-testid="version-2-0-0">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-2xl font-semibold text-slate-800">Version 2.0.0</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  Latest
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🤖 AI Rating System</h3>
+                  <p className="text-slate-600 mb-4">
+                    Introducing our most significant update yet: AI-powered post rating and suggestions. Get instant feedback on your LinkedIn content quality.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Smart AI Ratings:</strong> Get posts rated from 1-10 based on content quality, engagement potential, and LinkedIn best practices</li>
+                    <li><strong>Personalized Suggestions:</strong> Receive specific, actionable recommendations to improve your posts</li>
+                    <li><strong>Cloud Function Integration:</strong> Powered by Firebase cloud functions for fast, reliable AI analysis</li>
+                    <li><strong>Character Validation:</strong> Posts must be 100-1000 characters for rating (with helpful validation messages)</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">📊 Enhanced Post Management</h3>
+                  <p className="text-slate-600 mb-4">
+                    New visual indicators and improved organization for AI-rated content.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>AI Rated Badges:</strong> Visual indicators showing which posts have been analyzed by AI</li>
+                    <li><strong>Rating Display:</strong> See your post scores directly in the post list with star ratings</li>
+                    <li><strong>Live Preview Badge:</strong> AI rated status shown prominently in the editor preview</li>
+                    <li><strong>Automatic Status Tracking:</strong> aiRated flag automatically managed based on rating data</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🎯 User Experience Improvements</h3>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Title Character Limit:</strong> Titles now support up to 120 characters input, displayed with 42-character truncation and ellipsis</li>
+                    <li><strong>Improved Rating Flow:</strong> Rating → Preview → Suggestions layout for optimal user experience</li>
+                    <li><strong>Backend-Driven Logic:</strong> Rating status based on actual data rather than manual flags</li>
+                    <li><strong>Professional UI:</strong> Purple accent badges and clean rating displays</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🔧 Technical Architecture</h3>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li>New rating.ts library for AI integration</li>
+                    <li>Updated Post schema with rating and suggestions fields</li>
+                    <li>Firestore security rules updated for new data structure</li>
+                    <li>Comprehensive TypeScript typing for rating system</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Version 1.1.2 */}
             <div className="mb-8" data-testid="version-1-1-2">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl font-semibold text-slate-800">Version 1.1.2</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  Latest
-                </span>
               </div>
               <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
               

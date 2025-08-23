@@ -1,12 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash } from "lucide-react";
+import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { Checkbox } from "../components/ui/checkbox";
 import { Label } from "../components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../components/ui/alert-dialog";
 import EditorToolbar from "../components/EditorToolbar";
 import TagInput from "../components/TagInput";
 import CharacterCounter from "../components/CharacterCounter";
@@ -20,6 +30,7 @@ import { renderMarkdown, markdownToLinkedInText } from "../utils/markdown";
 import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
 import { useDebounce } from "@/hooks/use-debounce";
+import { getRating, RatingResponse, RatingData } from "../lib/rating";
 
 export default function Editor() {
   const params = useParams();
@@ -32,7 +43,6 @@ export default function Editor() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [aiVetted, setAiVetted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -40,12 +50,17 @@ export default function Editor() {
   const [error, setError] = useState<string | null>(null);
   const [previewExpanded, setPreviewExpanded] = useState(false);
   const [showHashtagManager, setShowHashtagManager] = useState(false);
+  const [rating, setRating] = useState<RatingData | null>(null);
+  const [loadingRating, setLoadingRating] = useState(false);
+  const [showRatingConfirmDialog, setShowRatingConfirmDialog] = useState(false);
+  
+  // Computed based on whether rating exists - backend handles aiRated flag
+  const aiRated = !!rating;
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const debouncedTitle = useDebounce(title, 800);
   const debouncedBody = useDebounce(body, 800);
   const debouncedTags = useDebounce(tags, 800);
-  const debouncedAiVetted = useDebounce(aiVetted, 800);
 
   // Reset preview to collapsed when body changes
   useEffect(() => {
@@ -82,7 +97,15 @@ export default function Editor() {
           setTitle(postData.title);
           setBody(postData.body);
           setTags(postData.tags);
-          setAiVetted(postData.aiVetted);
+          // aiRated is computed from rating existence
+          
+          // Load existing rating and suggestions if available
+          if (postData.rating && postData.suggestions) {
+            setRating({
+              rating: postData.rating,
+              suggestions: postData.suggestions
+            });
+          }
         } else {
           setError("Post not found");
         }
@@ -103,13 +126,12 @@ export default function Editor() {
     const hasChanges = 
       debouncedTitle !== post.title ||
       debouncedBody !== post.body ||
-      JSON.stringify(debouncedTags) !== JSON.stringify(post.tags) ||
-      debouncedAiVetted !== post.aiVetted;
+      JSON.stringify(debouncedTags) !== JSON.stringify(post.tags);
 
     if (hasChanges) {
       savePost();
     }
-  }, [debouncedTitle, debouncedBody, debouncedTags, debouncedAiVetted]);
+  }, [debouncedTitle, debouncedBody, debouncedTags]);
 
   const savePost = async () => {
     if (!user || !post || saving) return;
@@ -120,7 +142,6 @@ export default function Editor() {
         title,
         body,
         tags,
-        aiVetted,
       });
       setLastSaved(new Date());
       
@@ -130,7 +151,6 @@ export default function Editor() {
         title,
         body,
         tags,
-        aiVetted,
         updatedAt: new Date(),
       } : null);
     } catch (error) {
@@ -242,6 +262,77 @@ export default function Editor() {
     }
   };
 
+  const handleGetRating = async () => {
+    if (!body.trim() || loadingRating) return;
+
+    // Check if post already has a rating and ask for confirmation
+    if (rating) {
+      setShowRatingConfirmDialog(true);
+      return;
+    }
+
+    await performRating();
+  };
+
+  const performRating = async () => {
+    const trimmedBody = body.trim();
+    const charCount = trimmedBody.length;
+
+    // Check for posts that are too short
+    if (charCount < 100) {
+      toast({
+        title: "Post too short",
+        description: "Posts under 100 characters are too short for LinkedIn best practices. Consider adding more value and context.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check for posts that are too long
+    if (charCount > 1000) {
+      toast({
+        title: "Post too long",
+        description: "Posts over 1000 characters may lose reader engagement. Consider breaking into shorter, more digestible content.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoadingRating(true);
+    try {
+      const ratingResult = await getRating(body, postId!, user!.uid);
+      
+      if (ratingResult.success && ratingResult.data) {
+        setRating(ratingResult.data);
+        // aiRated is automatically computed from rating existence
+        toast({
+          title: "Rating received",
+          description: `Your post received a rating of ${ratingResult.data.rating}/10`,
+        });
+      } else {
+        toast({
+          title: "Rating failed",
+          description: ratingResult.error || "Failed to get rating for your post.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Rating error:', error);
+      toast({
+        title: "Rating failed",
+        description: "Failed to get rating for your post.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingRating(false);
+    }
+  };
+
+  const handleConfirmRating = () => {
+    setShowRatingConfirmDialog(false);
+    performRating();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -316,6 +407,25 @@ export default function Editor() {
             
             <Button
               variant="outline"
+              onClick={handleGetRating}
+              disabled={!body.trim() || loadingRating}
+              data-testid="button-get-rating"
+            >
+              {loadingRating ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                  Getting Rating...
+                </>
+              ) : (
+                <>
+                  <Star className="h-4 w-4 mr-2" />
+                  Get Rating
+                </>
+              )}
+            </Button>
+            
+            <Button
+              variant="outline"
               onClick={() => setShowPublishModal(true)}
               data-testid="button-open-publish-modal"
             >
@@ -364,19 +474,8 @@ export default function Editor() {
           placeholder="Enter tags separated by commas"
         />
         
-        {/* AI Vetting Checkbox and Hashtag Manager */}
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="ai-vetted"
-              checked={aiVetted}
-              onCheckedChange={(checked) => setAiVetted(checked === true)}
-              data-testid="checkbox-ai-vetted"
-            />
-            <Label htmlFor="ai-vetted" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Vetted by AI
-            </Label>
-          </div>
+        {/* Hashtag Manager */}
+        <div className="flex items-center justify-end mt-4">
           <Button
             type="button"
             variant="outline"
@@ -431,8 +530,31 @@ export default function Editor() {
         {/* Preview Panel */}
         <div className="w-1/2 bg-gray-50 flex flex-col">
           <div className="bg-white border-b border-gray-200 p-4">
-            <h3 className="font-semibold text-slate-700">Live Preview</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-slate-700">Live Preview</h3>
+              {aiRated && (
+                <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full flex items-center gap-1" data-testid="ai-rated-badge">
+                  <Bot className="h-3 w-3" />
+                  AI Rated
+                </span>
+              )}
+            </div>
           </div>
+          
+          {/* Rating Display */}
+          {rating && (
+            <div className="bg-white border-b border-gray-200 p-4" data-testid="rating-display">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium text-slate-700">Post Rating</h4>
+                <div className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                  <span className="text-lg font-bold text-slate-800" data-testid="rating-score">
+                    {rating.rating}/10
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="flex-1 p-6 overflow-y-auto">
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm" data-testid="preview-panel">
@@ -493,6 +615,23 @@ export default function Editor() {
                 </div>
               </div>
             </div>
+            
+            {/* Rating Suggestions */}
+            {rating && rating.suggestions && rating.suggestions.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm mt-6" data-testid="rating-suggestions-panel">
+                <div className="p-4">
+                  <h4 className="font-medium text-slate-700 mb-4">Suggestions for Improvement</h4>
+                  <ul className="space-y-3" data-testid="rating-suggestions">
+                    {rating.suggestions.map((suggestion, index) => (
+                      <li key={index} className="text-sm text-slate-600 flex items-start gap-3">
+                        <span className="text-slate-400 mt-1 font-bold">{index + 1}.</span>
+                        <span className="leading-relaxed">{suggestion}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -503,6 +642,25 @@ export default function Editor() {
         onClose={() => setShowPublishModal(false)}
         onPublish={handlePublishFromModal}
       />
+
+      {/* Rating Confirmation Dialog */}
+      <AlertDialog open={showRatingConfirmDialog} onOpenChange={setShowRatingConfirmDialog}>
+        <AlertDialogContent data-testid="rating-confirm-dialog">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Re-rate this post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This post already has a rating of <strong>{rating?.rating}/10</strong>. 
+              Are you sure you want to rate it again? This will replace the existing rating and suggestions.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-rating">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRating} data-testid="button-confirm-rating">
+              Yes, rate again
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

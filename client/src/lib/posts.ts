@@ -59,7 +59,7 @@ export const getPost = async (userId: string, postId: string): Promise<Post | nu
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       scheduledAt: data.scheduledAt?.toDate() || null,
-      aiVetted: data.aiVetted || false,
+      aiRated: data.aiRated || false,
     } as Post;
   }
   
@@ -79,7 +79,7 @@ export const getPosts = async (userId: string): Promise<Post[]> => {
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       scheduledAt: data.scheduledAt?.toDate() || null,
-      aiVetted: data.aiVetted || false,
+      aiRated: data.aiRated || false,
     } as Post;
   });
 };
@@ -101,7 +101,7 @@ export const getPostsByStatus = async (userId: string, status: PostStatus): Prom
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       scheduledAt: data.scheduledAt?.toDate() || null,
-      aiVetted: data.aiVetted || false,
+      aiRated: data.aiRated || false,
     } as Post;
   });
 };
@@ -122,7 +122,7 @@ export const subscribeToUserPosts = (
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
         scheduledAt: data.scheduledAt?.toDate() || null,
-        aiVetted: data.aiVetted || false,
+        aiRated: data.aiRated || false,
       } as Post;
     });
     callback(posts);
@@ -141,7 +141,7 @@ export const duplicatePost = async (userId: string, postId: string): Promise<str
     tags: [...originalPost.tags],
     status: "draft",
     scheduledAt: null,
-    aiVetted: false,
+    aiRated: false,
   };
 
   return createPost(userId, duplicateData);

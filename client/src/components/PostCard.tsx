@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
-import { Copy, CopyCheck, Download, Trash2, Edit, Clock, Bot } from "lucide-react";
+import { Copy, CopyCheck, Download, Trash2, Edit, Clock, Bot, Star } from "lucide-react";
 import { Post } from "../types/post";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -77,16 +77,16 @@ export default function PostCard({ post, onEdit, onDuplicate, onDelete }: PostCa
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-slate-800 line-clamp-1" data-testid={`text-title-${post.id}`}>
-                {post.title}
+              <h3 className="text-lg font-semibold text-slate-800" data-testid={`text-title-${post.id}`}>
+                {post.title.length > 42 ? post.title.substring(0, 42) + "..." : post.title}
               </h3>
               <Badge className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(post.status)}`} data-testid={`badge-status-${post.id}`}>
                 {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
               </Badge>
-              {post.aiVetted && (
-                <Badge variant="secondary" className="px-2 py-1 text-xs bg-blue-100 text-blue-700" data-testid={`badge-ai-vetted-${post.id}`}>
+              {post.rating && (
+                <Badge variant="secondary" className="px-2 py-1 text-xs bg-blue-100 text-blue-700" data-testid={`badge-ai-rated-${post.id}`}>
                   <Bot className="w-3 h-3 mr-1" />
-                  AI Vetted
+                  AI Rated
                 </Badge>
               )}
             </div>
@@ -110,6 +110,15 @@ export default function PostCard({ post, onEdit, onDuplicate, onDelete }: PostCa
                 <span className="text-xs">•</span>
                 <span data-testid={`text-tags-${post.id}`}>
                   {post.tags.join(", ")}
+                </span>
+              </div>
+            )}
+            {post.rating && (
+              <div className="flex items-center gap-1">
+                <span className="text-xs">•</span>
+                <Star className="w-3 h-3 text-yellow-500 fill-current" />
+                <span data-testid={`text-rating-${post.id}`}>
+                  {post.rating}/10
                 </span>
               </div>
             )}

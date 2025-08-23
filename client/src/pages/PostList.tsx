@@ -91,7 +91,7 @@ export default function PostList() {
         tags: [],
         status: "draft" as PostStatus,
         scheduledAt: null,
-        aiVetted: false,
+        aiRated: false,
       });
       setLocation(`/app/post/${newPostId}`);
     } catch (error) {

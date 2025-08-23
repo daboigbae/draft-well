@@ -7,7 +7,9 @@ export interface Post {
   tags: string[];
   status: PostStatus;
   scheduledAt: Date | null;
-  aiVetted: boolean;
+  aiRated: boolean;
+  rating?: number;
+  suggestions?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,7 +20,7 @@ export interface CreatePostData {
   tags: string[];
   status: PostStatus;
   scheduledAt: any; // Firestore Timestamp or null
-  aiVetted: boolean;
+  aiRated: boolean;
 }
 
 export interface UpdatePostData {
@@ -27,5 +29,5 @@ export interface UpdatePostData {
   tags?: string[];
   status?: PostStatus;
   scheduledAt?: any; // Firestore Timestamp or null
-  aiVetted?: boolean;
+  aiRated?: boolean;
 }
