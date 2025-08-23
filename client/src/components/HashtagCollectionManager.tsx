@@ -70,7 +70,6 @@ export default function HashtagCollectionManager({
         .filter(tag => tag)
         .map(tag => tag.startsWith('#') ? tag : `#${tag}`);
 
-      console.log("Creating hashtag collection:", { name: formData.name.trim(), hashtags });
       await createHashtagCollection(user.uid, {
         name: formData.name.trim(),
         hashtags,
@@ -82,11 +81,10 @@ export default function HashtagCollectionManager({
         title: "Collection created",
         description: "Your hashtag collection has been created successfully.",
       });
-    } catch (error: any) {
-      console.error("Error creating hashtag collection:", error);
+    } catch (error) {
       toast({
         title: "Failed to create collection",
-        description: error?.message || "There was an error creating your hashtag collection.",
+        description: "There was an error creating your hashtag collection.",
         variant: "destructive",
       });
     } finally {
