@@ -35,13 +35,54 @@ export default function ReleaseNotes() {
               </p>
             </div>
 
+            {/* Version 1.1.1 */}
+            <div className="mb-8" data-testid="version-1-1-1">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-2xl font-semibold text-slate-800">Version 1.1.1</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  Latest
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🔒 Closed Beta Access</h3>
+                  <p className="text-slate-600 mb-4">
+                    Linkedraft is now in closed beta. Authentication has been streamlined for invite-only access.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🔧 Changes</h3>
+                  <ul className="space-y-3 text-slate-600">
+                    <li className="flex items-start gap-3">
+                      <span className="text-orange-600 mt-0.5">•</span>
+                      <div>
+                        <strong>Removed Google Sign-in:</strong> Google OAuth authentication has been disabled for the closed beta period
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-orange-600 mt-0.5">•</span>
+                      <div>
+                        <strong>Removed Public Sign-up:</strong> New user registration is now invite-only through admin access
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-orange-600 mt-0.5">•</span>
+                      <div>
+                        <strong>Simplified Login:</strong> Login interface now only shows email/password fields for existing users
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Version 1.1.0 */}
             <div className="mb-8" data-testid="version-1-1-0">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl font-semibold text-slate-800">Version 1.1.0</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  Latest
-                </span>
               </div>
               <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
               
