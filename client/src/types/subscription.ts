@@ -20,6 +20,7 @@ export interface UserSubscription {
   currentPeriodStart?: Date;
   currentPeriodEnd?: Date;
   status: 'active' | 'canceled' | 'past_due' | 'incomplete';
+  reportTokens?: number;
   createdAt: Date;
   updatedAt: Date;
 }
