@@ -43,18 +43,14 @@ export async function createUserSubscription(
 
 export async function getUserSubscription(userId: string): Promise<UserSubscription | null> {
   try {
-    console.log('Getting subscription for user:', userId);
     const subscriptionDoc = await getDoc(doc(db, 'subscriptions', userId));
-    console.log('Subscription doc exists:', subscriptionDoc.exists());
     
     if (!subscriptionDoc.exists()) {
-      console.log('Creating default free subscription for new user');
       // Create default free subscription for new users
       return await createUserSubscription(userId);
     }
 
     const data = subscriptionDoc.data();
-    console.log('Raw subscription data:', data);
     
     const subscription = {
       ...data,
@@ -64,7 +60,6 @@ export async function getUserSubscription(userId: string): Promise<UserSubscript
       currentPeriodEnd: data.currentPeriodEnd?.toDate ? data.currentPeriodEnd.toDate() : (data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : undefined),
     } as UserSubscription;
     
-    console.log('Processed subscription:', subscription);
     return subscription;
   } catch (error) {
     console.error('Error in getUserSubscription:', error);

@@ -45,13 +45,8 @@ export default function Settings() {
     if (!user?.uid) return;
 
     try {
-      console.log('Loading subscription data for user:', user.uid);
-      
       const userSubscription = await getUserSubscription(user.uid);
-      console.log('Loaded subscription:', userSubscription);
-      
       const userUsage = await getCurrentUsage(user.uid);
-      console.log('Loaded usage:', userUsage);
       
       setSubscription(userSubscription);
       setUsage(userUsage);

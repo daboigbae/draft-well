@@ -30,7 +30,6 @@ export default function UsageIndicator() {
   useEffect(() => {
     const handleSubscriptionUpdate = () => {
       if (user?.uid) {
-        console.log('Subscription updated, refreshing usage data...');
         loadUsage();
       }
     };

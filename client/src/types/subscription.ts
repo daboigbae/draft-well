@@ -52,7 +52,7 @@ export const PLANS: Plan[] = [
     stripePriceId: import.meta.env.VITE_STRIPE_STARTER_PRICE_ID,
     features: {
       aiRatingsPerMonth: 20,
-      postReminders: true,
+      postReminders: false,
       advancedAiFeedback: false,
       csvExport: false,
     },
