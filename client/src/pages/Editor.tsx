@@ -383,13 +383,18 @@ export default function Editor() {
             <Button
               variant="outline"
               onClick={handleGetRating}
-              disabled={!body.trim() || loadingRating}
+              disabled={!body.trim() || loadingRating || !!rating}
               data-testid="button-get-rating"
             >
               {loadingRating ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
                   Getting Rating...
+                </>
+              ) : rating ? (
+                <>
+                  <Star className="h-4 w-4 mr-2" />
+                  Already Rated
                 </>
               ) : (
                 <>
