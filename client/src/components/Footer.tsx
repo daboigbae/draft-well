@@ -25,7 +25,7 @@ export default function Footer() {
 
           {/* Middle - Copyright */}
           <div className="text-sm text-slate-500">
-            © {currentYear} Linkedraft. All rights reserved.
+            © {currentYear} Draftwell. All rights reserved.
           </div>
 
           {/* Right - Replit referral */}

@@ -1,8 +1,8 @@
-# Linkedraft - LinkedIn Post Manager
+# Draftwell - LinkedIn Post Manager
 
 ## Overview
 
-Linkedraft is a full-stack LinkedIn post management application built with React, TypeScript, and Firebase. The application allows users to create, edit, organize, and schedule LinkedIn posts with features like markdown editing, character counting, and real-time synchronization. The app provides a complete content creation workflow from draft to publication with advanced filtering and search capabilities.
+Draftwell is a full-stack LinkedIn post management application built with React, TypeScript, and Firebase. The application allows users to create, edit, organize, and schedule LinkedIn posts with features like markdown editing, character counting, and real-time synchronization. The app provides a complete content creation workflow from draft to publication with advanced filtering and search capabilities.
 
 ## User Preferences
 

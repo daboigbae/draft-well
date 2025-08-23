@@ -31,7 +31,7 @@ export default function ReleaseNotes() {
                 Release Notes
               </h1>
               <p className="text-slate-600">
-                Stay up to date with the latest features and improvements in Linkedraft.
+                Stay up to date with the latest features and improvements in Draftwell.
               </p>
             </div>
 
@@ -49,7 +49,7 @@ export default function ReleaseNotes() {
                 <div>
                   <h3 className="text-lg font-medium text-slate-800 mb-3">🔒 Closed Beta Access</h3>
                   <p className="text-slate-600 mb-4">
-                    Linkedraft is now in closed beta. Authentication has been streamlined for invite-only access.
+                    Draftwell is now in closed beta. Authentication has been streamlined for invite-only access.
                   </p>
                 </div>
 
@@ -155,7 +155,7 @@ export default function ReleaseNotes() {
                 <div>
                   <h3 className="text-lg font-medium text-slate-800 mb-3">🎉 Initial Release</h3>
                   <p className="text-slate-600 mb-4">
-                    Welcome to Linkedraft! The complete LinkedIn post management application built for content creators and professionals.
+                    Welcome to Draftwell! The complete LinkedIn post management application built for content creators and professionals.
                   </p>
                 </div>
 
@@ -246,7 +246,7 @@ export default function ReleaseNotes() {
             <div className="border-t border-gray-200 pt-8">
               <p className="text-slate-500 text-sm">
                 Have feedback or feature requests? We'd love to hear from you! 
-                Your input helps make Linkedraft better for everyone.
+                Your input helps make Draftwell better for everyone.
               </p>
             </div>
           </div>

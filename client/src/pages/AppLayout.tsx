@@ -103,7 +103,7 @@ export default function AppLayout({
                 <Linkedin className="text-white h-4 w-4" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-800">Linkedraft</h1>
+                <h1 className="text-xl font-bold text-slate-800">Draftwell</h1>
                 <button
                   onClick={() => setLocation('/app/release-notes')}
                   className="text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer"

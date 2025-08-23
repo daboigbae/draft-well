@@ -40,13 +40,13 @@ export default function Login() {
         await signUpWithEmail(data.email, data.password);
         toast({
           title: "Account created",
-          description: "Welcome to Linkedraft! Your account has been created successfully.",
+          description: "Welcome to Draftwell! Your account has been created successfully.",
         });
       } else {
         await signInWithEmail(data.email, data.password);
         toast({
           title: "Signed in",
-          description: "Welcome back to Linkedraft!",
+          description: "Welcome back to Draftwell!",
         });
       }
     } catch (error: any) {
@@ -71,7 +71,7 @@ export default function Login() {
             <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
               <Linkedin className="text-white h-6 w-6" />
             </div>
-            <CardTitle className="text-2xl font-bold text-slate-800">Linkedraft</CardTitle>
+            <CardTitle className="text-2xl font-bold text-slate-800">Draftwell</CardTitle>
             <CardDescription>
               {isSignUp ? "Create your account for closed beta access" : "Closed Beta - Sign in to access"}
             </CardDescription>
@@ -154,7 +154,7 @@ export default function Login() {
                 The Complete LinkedIn Post Management Platform
               </h2>
               <p className="text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                Linkedraft helps content creators and professionals draft, organize, and perfect their LinkedIn posts 
+                Draftwell helps content creators and professionals draft, organize, and perfect their LinkedIn posts 
                 with powerful features designed for social media excellence.
               </p>
             </div>
