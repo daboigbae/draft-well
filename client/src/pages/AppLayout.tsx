@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Linkedin, Plus, Search, User, LogOut, Hash } from "lucide-react";
+import { Linkedin, Plus, Search, User, LogOut, Hash, Settings } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
@@ -226,6 +226,15 @@ export default function AppLayout({
             >
               <Hash className="mr-3 h-4 w-4" />
               Hashtag Collections
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setLocation('/app/settings')}
+              data-testid="button-settings"
+            >
+              <User className="mr-3 h-4 w-4" />
+              Settings
             </Button>
           </div>
         </div>
