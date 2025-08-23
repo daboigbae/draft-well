@@ -248,6 +248,29 @@ export default function Editor() {
   const handleGetRating = async () => {
     if (!body.trim() || loadingRating) return;
 
+    const trimmedBody = body.trim();
+    const charCount = trimmedBody.length;
+
+    // Check for posts that are too short
+    if (charCount < 100) {
+      toast({
+        title: "Post too short",
+        description: "Posts under 100 characters are too short for LinkedIn best practices. Consider adding more value and context.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check for posts that are too long
+    if (charCount > 1000) {
+      toast({
+        title: "Post too long",
+        description: "Posts over 1000 characters may lose reader engagement. Consider breaking into shorter, more digestible content.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoadingRating(true);
     try {
       const ratingResult = await getRating(body);
