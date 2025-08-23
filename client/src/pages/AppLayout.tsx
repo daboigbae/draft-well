@@ -10,6 +10,7 @@ import { useToast } from "../hooks/use-toast";
 import { logout } from "../lib/auth";
 import { createPost } from "../lib/posts";
 import { PostStatus } from "../types/post";
+import Footer from "../components/Footer";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -232,7 +233,10 @@ export default function AppLayout({
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col" data-testid="main-content">
-        {children}
+        <div className="flex-1">
+          {children}
+        </div>
+        <Footer />
       </div>
     </div>
   );

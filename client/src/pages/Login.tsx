@@ -10,6 +10,7 @@ import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { useToast } from "../hooks/use-toast";
 import { signInWithEmail, getAuthErrorMessage } from "../lib/auth";
+import Footer from "../components/Footer";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -52,8 +53,9 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6 lg:p-8">
-      <div className="w-full max-w-4xl space-y-16 lg:space-y-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
+        <div className="w-full max-w-4xl space-y-16 lg:space-y-20">
         {/* Login Card */}
         <Card className="w-full max-w-md mx-auto" data-testid="login-card">
           <CardHeader className="text-center">
@@ -191,7 +193,9 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }
