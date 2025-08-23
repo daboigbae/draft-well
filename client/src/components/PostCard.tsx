@@ -6,7 +6,7 @@ import { Badge } from "./ui/badge";
 import { useToast } from "../hooks/use-toast";
 import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
-import { markdownToPlainText } from "@/utils/markdown";
+import { markdownToLinkedInText } from "@/utils/markdown";
 
 interface PostCardProps {
   post: Post;
@@ -20,8 +20,8 @@ export default function PostCard({ post, onEdit, onDuplicate, onDelete }: PostCa
 
   const handleCopy = async () => {
     try {
-      const plainText = markdownToPlainText(post.body);
-      await copyToClipboard(plainText);
+      const linkedInText = markdownToLinkedInText(post.body);
+      await copyToClipboard(linkedInText);
       toast({
         title: "Copied to clipboard",
         description: "Post content has been copied to your clipboard.",
