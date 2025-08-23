@@ -23,12 +23,16 @@ const getHashtagCollectionDoc = (userId: string, collectionId: string) =>
   doc(db, `users/${userId}/hashtagCollections/${collectionId}`);
 
 export const createHashtagCollection = async (userId: string, data: CreateHashtagCollectionData): Promise<string> => {
+  console.log("Creating hashtag collection:", data);
+  console.log("Collection path:", `users/${userId}/hashtagCollections`);
+  
   const collectionsRef = getHashtagCollectionsCollection(userId);
   const docRef = await addDoc(collectionsRef, {
     ...data,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+  console.log("Successfully created collection with ID:", docRef.id);
   return docRef.id;
 };
 
@@ -82,10 +86,12 @@ export const subscribeToHashtagCollections = (
   userId: string, 
   callback: (collections: HashtagCollection[]) => void
 ): (() => void) => {
+  console.log("Setting up hashtag collections subscription for user:", userId);
   const collectionsRef = getHashtagCollectionsCollection(userId);
   const q = query(collectionsRef, orderBy("name"));
   
   return onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
+    console.log("Got hashtag collections snapshot:", querySnapshot.docs.length, "collections");
     const collections = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -98,6 +104,8 @@ export const subscribeToHashtagCollections = (
     callback(collections);
   }, (error) => {
     console.error("Error in hashtag collections subscription:", error);
+    console.error("Error code:", error.code);
+    console.error("Error message:", error.message);
     // Return empty array on error to prevent infinite loading
     callback([]);
   });
