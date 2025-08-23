@@ -4,6 +4,8 @@ import { Label } from "./ui/label";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { X, Plus } from "lucide-react";
+import { useAuth } from "../hooks/use-auth";
+import { subscribeToUserTags } from "../lib/posts";
 
 interface TagInputProps {
   tags: string[];
@@ -13,7 +15,41 @@ interface TagInputProps {
 
 export default function TagInput({ tags, onChange, placeholder = "Add tags (press Enter or comma to separate)" }: TagInputProps) {
   const [inputValue, setInputValue] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [allUserTags, setAllUserTags] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
+
+  // Subscribe to user's tags for auto-complete
+  useEffect(() => {
+    if (!user) return;
+
+    const unsubscribe = subscribeToUserTags(user.uid, (userTags) => {
+      setAllUserTags(userTags);
+    });
+
+    return unsubscribe;
+  }, [user]);
+
+  // Update suggestions based on input
+  useEffect(() => {
+    if (!inputValue.trim()) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const filteredSuggestions = allUserTags
+      .filter(tag => 
+        tag.toLowerCase().includes(inputValue.toLowerCase()) && 
+        !tags.includes(tag)
+      )
+      .slice(0, 5); // Limit to 5 suggestions
+
+    setSuggestions(filteredSuggestions);
+    setShowSuggestions(filteredSuggestions.length > 0);
+  }, [inputValue, allUserTags, tags]);
 
   const addTag = (tagText: string) => {
     const newTag = tagText.trim();
@@ -27,15 +63,28 @@ export default function TagInput({ tags, onChange, placeholder = "Add tags (pres
     if (e.key === 'Enter' && inputValue.trim()) {
       e.preventDefault();
       addTag(inputValue);
+      setShowSuggestions(false);
     } else if (e.key === ',' && inputValue.trim()) {
       e.preventDefault();
       addTag(inputValue);
+      setShowSuggestions(false);
     } else if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
       // Remove last tag when backspacing with empty input
       const updatedTags = [...tags];
       updatedTags.pop();
       onChange(updatedTags);
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+    } else if (e.key === 'ArrowDown' && suggestions.length > 0) {
+      e.preventDefault();
+      // Focus first suggestion (we'll implement this later if needed)
     }
+  };
+
+  const selectSuggestion = (suggestion: string) => {
+    addTag(suggestion);
+    setShowSuggestions(false);
+    inputRef.current?.focus();
   };
 
   const handleInputChange = (value: string) => {
@@ -58,20 +107,37 @@ export default function TagInput({ tags, onChange, placeholder = "Add tags (pres
   };
 
   return (
-    <div className="space-y-2" data-testid="tag-input">
+    <div className="space-y-2 relative" data-testid="tag-input">
       <Label htmlFor="tags">Tags</Label>
       <div className="flex gap-2">
-        <Input
-          ref={inputRef}
-          id="tags"
-          type="text"
-          placeholder={placeholder}
-          value={inputValue}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          data-testid="input-tags"
-          className="flex-1"
-        />
+        <div className="flex-1 relative">
+          <Input
+            ref={inputRef}
+            id="tags"
+            type="text"
+            placeholder={placeholder}
+            value={inputValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => inputValue && setShowSuggestions(suggestions.length > 0)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+            data-testid="input-tags"
+          />
+          {showSuggestions && (
+            <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md shadow-lg max-h-40 overflow-y-auto">
+              {suggestions.map((suggestion, index) => (
+                <div
+                  key={suggestion}
+                  className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer text-sm text-gray-900 dark:text-gray-100"
+                  onClick={() => selectSuggestion(suggestion)}
+                  data-testid={`suggestion-${suggestion}`}
+                >
+                  {suggestion}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         <Button
           type="button"
           variant="outline"
@@ -102,7 +168,7 @@ export default function TagInput({ tags, onChange, placeholder = "Add tags (pres
           ))}
         </div>
       )}
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-slate-500 dark:text-slate-400">
         Type tags and press Enter, comma, or click + to add. Press Backspace to remove the last tag.
       </p>
     </div>

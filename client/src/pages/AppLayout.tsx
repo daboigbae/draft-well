@@ -14,21 +14,27 @@ import { PostStatus } from "../types/post";
 interface AppLayoutProps {
   children: React.ReactNode;
   onFilterChange?: (filter: PostStatus | "all") => void;
+  onTagFilterChange?: (tag: string | null) => void;
   onSearchChange?: (query: string) => void;
   postCounts?: {
     all: number;
     draft: number;
     published: number;
   };
+  allTags?: string[];
   currentFilter?: PostStatus | "all";
+  currentTagFilter?: string | null;
 }
 
 export default function AppLayout({ 
   children, 
-  onFilterChange, 
+  onFilterChange,
+  onTagFilterChange,
   onSearchChange, 
   postCounts = { all: 0, draft: 0, published: 0 },
-  currentFilter = "all"
+  allTags = [],
+  currentFilter = "all",
+  currentTagFilter = null
 }: AppLayoutProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [, setLocation] = useLocation();
@@ -176,6 +182,39 @@ export default function AppLayout({
             ))}
           </nav>
           
+          {/* Tag Filter */}
+          {allTags.length > 0 && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <h3 className="text-sm font-medium text-slate-700 mb-3">Filter by Tag</h3>
+              <div className="space-y-1 max-h-32 overflow-y-auto">
+                <Button
+                  variant={currentTagFilter === null ? "default" : "ghost"}
+                  className="w-full justify-start text-xs"
+                  onClick={() => onTagFilterChange?.(null)}
+                  data-testid="button-tag-all"
+                >
+                  All Tags
+                </Button>
+                {allTags.slice(0, 10).map((tag) => (
+                  <Button
+                    key={tag}
+                    variant={currentTagFilter === tag ? "default" : "ghost"}
+                    className="w-full justify-start text-xs"
+                    onClick={() => onTagFilterChange?.(tag)}
+                    data-testid={`button-tag-${tag}`}
+                  >
+                    {tag}
+                  </Button>
+                ))}
+                {allTags.length > 10 && (
+                  <p className="text-xs text-slate-500 px-3 py-1">
+                    +{allTags.length - 10} more tags
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Additional Navigation */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <Button

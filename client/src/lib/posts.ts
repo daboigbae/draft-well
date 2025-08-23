@@ -161,3 +161,42 @@ export const publishPost = async (userId: string, postId: string): Promise<void>
     scheduledAt: null,
   });
 };
+
+// Get all unique tags from user's posts for auto-complete
+export const getUserTags = async (userId: string): Promise<string[]> => {
+  const postsRef = getPostsCollection(userId);
+  const querySnapshot = await getDocs(postsRef);
+  
+  const allTags = new Set<string>();
+  
+  querySnapshot.docs.forEach(doc => {
+    const data = doc.data();
+    if (data.tags && Array.isArray(data.tags)) {
+      data.tags.forEach((tag: string) => allTags.add(tag));
+    }
+  });
+  
+  return Array.from(allTags).sort();
+};
+
+// Subscribe to user tags for real-time updates
+export const subscribeToUserTags = (
+  userId: string, 
+  callback: (tags: string[]) => void
+): (() => void) => {
+  const postsRef = getPostsCollection(userId);
+  const q = query(postsRef, orderBy("updatedAt", "desc"));
+  
+  return onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
+    const allTags = new Set<string>();
+    
+    querySnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      if (data.tags && Array.isArray(data.tags)) {
+        data.tags.forEach((tag: string) => allTags.add(tag));
+      }
+    });
+    
+    callback(Array.from(allTags).sort());
+  });
+};

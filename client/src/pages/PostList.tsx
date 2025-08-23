@@ -8,12 +8,14 @@ import AppLayout from "./AppLayout";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
-import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost } from "../lib/posts";
+import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags } from "../lib/posts";
 
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [currentFilter, setCurrentFilter] = useState<PostStatus | "all">("all");
+  const [currentTagFilter, setCurrentTagFilter] = useState<string | null>(null);
+  const [allTags, setAllTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [loading, setLoading] = useState(true);
@@ -22,16 +24,23 @@ export default function PostList() {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Subscribe to user posts
+  // Subscribe to user posts and tags
   useEffect(() => {
     if (!user) return;
 
-    const unsubscribe = subscribeToUserPosts(user.uid, (newPosts) => {
+    const unsubscribePosts = subscribeToUserPosts(user.uid, (newPosts) => {
       setPosts(newPosts);
       setLoading(false);
     });
 
-    return unsubscribe;
+    const unsubscribeTags = subscribeToUserTags(user.uid, (userTags) => {
+      setAllTags(userTags);
+    });
+
+    return () => {
+      unsubscribePosts();
+      unsubscribeTags();
+    };
   }, [user]);
 
   // Filter and search posts
@@ -41,6 +50,11 @@ export default function PostList() {
     // Apply status filter
     if (currentFilter !== "all") {
       filtered = filtered.filter(post => post.status === currentFilter);
+    }
+
+    // Apply tag filter
+    if (currentTagFilter) {
+      filtered = filtered.filter(post => post.tags.includes(currentTagFilter));
     }
 
     // Apply search filter
@@ -61,7 +75,7 @@ export default function PostList() {
     });
 
     setFilteredPosts(filtered);
-  }, [posts, currentFilter, searchQuery, sortOrder]);
+  }, [posts, currentFilter, currentTagFilter, searchQuery, sortOrder]);
 
   const handleEditPost = (postId: string) => {
     setLocation(`/app/post/${postId}`);
@@ -126,9 +140,12 @@ export default function PostList() {
     return (
       <AppLayout
         onFilterChange={setCurrentFilter}
+        onTagFilterChange={setCurrentTagFilter}
         onSearchChange={setSearchQuery}
         postCounts={getPostCounts()}
+        allTags={allTags}
         currentFilter={currentFilter}
+        currentTagFilter={currentTagFilter}
       >
         <div className="flex-1 p-8">
           <Alert variant="destructive">
@@ -143,9 +160,12 @@ export default function PostList() {
   return (
     <AppLayout
       onFilterChange={setCurrentFilter}
+      onTagFilterChange={setCurrentTagFilter}
       onSearchChange={setSearchQuery}
       postCounts={getPostCounts()}
+      allTags={allTags}
       currentFilter={currentFilter}
+      currentTagFilter={currentTagFilter}
     >
       <div className="flex-1 p-8" data-testid="post-list">
         <div className="max-w-4xl mx-auto">
