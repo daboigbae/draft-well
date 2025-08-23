@@ -83,10 +83,10 @@ export default function PostCard({ post, onEdit, onDuplicate, onDelete }: PostCa
               <Badge className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(post.status)}`} data-testid={`badge-status-${post.id}`}>
                 {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
               </Badge>
-              {post.aiVetted && (
-                <Badge variant="secondary" className="px-2 py-1 text-xs bg-blue-100 text-blue-700" data-testid={`badge-ai-vetted-${post.id}`}>
+              {post.aiRated && (
+                <Badge variant="secondary" className="px-2 py-1 text-xs bg-blue-100 text-blue-700" data-testid={`badge-ai-rated-${post.id}`}>
                   <Bot className="w-3 h-3 mr-1" />
-                  AI Vetted
+                  AI Rated
                 </Badge>
               )}
             </div>

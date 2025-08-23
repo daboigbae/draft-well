@@ -33,7 +33,7 @@ export default function Editor() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [aiVetted, setAiVetted] = useState(false);
+  const [aiRated, setAiRated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -84,7 +84,7 @@ export default function Editor() {
           setTitle(postData.title);
           setBody(postData.body);
           setTags(postData.tags);
-          setAiVetted(postData.aiVetted);
+          setAiRated(postData.aiRated);
           
           // Load existing rating and suggestions if available
           if (postData.rating && postData.suggestions) {
@@ -114,12 +114,12 @@ export default function Editor() {
       debouncedTitle !== post.title ||
       debouncedBody !== post.body ||
       JSON.stringify(debouncedTags) !== JSON.stringify(post.tags) ||
-      aiVetted !== post.aiVetted;
+      aiRated !== post.aiRated;
 
     if (hasChanges) {
       savePost();
     }
-  }, [debouncedTitle, debouncedBody, debouncedTags, aiVetted]);
+  }, [debouncedTitle, debouncedBody, debouncedTags, aiRated]);
 
   const savePost = async () => {
     if (!user || !post || saving) return;
@@ -130,7 +130,7 @@ export default function Editor() {
         title,
         body,
         tags,
-        aiVetted,
+        aiRated,
       });
       setLastSaved(new Date());
       
@@ -140,7 +140,7 @@ export default function Editor() {
         title,
         body,
         tags,
-        aiVetted,
+        aiRated,
         updatedAt: new Date(),
       } : null);
     } catch (error) {
@@ -284,7 +284,7 @@ export default function Editor() {
       
       if (ratingResult.success && ratingResult.data) {
         setRating(ratingResult.data);
-        setAiVetted(true); // Automatically mark as AI vetted when rating is received
+        setAiRated(true); // Automatically mark as AI vetted when rating is received
         toast({
           title: "Rating received",
           description: `Your post received a rating of ${ratingResult.data.rating}/10`,
@@ -512,10 +512,10 @@ export default function Editor() {
           <div className="bg-white border-b border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-slate-700">Live Preview</h3>
-              {aiVetted && (
-                <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full flex items-center gap-1" data-testid="ai-vetted-badge">
+              {aiRated && (
+                <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full flex items-center gap-1" data-testid="ai-rated-badge">
                   <Bot className="h-3 w-3" />
-                  Vetted by AI
+                  AI Rated
                 </span>
               )}
             </div>

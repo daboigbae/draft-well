@@ -9,11 +9,11 @@ service cloud.firestore {
 
       match /posts/{postId} {
         allow create: if isSignedIn() && isOwner(uid) &&
-          request.resource.data.keys().hasAll(['title','body','status','createdAt','updatedAt','aiVetted']) &&
+          request.resource.data.keys().hasAll(['title','body','status','createdAt','updatedAt','aiRated']) &&
           request.resource.data.title is string &&
           request.resource.data.body is string &&
           request.resource.data.status in ['draft','published'] &&
-          request.resource.data.aiVetted is bool;
+          request.resource.data.aiRated is bool;
 
         allow read, update, delete: if isSignedIn() && isOwner(uid);
       }
