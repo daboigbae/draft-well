@@ -108,7 +108,7 @@ export default function AppLayout({
                   className="text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer"
                   data-testid="button-version"
                 >
-                  v1.0.0
+                  v1.1.0
                 </button>
               </div>
             </div>

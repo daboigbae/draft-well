@@ -35,13 +35,78 @@ export default function ReleaseNotes() {
               </p>
             </div>
 
+            {/* Version 1.1.0 */}
+            <div className="mb-8" data-testid="version-1-1-0">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-2xl font-semibold text-slate-800">Version 1.1.0</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  Latest
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🏷️ Enhanced Tag Management</h3>
+                  <p className="text-slate-600 mb-4">
+                    This update significantly improves how you work with tags, making them more powerful and easier to reuse across your posts.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">✨ New Features</h3>
+                  <ul className="space-y-3 text-slate-600">
+                    <li className="flex items-start gap-3">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <div>
+                        <strong>Smart Tag Auto-Complete:</strong> Tags now auto-complete from your previous posts as you type, making tag entry faster and more consistent
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <div>
+                        <strong>Tag-Based Filtering:</strong> New sidebar filter to view posts by specific tags, helping you organize and find content by topic
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <div>
+                        <strong>Enhanced Tag Input:</strong> Improved tag input with real-time suggestions dropdown and multiple input methods (Enter, comma, or + button)
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-green-600 mt-0.5">•</span>
+                      <div>
+                        <strong>Improved Copy Function:</strong> Copy button now copies clean, formatted text instead of raw markdown for better pasting into LinkedIn
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🔧 Technical Improvements</h3>
+                  <ul className="space-y-2 text-slate-600">
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-600 mt-0.5">•</span>
+                      Real-time tag synchronization across all posts
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-600 mt-0.5">•</span>
+                      Enhanced markdown-to-plaintext conversion for better copy functionality
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-600 mt-0.5">•</span>
+                      Improved dark mode support for new components
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Version 1.0.0 */}
             <div className="mb-8" data-testid="version-1-0-0">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl font-semibold text-slate-800">Version 1.0.0</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  Latest
-                </span>
               </div>
               <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
               
