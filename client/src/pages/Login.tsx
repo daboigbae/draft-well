@@ -52,8 +52,8 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6 lg:p-8">
+      <div className="w-full max-w-4xl space-y-16 lg:space-y-20">
         {/* Login Card */}
         <Card className="w-full max-w-md mx-auto" data-testid="login-card">
           <CardHeader className="text-center">
@@ -120,72 +120,72 @@ export default function Login() {
 
         {/* About Linkedraft */}
         <Card className="w-full max-w-3xl mx-auto bg-white/80 backdrop-blur-sm border-slate-200">
-          <CardContent className="p-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-slate-800 mb-4">
+          <CardContent className="p-8 lg:p-12">
+            <div className="text-center mb-12 lg:mb-16">
+              <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-6">
                 The Complete LinkedIn Post Management Platform
               </h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              <p className="text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
                 Linkedraft helps content creators and professionals draft, organize, and perfect their LinkedIn posts 
                 with powerful features designed for social media excellence.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="text-center space-y-3">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto">
-                  <FileText className="h-6 w-6 text-blue-600" />
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-12 lg:mb-16">
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-blue-100 rounded-xl flex items-center justify-center mx-auto">
+                  <FileText className="h-8 w-8 lg:h-10 lg:w-10 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-slate-800">Rich Editor</h3>
-                <p className="text-sm text-slate-600">
+                <h3 className="font-semibold text-slate-800 text-lg">Rich Editor</h3>
+                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
                   Markdown-powered editor with live preview and LinkedIn-style formatting
                 </p>
               </div>
 
-              <div className="text-center space-y-3">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto">
-                  <Sparkles className="h-6 w-6 text-green-600" />
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-green-100 rounded-xl flex items-center justify-center mx-auto">
+                  <Sparkles className="h-8 w-8 lg:h-10 lg:w-10 text-green-600" />
                 </div>
-                <h3 className="font-semibold text-slate-800">Smart Tags</h3>
-                <p className="text-sm text-slate-600">
+                <h3 className="font-semibold text-slate-800 text-lg">Smart Tags</h3>
+                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
                   Auto-complete tags from previous posts and organize content by topic
                 </p>
               </div>
 
-              <div className="text-center space-y-3">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto">
-                  <Users className="h-6 w-6 text-purple-600" />
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-purple-100 rounded-xl flex items-center justify-center mx-auto">
+                  <Users className="h-8 w-8 lg:h-10 lg:w-10 text-purple-600" />
                 </div>
-                <h3 className="font-semibold text-slate-800">AI Vetting</h3>
-                <p className="text-sm text-slate-600">
+                <h3 className="font-semibold text-slate-800 text-lg">AI Vetting</h3>
+                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
                   Mark and track posts reviewed or enhanced by AI tools
                 </p>
               </div>
 
-              <div className="text-center space-y-3">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto">
-                  <Shield className="h-6 w-6 text-orange-600" />
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-orange-100 rounded-xl flex items-center justify-center mx-auto">
+                  <Shield className="h-8 w-8 lg:h-10 lg:w-10 text-orange-600" />
                 </div>
-                <h3 className="font-semibold text-slate-800">Real-time Sync</h3>
-                <p className="text-sm text-slate-600">
+                <h3 className="font-semibold text-slate-800 text-lg">Real-time Sync</h3>
+                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
                   Your posts sync across all devices with automatic saving
                 </p>
               </div>
             </div>
 
-            <div className="text-center space-y-4">
-              <div className="flex items-center justify-center gap-4">
+            <div className="text-center space-y-6">
+              <div className="flex items-center justify-center gap-6">
                 <button
                   onClick={() => setLocation('/app/release-notes')}
-                  className="text-sm text-slate-500 hover:text-slate-700 hover:underline cursor-pointer font-medium"
+                  className="text-sm lg:text-base text-slate-500 hover:text-slate-700 hover:underline cursor-pointer font-medium"
                   data-testid="button-release-notes"
                 >
                   v1.1.1 Release Notes
                 </button>
                 <span className="text-slate-300">•</span>
-                <span className="text-sm text-slate-500">Closed Beta</span>
+                <span className="text-sm lg:text-base text-slate-500">Closed Beta</span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs lg:text-sm text-slate-500 leading-relaxed">
                 Built with React, TypeScript, and Firebase for professionals who take their LinkedIn presence seriously.
               </p>
             </div>
