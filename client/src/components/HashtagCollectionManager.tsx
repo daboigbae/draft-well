@@ -28,7 +28,6 @@ export default function HashtagCollectionManager({
   const { toast } = useToast();
   const [collections, setCollections] = useState<HashtagCollection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingCollection, setEditingCollection] = useState<HashtagCollection | null>(null);
   const [formData, setFormData] = useState({ name: "", hashtags: "" });
@@ -37,22 +36,10 @@ export default function HashtagCollectionManager({
   useEffect(() => {
     if (!user) return;
 
-    console.log('Setting up hashtag collections subscription for user:', user.uid);
-    
-    const unsubscribe = subscribeToHashtagCollections(
-      user.uid, 
-      (collections) => {
-        console.log('Received hashtag collections:', collections);
-        setCollections(collections);
-        setLoading(false);
-        setError(null);
-      },
-      (error) => {
-        console.error('Error in hashtag collections subscription:', error);
-        setError(error.message || 'Failed to load hashtag collections');
-        setLoading(false);
-      }
-    );
+    const unsubscribe = subscribeToHashtagCollections(user.uid, (collections) => {
+      setCollections(collections);
+      setLoading(false);
+    });
 
     return unsubscribe;
   }, [user]);
@@ -159,7 +146,7 @@ export default function HashtagCollectionManager({
     }
   };
 
-  if (loading && !error) {
+  if (loading) {
     return (
       <div className="p-4">
         <div className="animate-pulse space-y-3">
@@ -167,16 +154,6 @@ export default function HashtagCollectionManager({
           <div className="h-4 bg-slate-200 rounded w-1/2"></div>
         </div>
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>
-          {error}
-        </AlertDescription>
-      </Alert>
     );
   }
 

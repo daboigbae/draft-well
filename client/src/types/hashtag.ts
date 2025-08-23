@@ -1,6 +1,5 @@
 export interface HashtagCollection {
   id: string;
-  userId: string;
   name: string;
   hashtags: string[];
   createdAt: Date;
