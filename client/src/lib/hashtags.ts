@@ -1,104 +1,114 @@
 import {
-  collection,
   doc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  getDocs,
   getDoc,
+  updateDoc,
   onSnapshot,
-  query,
-  orderBy,
   serverTimestamp,
-  QuerySnapshot,
-  DocumentData
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { HashtagCollection, CreateHashtagCollectionData, UpdateHashtagCollectionData } from "../types/hashtag";
 
-const getHashtagCollectionsCollection = (userId: string) => 
-  collection(db, `users/${userId}/hashtagCollections`);
+const getUserDoc = (userId: string) => doc(db, `users/${userId}`);
 
-const getHashtagCollectionDoc = (userId: string, collectionId: string) => 
-  doc(db, `users/${userId}/hashtagCollections/${collectionId}`);
+// Helper function to generate a unique ID
+const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
 export const createHashtagCollection = async (userId: string, data: CreateHashtagCollectionData): Promise<string> => {
-  const collectionsRef = getHashtagCollectionsCollection(userId);
-  const docRef = await addDoc(collectionsRef, {
+  const userDocRef = getUserDoc(userId);
+  const userDoc = await getDoc(userDocRef);
+  
+  const newId = generateId();
+  const newCollection: HashtagCollection = {
+    id: newId,
     ...data,
-    createdAt: serverTimestamp(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  
+  let existingCollections: HashtagCollection[] = [];
+  if (userDoc.exists()) {
+    existingCollections = userDoc.data()?.hashtagCollections || [];
+  }
+  
+  const updatedCollections = [...existingCollections, newCollection];
+  
+  await updateDoc(userDocRef, {
+    hashtagCollections: updatedCollections,
     updatedAt: serverTimestamp(),
   });
-  return docRef.id;
+  
+  return newId;
 };
 
 export const updateHashtagCollection = async (userId: string, collectionId: string, data: UpdateHashtagCollectionData): Promise<void> => {
-  const collectionRef = getHashtagCollectionDoc(userId, collectionId);
-  await updateDoc(collectionRef, {
-    ...data,
+  const userDocRef = getUserDoc(userId);
+  const userDoc = await getDoc(userDocRef);
+  
+  if (!userDoc.exists()) return;
+  
+  const collections: HashtagCollection[] = userDoc.data()?.hashtagCollections || [];
+  const updatedCollections = collections.map(collection => 
+    collection.id === collectionId 
+      ? { ...collection, ...data, updatedAt: new Date() }
+      : collection
+  );
+  
+  await updateDoc(userDocRef, {
+    hashtagCollections: updatedCollections,
     updatedAt: serverTimestamp(),
   });
 };
 
 export const deleteHashtagCollection = async (userId: string, collectionId: string): Promise<void> => {
-  const collectionRef = getHashtagCollectionDoc(userId, collectionId);
-  await deleteDoc(collectionRef);
+  const userDocRef = getUserDoc(userId);
+  const userDoc = await getDoc(userDocRef);
+  
+  if (!userDoc.exists()) return;
+  
+  const collections: HashtagCollection[] = userDoc.data()?.hashtagCollections || [];
+  const updatedCollections = collections.filter(collection => collection.id !== collectionId);
+  
+  await updateDoc(userDocRef, {
+    hashtagCollections: updatedCollections,
+    updatedAt: serverTimestamp(),
+  });
 };
 
 export const getHashtagCollection = async (userId: string, collectionId: string): Promise<HashtagCollection | null> => {
-  const collectionRef = getHashtagCollectionDoc(userId, collectionId);
-  const docSnap = await getDoc(collectionRef);
+  const userDocRef = getUserDoc(userId);
+  const userDoc = await getDoc(userDocRef);
   
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    return {
-      id: docSnap.id,
-      ...data,
-      createdAt: data.createdAt?.toDate() || new Date(),
-      updatedAt: data.updatedAt?.toDate() || new Date(),
-    } as HashtagCollection;
-  }
+  if (!userDoc.exists()) return null;
   
-  return null;
+  const collections: HashtagCollection[] = userDoc.data()?.hashtagCollections || [];
+  return collections.find(collection => collection.id === collectionId) || null;
 };
 
 export const getHashtagCollections = async (userId: string): Promise<HashtagCollection[]> => {
-  const collectionsRef = getHashtagCollectionsCollection(userId);
-  const q = query(collectionsRef, orderBy("name"));
-  const querySnapshot = await getDocs(q);
+  const userDocRef = getUserDoc(userId);
+  const userDoc = await getDoc(userDocRef);
   
-  return querySnapshot.docs.map(doc => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      ...data,
-      createdAt: data.createdAt?.toDate() || new Date(),
-      updatedAt: data.updatedAt?.toDate() || new Date(),
-    } as HashtagCollection;
-  });
+  if (!userDoc.exists()) return [];
+  
+  const collections: HashtagCollection[] = userDoc.data()?.hashtagCollections || [];
+  return collections.sort((a, b) => a.name.localeCompare(b.name));
 };
 
 export const subscribeToHashtagCollections = (
   userId: string, 
   callback: (collections: HashtagCollection[]) => void
 ): (() => void) => {
-  const collectionsRef = getHashtagCollectionsCollection(userId);
-  const q = query(collectionsRef, orderBy("name"));
+  const userDocRef = getUserDoc(userId);
   
-  return onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
-    const collections = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate() || new Date(),
-        updatedAt: data.updatedAt?.toDate() || new Date(),
-      } as HashtagCollection;
-    });
-    callback(collections);
+  return onSnapshot(userDocRef, (doc) => {
+    if (doc.exists()) {
+      const collections: HashtagCollection[] = doc.data()?.hashtagCollections || [];
+      callback(collections.sort((a, b) => a.name.localeCompare(b.name)));
+    } else {
+      callback([]);
+    }
   }, (error) => {
     console.error("Error in hashtag collections subscription:", error);
-    // Return empty array on error to prevent infinite loading
     callback([]);
   });
 };
