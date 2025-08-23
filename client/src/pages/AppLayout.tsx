@@ -50,6 +50,7 @@ export default function AppLayout({
         tags: [],
         status: "draft",
         scheduledAt: null,
+        aiVetted: false,
       });
       setLocation(`/app/post/${postId}`);
     } catch (error) {

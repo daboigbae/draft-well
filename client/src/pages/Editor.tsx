@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Copy, Download, Share, Calendar, Save } from "lucide-react";
+import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Alert, AlertDescription } from "../components/ui/alert";
+import { Checkbox } from "../components/ui/checkbox";
+import { Label } from "../components/ui/label";
 import EditorToolbar from "../components/EditorToolbar";
 import TagInput from "../components/TagInput";
 import CharacterCounter from "../components/CharacterCounter";
@@ -29,6 +31,7 @@ export default function Editor() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [aiVetted, setAiVetted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -39,6 +42,7 @@ export default function Editor() {
   const debouncedTitle = useDebounce(title, 800);
   const debouncedBody = useDebounce(body, 800);
   const debouncedTags = useDebounce(tags, 800);
+  const debouncedAiVetted = useDebounce(aiVetted, 800);
 
   // Load post
   useEffect(() => {
@@ -52,6 +56,7 @@ export default function Editor() {
           setTitle(postData.title);
           setBody(postData.body);
           setTags(postData.tags);
+          setAiVetted(postData.aiVetted);
         } else {
           setError("Post not found");
         }
@@ -72,12 +77,13 @@ export default function Editor() {
     const hasChanges = 
       debouncedTitle !== post.title ||
       debouncedBody !== post.body ||
-      JSON.stringify(debouncedTags) !== JSON.stringify(post.tags);
+      JSON.stringify(debouncedTags) !== JSON.stringify(post.tags) ||
+      debouncedAiVetted !== post.aiVetted;
 
     if (hasChanges) {
       savePost();
     }
-  }, [debouncedTitle, debouncedBody, debouncedTags]);
+  }, [debouncedTitle, debouncedBody, debouncedTags, debouncedAiVetted]);
 
   const savePost = async () => {
     if (!user || !post || saving) return;
@@ -88,6 +94,7 @@ export default function Editor() {
         title,
         body,
         tags,
+        aiVetted,
       });
       setLastSaved(new Date());
       
@@ -97,6 +104,7 @@ export default function Editor() {
         title,
         body,
         tags,
+        aiVetted,
         updatedAt: new Date(),
       } : null);
     } catch (error) {
@@ -321,6 +329,19 @@ export default function Editor() {
           onChange={setTags}
           placeholder="Enter tags separated by commas"
         />
+        
+        {/* AI Vetting Checkbox */}
+        <div className="flex items-center space-x-2 mt-4">
+          <Checkbox
+            id="ai-vetted"
+            checked={aiVetted}
+            onCheckedChange={(checked) => setAiVetted(checked === true)}
+            data-testid="checkbox-ai-vetted"
+          />
+          <Label htmlFor="ai-vetted" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Vetted by AI
+          </Label>
+        </div>
       </div>
 
       {/* Editor Content */}

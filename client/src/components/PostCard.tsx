@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
-import { Copy, CopyCheck, Download, Trash2, Edit, Clock } from "lucide-react";
+import { Copy, CopyCheck, Download, Trash2, Edit, Clock, Bot } from "lucide-react";
 import { Post } from "../types/post";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -81,6 +81,12 @@ export default function PostCard({ post, onEdit, onDuplicate, onDelete }: PostCa
               <Badge className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(post.status)}`} data-testid={`badge-status-${post.id}`}>
                 {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
               </Badge>
+              {post.aiVetted && (
+                <Badge variant="secondary" className="px-2 py-1 text-xs bg-blue-100 text-blue-700" data-testid={`badge-ai-vetted-${post.id}`}>
+                  <Bot className="w-3 h-3 mr-1" />
+                  AI Vetted
+                </Badge>
+              )}
             </div>
             <p className="text-slate-600 text-sm line-clamp-3" data-testid={`text-body-preview-${post.id}`}>
               {post.body.substring(0, 150)}

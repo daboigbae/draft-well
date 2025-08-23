@@ -29,8 +29,9 @@ Preferred communication style: Simple, everyday language.
 - **Character Counting**: LinkedIn-specific 3000 character limit with soft warnings at 2600 characters
 - **Auto-save**: Debounced auto-save with 800ms delay and optimistic UI updates
 - **Post Actions**: Copy to clipboard, duplicate posts, and export as text files
-- **Scheduling**: Date/time picker for scheduling future posts
-- **Filtering & Search**: Real-time filtering by status (draft/scheduled/published) and text search
+- **AI Vetting Flag**: Toggle to mark posts as reviewed/improved by AI with visual indicators
+- **Status Tracking**: Simple draft/published status system for tracking post lifecycle
+- **Filtering & Search**: Real-time filtering by status (draft/published) and text search
 
 ### Backend Infrastructure
 - **Express Server**: Node.js server with Express for API routing (currently minimal, primarily using Firebase)
