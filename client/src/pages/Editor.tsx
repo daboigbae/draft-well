@@ -254,6 +254,16 @@ export default function Editor() {
   const handleGetRating = async () => {
     if (!body.trim() || loadingRating) return;
 
+    // Check if post already has a rating and ask for confirmation
+    if (rating) {
+      const confirmed = window.confirm(
+        `This post already has a rating of ${rating.rating}/10. Are you sure you want to rate it again? This will replace the existing rating and suggestions.`
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
     const trimmedBody = body.trim();
     const charCount = trimmedBody.length;
 
