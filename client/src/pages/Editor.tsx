@@ -16,7 +16,7 @@ import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post } from "../types/post";
 import { getPost, updatePost, publishPost } from "../lib/posts";
-import { renderMarkdown } from "../utils/markdown";
+import { renderMarkdown, markdownToPlainText } from "../utils/markdown";
 import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -171,7 +171,8 @@ export default function Editor() {
 
   const handleCopy = async () => {
     try {
-      await copyToClipboard(body);
+      const plainText = markdownToPlainText(body);
+      await copyToClipboard(plainText);
       toast({
         title: "Copied to clipboard",
         description: "Post content has been copied to your clipboard.",
