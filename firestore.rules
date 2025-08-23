@@ -20,7 +20,7 @@ service cloud.firestore {
     }
 
     match /hashtagCollections/{collectionId} {
-      allow read, write: if isSignedIn();
+      allow read, write: if true;
     }
   }
 }
