@@ -90,6 +90,7 @@ export default function PostList() {
         body: "",
         tags: [],
         status: "draft" as PostStatus,
+        scheduledAt: null,
         aiVetted: false,
       });
       setLocation(`/app/post/${newPostId}`);
