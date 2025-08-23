@@ -33,7 +33,6 @@ export default function Editor() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [aiRated, setAiRated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -43,6 +42,9 @@ export default function Editor() {
   const [showHashtagManager, setShowHashtagManager] = useState(false);
   const [rating, setRating] = useState<RatingData | null>(null);
   const [loadingRating, setLoadingRating] = useState(false);
+  
+  // Computed based on whether rating exists - backend handles aiRated flag
+  const aiRated = !!rating;
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const debouncedTitle = useDebounce(title, 800);
@@ -84,7 +86,7 @@ export default function Editor() {
           setTitle(postData.title);
           setBody(postData.body);
           setTags(postData.tags);
-          setAiRated(postData.aiRated);
+          // aiRated is computed from rating existence
           
           // Load existing rating and suggestions if available
           if (postData.rating && postData.suggestions) {
@@ -113,13 +115,12 @@ export default function Editor() {
     const hasChanges = 
       debouncedTitle !== post.title ||
       debouncedBody !== post.body ||
-      JSON.stringify(debouncedTags) !== JSON.stringify(post.tags) ||
-      aiRated !== post.aiRated;
+      JSON.stringify(debouncedTags) !== JSON.stringify(post.tags);
 
     if (hasChanges) {
       savePost();
     }
-  }, [debouncedTitle, debouncedBody, debouncedTags, aiRated]);
+  }, [debouncedTitle, debouncedBody, debouncedTags]);
 
   const savePost = async () => {
     if (!user || !post || saving) return;
@@ -130,7 +131,6 @@ export default function Editor() {
         title,
         body,
         tags,
-        aiRated,
       });
       setLastSaved(new Date());
       
@@ -140,7 +140,6 @@ export default function Editor() {
         title,
         body,
         tags,
-        aiRated,
         updatedAt: new Date(),
       } : null);
     } catch (error) {
@@ -284,7 +283,7 @@ export default function Editor() {
       
       if (ratingResult.success && ratingResult.data) {
         setRating(ratingResult.data);
-        setAiRated(true); // Automatically mark as AI vetted when rating is received
+        // aiRated is automatically computed from rating existence
         toast({
           title: "Rating received",
           description: `Your post received a rating of ${ratingResult.data.rating}/10`,
