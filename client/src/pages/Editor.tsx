@@ -37,12 +37,18 @@ export default function Editor() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewExpanded, setPreviewExpanded] = useState(false);
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const debouncedTitle = useDebounce(title, 800);
   const debouncedBody = useDebounce(body, 800);
   const debouncedTags = useDebounce(tags, 800);
   const debouncedAiVetted = useDebounce(aiVetted, 800);
+
+  // Reset preview to collapsed when body changes
+  useEffect(() => {
+    setPreviewExpanded(false);
+  }, [body]);
 
   // Load post
   useEffect(() => {
@@ -238,7 +244,14 @@ export default function Editor() {
     );
   }
 
-  const renderedMarkdown = renderMarkdown(body);
+  // LinkedIn-style preview logic
+  const PREVIEW_CHAR_LIMIT = 200;
+  const shouldShowMore = body.length > PREVIEW_CHAR_LIMIT;
+  const previewText = previewExpanded || !shouldShowMore 
+    ? body 
+    : body.substring(0, PREVIEW_CHAR_LIMIT);
+  
+  const renderedMarkdown = renderMarkdown(previewText);
 
   return (
     <div className="min-h-screen bg-background flex flex-col" data-testid="editor">
@@ -363,11 +376,12 @@ export default function Editor() {
             
             <div className="bg-white border-t border-gray-200 p-4">
               <CharacterCounter
-                text={body}
-                maxLength={3000}
+                text={previewExpanded || !shouldShowMore ? body : previewText}
+                maxLength={previewExpanded || !shouldShowMore ? 3000 : body.length}
                 warningThreshold={2600 / 3000}
                 showProgressBar={true}
                 showWordCount={true}
+                isPreviewMode={!previewExpanded && shouldShowMore}
               />
             </div>
           </div>
@@ -393,11 +407,27 @@ export default function Editor() {
                 </div>
                 
                 {/* Post Content Preview */}
-                <div 
-                  className="prose max-w-none prose-slate"
-                  dangerouslySetInnerHTML={{ __html: renderedMarkdown }}
-                  data-testid="markdown-preview"
-                />
+                <div className="prose max-w-none prose-slate" data-testid="markdown-preview">
+                  <div dangerouslySetInnerHTML={{ __html: renderedMarkdown }} />
+                  {shouldShowMore && !previewExpanded && (
+                    <button
+                      onClick={() => setPreviewExpanded(true)}
+                      className="text-slate-500 hover:text-slate-700 font-medium text-sm mt-1 cursor-pointer"
+                      data-testid="button-show-more"
+                    >
+                      ...more
+                    </button>
+                  )}
+                  {shouldShowMore && previewExpanded && (
+                    <button
+                      onClick={() => setPreviewExpanded(false)}
+                      className="text-slate-500 hover:text-slate-700 font-medium text-sm mt-2 cursor-pointer"
+                      data-testid="button-show-less"
+                    >
+                      Show less
+                    </button>
+                  )}
+                </div>
                 
                 {/* Mock LinkedIn Actions */}
                 <div className="border-t border-gray-100 mt-4 pt-3">
