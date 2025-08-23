@@ -105,20 +105,20 @@ export default function PostCard({ post, onEdit, onDuplicate, onDelete }: PostCa
             <span data-testid={`text-length-${post.id}`}>
               {post.body.length} characters
             </span>
+            {post.tags.length > 0 && (
+              <div className="flex items-center gap-1">
+                <span className="text-xs">•</span>
+                <span data-testid={`text-tags-${post.id}`}>
+                  {post.tags.join(", ")}
+                </span>
+              </div>
+            )}
             {post.rating && (
               <div className="flex items-center gap-1">
                 <span className="text-xs">•</span>
                 <Star className="w-3 h-3 text-yellow-500 fill-current" />
                 <span data-testid={`text-rating-${post.id}`}>
                   {post.rating}/10
-                </span>
-              </div>
-            )}
-            {post.tags.length > 0 && (
-              <div className="flex items-center gap-1">
-                <span className="text-xs">•</span>
-                <span data-testid={`text-tags-${post.id}`}>
-                  {post.tags.join(", ")}
                 </span>
               </div>
             )}
