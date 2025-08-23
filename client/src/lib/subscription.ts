@@ -38,7 +38,31 @@ export async function createUserSubscription(
     updatedAt: serverTimestamp(),
   });
 
+  // Give free users 2 initial AI rating tokens
+  if (planType === 'free') {
+    await createInitialUsageRecord(userId, planType);
+  }
+
   return subscription;
+}
+
+// Create initial usage record for free users with 2 bonus tokens
+async function createInitialUsageRecord(userId: string, planType: PlanType): Promise<void> {
+  const monthKey = getCurrentMonthKey();
+  const usageId = `${userId}_${monthKey}`;
+  
+  const initialUsage: Omit<UsageRecord, 'createdAt' | 'updatedAt'> = {
+    userId,
+    month: monthKey,
+    planType,
+    ratingsUsed: -2, // Start with -2 to give them 2 bonus tokens
+  };
+  
+  await setDoc(doc(db, 'usage', usageId), {
+    ...initialUsage,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
 }
 
 export async function getUserSubscription(userId: string): Promise<UserSubscription | null> {
