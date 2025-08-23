@@ -16,8 +16,8 @@ export async function createCheckoutSession(planType: PlanType, userId: string) 
     body: JSON.stringify({
       planType,
       userId,
-      successUrl: `https://${import.meta.env.REPL_ID || 'c5b7500e-d598-44c4-974a-d2bbc5606179'}-00-26cbhdaxtp7iu.picard.replit.dev/settings?success=true`,
-      cancelUrl: `https://${import.meta.env.REPL_ID || 'c5b7500e-d598-44c4-974a-d2bbc5606179'}-00-26cbhdaxtp7iu.picard.replit.dev/settings?canceled=true`,
+      successUrl: `https://${import.meta.env.REPL_ID || 'c5b7500e-d598-44c4-974a-d2bbc5606179'}-00-26cbhdaxtp7iu.picard.replit.dev/app/settings?success=true`,
+      cancelUrl: `https://${import.meta.env.REPL_ID || 'c5b7500e-d598-44c4-974a-d2bbc5606179'}-00-26cbhdaxtp7iu.picard.replit.dev/app/settings?canceled=true`,
     }),
   });
 

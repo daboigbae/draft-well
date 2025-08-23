@@ -2,6 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
+import { initializeApp } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -9,13 +11,22 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// Initialize Firebase Admin
+let adminApp;
+try {
+  adminApp = initializeApp();
+} catch (error) {
+  // App already initialized
+}
+const adminDb = getFirestore();
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe checkout session creation
   app.post("/api/create-checkout-session", async (req, res) => {
     try {
       const { planType, userId, successUrl, cancelUrl } = req.body;
 
-      // Price IDs mapping - these would need to be set up in Stripe Dashboard
+      // Price IDs mapping 
       const priceIdMapping: Record<string, string> = {
         starter: process.env.STRIPE_STARTER_PRICE_ID || 'price_starter_placeholder',
         pro: process.env.STRIPE_PRO_PRICE_ID || 'price_pro_placeholder'
@@ -89,7 +100,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       case 'checkout.session.completed':
         const session = event.data.object;
         console.log('Checkout session completed:', session);
+        
         // Update user subscription in Firestore
+        try {
+          const userId = session.client_reference_id;
+          const planType = session.metadata?.planType || 'starter';
+          
+          if (userId) {
+            await adminDb.collection('subscriptions').doc(userId).set({
+              customerId: session.customer,
+              planType,
+              status: 'active',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            console.log(`Updated subscription for user ${userId} to ${planType}`);
+          }
+        } catch (error) {
+          console.error('Error updating subscription:', error);
+        }
         break;
       case 'customer.subscription.updated':
         const subscription = event.data.object;
