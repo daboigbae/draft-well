@@ -505,22 +505,22 @@ export default function Editor() {
         {/* Preview Panel */}
         <div className="w-1/2 bg-gray-50 flex flex-col">
           <div className="bg-white border-b border-gray-200 p-4">
-            <h3 className="font-semibold text-slate-700">Live Preview</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-slate-700">Live Preview</h3>
+              {aiVetted && (
+                <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full flex items-center gap-1" data-testid="ai-vetted-badge">
+                  <Bot className="h-3 w-3" />
+                  Vetted by AI
+                </span>
+              )}
+            </div>
           </div>
           
           {/* Rating Display */}
           {rating && (
             <div className="bg-white border-b border-gray-200 p-4" data-testid="rating-display">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <h4 className="font-medium text-slate-700">Post Rating</h4>
-                  {aiVetted && (
-                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full flex items-center gap-1" data-testid="ai-vetted-badge">
-                      <Bot className="h-3 w-3" />
-                      Vetted by AI
-                    </span>
-                  )}
-                </div>
+                <h4 className="font-medium text-slate-700">Post Rating</h4>
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5 text-yellow-500 fill-current" />
                   <span className="text-lg font-bold text-slate-800" data-testid="rating-score">
