@@ -419,17 +419,17 @@ export default function Editor() {
         <div className="mb-4">
           <Input
             type="text"
-            placeholder="Enter post title (max 100 characters)"
+            placeholder="Enter post title (max 120 characters)"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={handleKeyboardShortcuts}
             className="text-2xl font-bold border-none p-0 focus-visible:ring-0"
-            maxLength={100}
+            maxLength={120}
             data-testid="input-title"
           />
           <div className="flex items-center justify-between mt-2">
             <span className="text-sm text-slate-500" data-testid="title-char-count">
-              {title.length}/100 characters
+              {title.length}/120 characters
             </span>
             <div className="flex items-center gap-4 text-sm text-slate-500">
               <span data-testid="word-count">

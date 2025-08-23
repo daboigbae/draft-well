@@ -77,8 +77,8 @@ export default function PostCard({ post, onEdit, onDuplicate, onDelete }: PostCa
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-slate-800 line-clamp-1" data-testid={`text-title-${post.id}`}>
-                {post.title}
+              <h3 className="text-lg font-semibold text-slate-800" data-testid={`text-title-${post.id}`}>
+                {post.title.length > 42 ? post.title.substring(0, 42) + "..." : post.title}
               </h3>
               <Badge className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(post.status)}`} data-testid={`badge-status-${post.id}`}>
                 {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
