@@ -274,17 +274,6 @@ export default function Editor() {
     setLoadingRating(true);
     try {
       const ratingResult = await getRating(body);
-      console.log('=== FULL RATING RESPONSE ===');
-      console.log('Raw response:', ratingResult);
-      console.log('Response type:', typeof ratingResult);
-      console.log('Response keys:', Object.keys(ratingResult || {}));
-      if (ratingResult) {
-        console.log('Has rating?', 'rating' in ratingResult);
-        console.log('Has suggestions?', 'suggestions' in ratingResult);
-        console.log('Rating value:', ratingResult.rating);
-        console.log('Suggestions value:', ratingResult.suggestions);
-      }
-      console.log('=== END RATING RESPONSE ===');
       
       if (ratingResult.success && ratingResult.data) {
         setRating(ratingResult.data);
@@ -525,7 +514,7 @@ export default function Editor() {
           {/* Rating Display */}
           {rating && (
             <div className="bg-white border-b border-gray-200 p-4" data-testid="rating-display">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between">
                 <h4 className="font-medium text-slate-700">Post Rating</h4>
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5 text-yellow-500 fill-current" />
@@ -534,20 +523,6 @@ export default function Editor() {
                   </span>
                 </div>
               </div>
-              
-              {rating.suggestions && rating.suggestions.length > 0 && (
-                <div>
-                  <h5 className="text-sm font-medium text-slate-600 mb-2">Suggestions:</h5>
-                  <ul className="space-y-1" data-testid="rating-suggestions">
-                    {rating.suggestions.map((suggestion, index) => (
-                      <li key={index} className="text-sm text-slate-600 flex items-start gap-2">
-                        <span className="text-slate-400 mt-1">•</span>
-                        <span>{suggestion}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
           )}
           
@@ -610,6 +585,23 @@ export default function Editor() {
                 </div>
               </div>
             </div>
+            
+            {/* Rating Suggestions */}
+            {rating && rating.suggestions && rating.suggestions.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm mt-6" data-testid="rating-suggestions-panel">
+                <div className="p-4">
+                  <h4 className="font-medium text-slate-700 mb-4">Suggestions for Improvement</h4>
+                  <ul className="space-y-3" data-testid="rating-suggestions">
+                    {rating.suggestions.map((suggestion, index) => (
+                      <li key={index} className="text-sm text-slate-600 flex items-start gap-3">
+                        <span className="text-slate-400 mt-1 font-bold">{index + 1}.</span>
+                        <span className="leading-relaxed">{suggestion}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
