@@ -18,12 +18,22 @@ export default function Settings() {
   const [usage, setUsage] = useState<UsageRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [verifyingSubscription, setVerifyingSubscription] = useState(false);
 
   useEffect(() => {
     if (user?.uid) {
       loadSubscriptionData();
+      
+      // Check if user returned from successful Stripe checkout
+      const urlParams = new URLSearchParams(window.location.search);
+      const success = urlParams.get('success');
+      const sessionId = urlParams.get('session_id');
+      
+      if (success && sessionId && !verifyingSubscription) {
+        verifySubscription(sessionId);
+      }
     }
-  }, [user?.uid]);
+  }, [user?.uid, verifyingSubscription]);
 
   const loadSubscriptionData = async () => {
     if (!user?.uid) return;
@@ -48,8 +58,61 @@ export default function Settings() {
     }
   };
 
+  const verifySubscription = async (sessionId: string) => {
+    if (!user?.uid) return;
+    
+    setVerifyingSubscription(true);
+    try {
+      const response = await fetch('/api/verify-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          userId: user.uid,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        toast({
+          title: 'Subscription Activated!',
+          description: `Your ${result.planType} plan is now active.`,
+        });
+        
+        // Reload subscription data to reflect changes
+        await loadSubscriptionData();
+        
+        // Clear URL parameters
+        window.history.replaceState({}, '', '/app/settings');
+      } else {
+        throw new Error('Failed to verify subscription');
+      }
+    } catch (error) {
+      console.error('Error verifying subscription:', error);
+      toast({
+        title: 'Verification Error',
+        description: 'There was an issue activating your subscription. Please contact support.',
+        variant: 'destructive'
+      });
+    } finally {
+      setVerifyingSubscription(false);
+    }
+  };
+
   const handleUpgrade = async (planType: 'starter' | 'pro') => {
     if (!user?.uid) return;
+
+    // Prevent duplicate subscriptions
+    if (subscription && subscription.status === 'active') {
+      toast({
+        title: 'Already Subscribed',
+        description: 'You already have an active subscription. Use the customer portal to manage it.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     setUpgrading(planType);
     try {
@@ -263,11 +326,20 @@ export default function Settings() {
           )}
 
           {/* Success/Cancel Messages */}
-          {new URLSearchParams(window.location.search).get('success') && (
+          {verifyingSubscription && (
+            <Alert className="mb-6">
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              <AlertDescription>
+                Activating your subscription...
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {new URLSearchParams(window.location.search).get('success') && !verifyingSubscription && (
             <Alert className="mb-6">
               <Check className="h-4 w-4" />
               <AlertDescription>
-                Your subscription has been activated successfully! You can now enjoy your new plan features.
+                Payment completed! Your subscription is being activated.
               </AlertDescription>
             </Alert>
           )}

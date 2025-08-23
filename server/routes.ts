@@ -45,7 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             quantity: 1,
           },
         ],
-        success_url: successUrl,
+        success_url: `${successUrl}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: cancelUrl,
         client_reference_id: userId,
         metadata: {
@@ -57,6 +57,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ sessionId: session.id });
     } catch (error: any) {
       console.error('Error creating checkout session:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Verify and update subscription after successful checkout
+  app.post("/api/verify-subscription", async (req, res) => {
+    try {
+      const { sessionId, userId } = req.body;
+      
+      if (!sessionId || !userId) {
+        return res.status(400).json({ error: 'Missing sessionId or userId' });
+      }
+      
+      // Get the checkout session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      
+      if (session.payment_status === 'paid' && session.client_reference_id === userId) {
+        // Update subscription in Firestore
+        const planType = session.metadata?.planType || 'starter';
+        
+        await adminDb.collection('subscriptions').doc(userId).set({
+          customerId: session.customer,
+          planType,
+          status: 'active',
+          stripeSessionId: sessionId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+        
+        console.log(`Verified and updated subscription for user ${userId} to ${planType}`);
+        res.json({ success: true, planType });
+      } else {
+        res.status(400).json({ error: 'Payment not completed or user mismatch' });
+      }
+    } catch (error: any) {
+      console.error('Error verifying subscription:', error);
       res.status(500).json({ error: error.message });
     }
   });
@@ -85,6 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Stripe webhook handler
   app.post("/api/stripe-webhook", async (req, res) => {
+    console.log('Webhook received:', req.body);
     let event;
 
     try {
