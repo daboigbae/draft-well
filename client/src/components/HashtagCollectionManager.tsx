@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Hash, X } from "lucide-react";
+import { Plus, Edit2, Trash2, Hash, X, Copy } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
@@ -161,6 +161,23 @@ export default function HashtagCollectionManager({
     }
   };
 
+  const handleCopyHashtags = async (hashtags: string[]) => {
+    try {
+      const hashtagText = hashtags.join(' ');
+      await navigator.clipboard.writeText(hashtagText);
+      toast({
+        title: "Hashtags copied",
+        description: `${hashtags.length} hashtags copied to clipboard.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to copy",
+        description: "Could not copy hashtags to clipboard.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-4">
@@ -303,6 +320,15 @@ export default function HashtagCollectionManager({
                           Insert
                         </Button>
                       )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleCopyHashtags(collection.hashtags)}
+                        data-testid={`button-copy-${collection.id}`}
+                      >
+                        <Copy className="h-4 w-4" />
+                        Copy
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"
