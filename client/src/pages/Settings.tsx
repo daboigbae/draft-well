@@ -104,6 +104,11 @@ export default function Settings() {
         
         // Reload subscription data to reflect changes
         await loadSubscriptionData();
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('subscriptionUpdated', { 
+          detail: { planType: result.planType } 
+        }));
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to verify subscription');

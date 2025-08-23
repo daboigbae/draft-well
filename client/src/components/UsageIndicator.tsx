@@ -26,6 +26,19 @@ export default function UsageIndicator() {
     }
   }, [user?.uid]);
 
+  // Listen for subscription updates from other components
+  useEffect(() => {
+    const handleSubscriptionUpdate = () => {
+      if (user?.uid) {
+        console.log('Subscription updated, refreshing usage data...');
+        loadUsage();
+      }
+    };
+
+    window.addEventListener('subscriptionUpdated', handleSubscriptionUpdate);
+    return () => window.removeEventListener('subscriptionUpdated', handleSubscriptionUpdate);
+  }, [user?.uid]);
+
   const loadUsage = async () => {
     if (!user?.uid) return;
     
