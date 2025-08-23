@@ -7,6 +7,16 @@ import { Textarea } from "../components/ui/textarea";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { Checkbox } from "../components/ui/checkbox";
 import { Label } from "../components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../components/ui/alert-dialog";
 import EditorToolbar from "../components/EditorToolbar";
 import TagInput from "../components/TagInput";
 import CharacterCounter from "../components/CharacterCounter";
@@ -42,6 +52,7 @@ export default function Editor() {
   const [showHashtagManager, setShowHashtagManager] = useState(false);
   const [rating, setRating] = useState<RatingData | null>(null);
   const [loadingRating, setLoadingRating] = useState(false);
+  const [showRatingConfirmDialog, setShowRatingConfirmDialog] = useState(false);
   
   // Computed based on whether rating exists - backend handles aiRated flag
   const aiRated = !!rating;
@@ -256,14 +267,14 @@ export default function Editor() {
 
     // Check if post already has a rating and ask for confirmation
     if (rating) {
-      const confirmed = window.confirm(
-        `This post already has a rating of ${rating.rating}/10. Are you sure you want to rate it again? This will replace the existing rating and suggestions.`
-      );
-      if (!confirmed) {
-        return;
-      }
+      setShowRatingConfirmDialog(true);
+      return;
     }
 
+    await performRating();
+  };
+
+  const performRating = async () => {
     const trimmedBody = body.trim();
     const charCount = trimmedBody.length;
 
@@ -315,6 +326,11 @@ export default function Editor() {
     } finally {
       setLoadingRating(false);
     }
+  };
+
+  const handleConfirmRating = () => {
+    setShowRatingConfirmDialog(false);
+    performRating();
   };
 
   if (loading) {
@@ -626,6 +642,25 @@ export default function Editor() {
         onClose={() => setShowPublishModal(false)}
         onPublish={handlePublishFromModal}
       />
+
+      {/* Rating Confirmation Dialog */}
+      <AlertDialog open={showRatingConfirmDialog} onOpenChange={setShowRatingConfirmDialog}>
+        <AlertDialogContent data-testid="rating-confirm-dialog">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Re-rate this post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This post already has a rating of <strong>{rating?.rating}/10</strong>. 
+              Are you sure you want to rate it again? This will replace the existing rating and suggestions.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-rating">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRating} data-testid="button-confirm-rating">
+              Yes, rate again
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
