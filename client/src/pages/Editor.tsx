@@ -273,7 +273,7 @@ export default function Editor() {
 
     setLoadingRating(true);
     try {
-      const ratingResult = await getRating(body);
+      const ratingResult = await getRating(body, postId!, user!.uid);
       
       if (ratingResult.success && ratingResult.data) {
         setRating(ratingResult.data);
