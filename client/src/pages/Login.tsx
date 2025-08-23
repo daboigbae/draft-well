@@ -9,7 +9,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { useToast } from "../hooks/use-toast";
-import { signInWithEmail, signUpWithEmail, getAuthErrorMessage } from "../lib/auth";
+import { signInWithEmail, getAuthErrorMessage } from "../lib/auth";
 import Footer from "../components/Footer";
 
 const loginSchema = z.object({
@@ -21,7 +21,6 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -36,22 +35,14 @@ export default function Login() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     try {
-      if (isSignUp) {
-        await signUpWithEmail(data.email, data.password);
-        toast({
-          title: "Account created",
-          description: "Welcome to Draftwell! Your account has been created successfully.",
-        });
-      } else {
-        await signInWithEmail(data.email, data.password);
-        toast({
-          title: "Signed in",
-          description: "Welcome back to Draftwell!",
-        });
-      }
+      await signInWithEmail(data.email, data.password);
+      toast({
+        title: "Signed in",
+        description: "Welcome back to Draftwell!",
+      });
     } catch (error: any) {
       toast({
-        title: isSignUp ? "Sign up failed" : "Authentication failed",
+        title: "Authentication failed",
         description: getAuthErrorMessage(error),
         variant: "destructive",
       });
@@ -73,7 +64,7 @@ export default function Login() {
             </div>
             <CardTitle className="text-2xl font-bold text-slate-800">Draftwell</CardTitle>
             <CardDescription>
-              {isSignUp ? "Create your account for closed beta access" : "Closed Beta - Sign in to access"}
+              Closed Beta - Sign in to access
             </CardDescription>
           </CardHeader>
           
@@ -125,24 +116,10 @@ export default function Login() {
                 disabled={isLoading}
                 data-testid="button-submit"
               >
-                {isLoading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
+                {isLoading ? "Please wait..." : "Sign In"}
               </Button>
             </form>
 
-            {/* Toggle between Sign In and Sign Up */}
-            <div className="text-center border-t border-gray-200 pt-4">
-              <p className="text-sm text-slate-600">
-                {isSignUp ? "Already have an account?" : "Need an account?"}
-              </p>
-              <Button
-                variant="link"
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 p-0 h-auto"
-                onClick={() => setIsSignUp(!isSignUp)}
-                data-testid="button-toggle-auth-mode"
-              >
-                {isSignUp ? "Sign in here" : "Sign up for beta access"}
-              </Button>
-            </div>
           </CardContent>
         </Card>
 
