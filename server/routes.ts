@@ -16,15 +16,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { planType, userId, successUrl, cancelUrl } = req.body;
 
       // Price IDs mapping - these would need to be set up in Stripe Dashboard
-      console.log('STRIPE_STARTER_PRICE_ID:', process.env.STRIPE_STARTER_PRICE_ID);
-      console.log('STRIPE_PRO_PRICE_ID:', process.env.STRIPE_PRO_PRICE_ID);
-      
       const priceIdMapping: Record<string, string> = {
         starter: process.env.STRIPE_STARTER_PRICE_ID || 'price_starter_placeholder',
         pro: process.env.STRIPE_PRO_PRICE_ID || 'price_pro_placeholder'
       };
-      
-      console.log('Price mapping:', priceIdMapping);
 
       if (!priceIdMapping[planType as keyof typeof priceIdMapping]) {
         return res.status(400).json({ error: 'Invalid plan type' });
