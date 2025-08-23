@@ -245,7 +245,7 @@ export default function Editor() {
   }
 
   // LinkedIn-style preview logic
-  const PREVIEW_CHAR_LIMIT = 200;
+  const PREVIEW_CHAR_LIMIT = 110;
   const shouldShowMore = body.length > PREVIEW_CHAR_LIMIT;
   const previewText = previewExpanded || !shouldShowMore 
     ? body 
