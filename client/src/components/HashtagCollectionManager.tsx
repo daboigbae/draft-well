@@ -34,14 +34,29 @@ export default function HashtagCollectionManager({
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
-
-    const unsubscribe = subscribeToHashtagCollections(user.uid, (collections) => {
-      setCollections(collections);
+    if (!user) {
       setLoading(false);
-    });
+      return;
+    }
 
-    return unsubscribe;
+    let unsubscribe: (() => void) | undefined;
+    
+    try {
+      unsubscribe = subscribeToHashtagCollections(user.uid, (collections) => {
+        setCollections(collections);
+        setLoading(false);
+      });
+    } catch (error) {
+      console.error("Failed to subscribe to hashtag collections:", error);
+      setCollections([]);
+      setLoading(false);
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [user]);
 
   const handleCreateCollection = async () => {

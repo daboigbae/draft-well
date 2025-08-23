@@ -19,12 +19,7 @@ service cloud.firestore {
       }
 
       match /hashtagCollections/{collectionId} {
-        allow create: if isSignedIn() && isOwner(uid) &&
-          request.resource.data.keys().hasAll(['name','hashtags','createdAt','updatedAt']) &&
-          request.resource.data.name is string &&
-          request.resource.data.hashtags is list;
-
-        allow read, update, delete: if isSignedIn() && isOwner(uid);
+        allow create, read, update, delete: if isSignedIn() && isOwner(uid);
       }
     }
   }

@@ -96,5 +96,9 @@ export const subscribeToHashtagCollections = (
       } as HashtagCollection;
     });
     callback(collections);
+  }, (error) => {
+    console.error("Error in hashtag collections subscription:", error);
+    // Return empty array on error to prevent infinite loading
+    callback([]);
   });
 };
