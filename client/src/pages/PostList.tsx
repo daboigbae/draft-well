@@ -8,7 +8,7 @@ import AppLayout from "./AppLayout";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
-import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags } from "../lib/posts";
+import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags, createPost } from "../lib/posts";
 
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -79,6 +79,27 @@ export default function PostList() {
 
   const handleEditPost = (postId: string) => {
     setLocation(`/app/post/${postId}`);
+  };
+
+  const handleNewPost = async () => {
+    if (!user) return;
+
+    try {
+      const newPostId = await createPost(user.uid, {
+        title: "",
+        body: "",
+        tags: [],
+        status: "draft" as PostStatus,
+        aiVetted: false,
+      });
+      setLocation(`/app/post/${newPostId}`);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create new post.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDuplicatePost = async (postId: string) => {
@@ -232,7 +253,7 @@ export default function PostList() {
                 }
               </p>
               {!searchQuery && currentFilter === "all" && (
-                <Button onClick={() => setLocation("/app/new")} data-testid="button-create-first-post">
+                <Button onClick={handleNewPost} data-testid="button-create-first-post">
                   Create Your First Post
                 </Button>
               )}
