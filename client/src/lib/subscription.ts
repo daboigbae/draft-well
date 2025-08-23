@@ -42,21 +42,34 @@ export async function createUserSubscription(
 }
 
 export async function getUserSubscription(userId: string): Promise<UserSubscription | null> {
-  const subscriptionDoc = await getDoc(doc(db, 'subscriptions', userId));
-  
-  if (!subscriptionDoc.exists()) {
-    // Create default free subscription for new users
-    return await createUserSubscription(userId);
-  }
+  try {
+    console.log('Getting subscription for user:', userId);
+    const subscriptionDoc = await getDoc(doc(db, 'subscriptions', userId));
+    console.log('Subscription doc exists:', subscriptionDoc.exists());
+    
+    if (!subscriptionDoc.exists()) {
+      console.log('Creating default free subscription for new user');
+      // Create default free subscription for new users
+      return await createUserSubscription(userId);
+    }
 
-  const data = subscriptionDoc.data();
-  return {
-    ...data,
-    createdAt: data.createdAt?.toDate() || new Date(),
-    updatedAt: data.updatedAt?.toDate() || new Date(),
-    currentPeriodStart: data.currentPeriodStart?.toDate(),
-    currentPeriodEnd: data.currentPeriodEnd?.toDate(),
-  } as UserSubscription;
+    const data = subscriptionDoc.data();
+    console.log('Raw subscription data:', data);
+    
+    const subscription = {
+      ...data,
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
+      currentPeriodStart: data.currentPeriodStart?.toDate(),
+      currentPeriodEnd: data.currentPeriodEnd?.toDate(),
+    } as UserSubscription;
+    
+    console.log('Processed subscription:', subscription);
+    return subscription;
+  } catch (error) {
+    console.error('Error in getUserSubscription:', error);
+    throw error;
+  }
 }
 
 export async function updateUserSubscription(
