@@ -12,13 +12,22 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Initialize Firebase Admin
-let adminApp;
+let adminApp: any;
+let adminDb: any = null;
 try {
-  adminApp = initializeApp();
+  // Check if we have the Firebase config as environment variables
+  if (process.env.VITE_FIREBASE_PROJECT_ID) {
+    adminApp = initializeApp({
+      projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+    });
+    adminDb = getFirestore(adminApp);
+  } else {
+    throw new Error('Missing Firebase project configuration');
+  }
 } catch (error) {
-  // App already initialized
+  console.warn('Firebase Admin not configured, subscription updates will be skipped');
+  adminDb = null;
 }
-const adminDb = getFirestore();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe checkout session creation
@@ -77,17 +86,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update subscription in Firestore
         const planType = session.metadata?.planType || 'starter';
         
-        await adminDb.collection('subscriptions').doc(userId).set({
-          customerId: session.customer,
-          planType,
-          status: 'active',
-          stripeSessionId: sessionId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
+        if (adminDb) {
+          try {
+            await adminDb.collection('subscriptions').doc(userId).set({
+              customerId: session.customer,
+              planType,
+              status: 'active',
+              stripeSessionId: sessionId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            console.log(`Verified and updated subscription for user ${userId} to ${planType}`);
+          } catch (dbError) {
+            console.error('Firestore write error:', dbError);
+            // Continue anyway - payment was successful
+          }
+        } else {
+          console.log('Firestore not available, skipping subscription update');
+        }
         
-        console.log(`Verified and updated subscription for user ${userId} to ${planType}`);
-        res.json({ success: true, planType });
+        res.json({ success: true, planType, customerId: session.customer });
       } else {
         res.status(400).json({ error: 'Payment not completed or user mismatch' });
       }

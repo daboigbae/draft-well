@@ -23,17 +23,21 @@ export default function Settings() {
   useEffect(() => {
     if (user?.uid) {
       loadSubscriptionData();
-      
+    }
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (user?.uid && !verifyingSubscription) {
       // Check if user returned from successful Stripe checkout
       const urlParams = new URLSearchParams(window.location.search);
       const success = urlParams.get('success');
       const sessionId = urlParams.get('session_id');
       
-      if (success && sessionId && !verifyingSubscription) {
+      if (success && sessionId) {
         verifySubscription(sessionId);
       }
     }
-  }, [user?.uid, verifyingSubscription]);
+  }, [user?.uid]); // Remove verifyingSubscription dependency to prevent loop
 
   const loadSubscriptionData = async () => {
     if (!user?.uid) return;
@@ -59,9 +63,13 @@ export default function Settings() {
   };
 
   const verifySubscription = async (sessionId: string) => {
-    if (!user?.uid) return;
+    if (!user?.uid || verifyingSubscription) return;
     
     setVerifyingSubscription(true);
+    
+    // Always clear URL parameters first to prevent loops
+    window.history.replaceState({}, '', '/app/settings');
+    
     try {
       const response = await fetch('/api/verify-subscription', {
         method: 'POST',
@@ -83,17 +91,15 @@ export default function Settings() {
         
         // Reload subscription data to reflect changes
         await loadSubscriptionData();
-        
-        // Clear URL parameters
-        window.history.replaceState({}, '', '/app/settings');
       } else {
-        throw new Error('Failed to verify subscription');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to verify subscription');
       }
     } catch (error) {
       console.error('Error verifying subscription:', error);
       toast({
-        title: 'Verification Error',
-        description: 'There was an issue activating your subscription. Please contact support.',
+        title: 'Payment Successful',
+        description: 'Your payment was processed, but there was an issue activating your subscription. Please refresh the page or contact support.',
         variant: 'destructive'
       });
     } finally {
