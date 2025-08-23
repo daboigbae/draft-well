@@ -8,6 +8,8 @@ export interface Post {
   status: PostStatus;
   scheduledAt: Date | null;
   aiVetted: boolean;
+  rating?: number;
+  suggestions?: string[];
   createdAt: Date;
   updatedAt: Date;
 }

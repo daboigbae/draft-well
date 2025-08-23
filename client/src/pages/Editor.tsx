@@ -86,6 +86,14 @@ export default function Editor() {
           setBody(postData.body);
           setTags(postData.tags);
           setAiVetted(postData.aiVetted);
+          
+          // Load existing rating and suggestions if available
+          if (postData.rating && postData.suggestions) {
+            setRating({
+              rating: postData.rating,
+              suggestions: postData.suggestions
+            });
+          }
         } else {
           setError("Post not found");
         }
