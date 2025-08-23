@@ -274,12 +274,14 @@ export default function Editor() {
     setLoadingRating(true);
     try {
       const ratingResult = await getRating(body);
+      console.log('Rating response:', ratingResult);
       setRating(ratingResult);
       toast({
         title: "Rating received",
         description: `Your post received a rating of ${ratingResult.rating}/10`,
       });
     } catch (error) {
+      console.error('Rating error:', error);
       toast({
         title: "Rating failed",
         description: "Failed to get rating for your post.",
@@ -514,7 +516,8 @@ export default function Editor() {
                 </div>
               </div>
               
-              {rating.suggestions.length > 0 && (
+              {/* Commented out temporarily to debug crash */}
+              {/* {rating.suggestions.length > 0 && (
                 <div>
                   <h5 className="text-sm font-medium text-slate-600 mb-2">Suggestions:</h5>
                   <ul className="space-y-1" data-testid="rating-suggestions">
@@ -526,7 +529,12 @@ export default function Editor() {
                     ))}
                   </ul>
                 </div>
-              )}
+              )} */}
+              
+              {/* Debug logging */}
+              <div className="mt-2 p-2 bg-gray-100 rounded text-xs">
+                <strong>Debug:</strong> {JSON.stringify(rating, null, 2)}
+              </div>
             </div>
           )}
           
