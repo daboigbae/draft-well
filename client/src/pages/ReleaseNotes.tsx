@@ -35,13 +35,45 @@ export default function ReleaseNotes() {
               </p>
             </div>
 
+            {/* Version 1.1.2 */}
+            <div className="mb-8" data-testid="version-1-1-2">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-2xl font-semibold text-slate-800">Version 1.1.2</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  Latest
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">📋 Enhanced Copy Functionality</h3>
+                  <p className="text-slate-600 mb-4">
+                    Improved the copy-to-clipboard feature to preserve formatting and structure when copying posts to LinkedIn.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Preserves Bold Text:</strong> Bold formatting content is maintained when copying (removes ** but keeps emphasized text)</li>
+                    <li><strong>Maintains Line Breaks:</strong> Single and double line breaks are properly preserved for better readability</li>
+                    <li><strong>LinkedIn-Optimized:</strong> Removes markdown syntax while keeping the intended text structure</li>
+                    <li><strong>Clean Headings:</strong> Converts # headings to clean text without losing content</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🔧 Technical Improvements</h3>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li>Updated both post card and editor copy functions</li>
+                    <li>New LinkedIn-specific text conversion utility</li>
+                    <li>Better handling of markdown-to-text conversion</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Version 1.2.0 */}
             <div className="mb-8" data-testid="version-1-2-0">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl font-semibold text-slate-800">Version 1.2.0</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  Latest
-                </span>
               </div>
               <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
               
