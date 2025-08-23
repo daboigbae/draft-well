@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot } from "lucide-react";
+import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -10,6 +10,7 @@ import { Label } from "../components/ui/label";
 import EditorToolbar from "../components/EditorToolbar";
 import TagInput from "../components/TagInput";
 import CharacterCounter from "../components/CharacterCounter";
+import HashtagCollectionManager from "../components/HashtagCollectionManager";
 import ScheduleModal from "../components/ScheduleModal";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
@@ -38,6 +39,7 @@ export default function Editor() {
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewExpanded, setPreviewExpanded] = useState(false);
+  const [showHashtagManager, setShowHashtagManager] = useState(false);
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const debouncedTitle = useDebounce(title, 800);
@@ -49,6 +51,24 @@ export default function Editor() {
   useEffect(() => {
     setPreviewExpanded(false);
   }, [body]);
+
+  const handleInsertHashtags = (hashtags: string[]) => {
+    const hashtagText = hashtags.join(' ');
+    const currentCursor = bodyRef.current?.selectionStart || body.length;
+    const newBody = body.slice(0, currentCursor) + ' ' + hashtagText + body.slice(currentCursor);
+    setBody(newBody);
+    
+    // Focus back on the textarea and position cursor after inserted hashtags
+    setTimeout(() => {
+      if (bodyRef.current) {
+        bodyRef.current.focus();
+        bodyRef.current.setSelectionRange(
+          currentCursor + hashtagText.length + 1,
+          currentCursor + hashtagText.length + 1
+        );
+      }
+    }, 0);
+  };
 
   // Load post
   useEffect(() => {
@@ -343,18 +363,39 @@ export default function Editor() {
           placeholder="Enter tags separated by commas"
         />
         
-        {/* AI Vetting Checkbox */}
-        <div className="flex items-center space-x-2 mt-4">
-          <Checkbox
-            id="ai-vetted"
-            checked={aiVetted}
-            onCheckedChange={(checked) => setAiVetted(checked === true)}
-            data-testid="checkbox-ai-vetted"
-          />
-          <Label htmlFor="ai-vetted" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Vetted by AI
-          </Label>
+        {/* AI Vetting Checkbox and Hashtag Manager */}
+        <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="ai-vetted"
+              checked={aiVetted}
+              onCheckedChange={(checked) => setAiVetted(checked === true)}
+              data-testid="checkbox-ai-vetted"
+            />
+            <Label htmlFor="ai-vetted" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Vetted by AI
+            </Label>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowHashtagManager(!showHashtagManager)}
+            data-testid="button-toggle-hashtag-manager"
+          >
+            <Hash className="w-4 h-4 mr-2" />
+            {showHashtagManager ? 'Hide' : 'Show'} Hashtag Collections
+          </Button>
         </div>
+
+        {showHashtagManager && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4">
+            <HashtagCollectionManager
+              onSelectCollection={handleInsertHashtags}
+              showInsertButtons={true}
+            />
+          </div>
+        )}
       </div>
 
       {/* Editor Content */}
