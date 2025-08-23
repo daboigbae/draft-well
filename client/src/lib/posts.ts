@@ -59,6 +59,7 @@ export const getPost = async (userId: string, postId: string): Promise<Post | nu
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       scheduledAt: data.scheduledAt?.toDate() || null,
+      aiVetted: data.aiVetted || false,
     } as Post;
   }
   

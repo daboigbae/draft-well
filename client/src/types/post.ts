@@ -7,6 +7,7 @@ export interface Post {
   tags: string[];
   status: PostStatus;
   scheduledAt: Date | null;
+  aiVetted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +18,7 @@ export interface CreatePostData {
   tags: string[];
   status: PostStatus;
   scheduledAt: any; // Firestore Timestamp or null
+  aiVetted: boolean;
 }
 
 export interface UpdatePostData {
@@ -25,4 +27,5 @@ export interface UpdatePostData {
   tags?: string[];
   status?: PostStatus;
   scheduledAt?: any; // Firestore Timestamp or null
+  aiVetted?: boolean;
 }
