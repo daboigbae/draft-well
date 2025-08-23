@@ -233,7 +233,7 @@ export default function AppLayout({
               onClick={() => setLocation('/app/settings')}
               data-testid="button-settings"
             >
-              <User className="mr-3 h-4 w-4" />
+              <Settings className="mr-3 h-4 w-4" />
               Settings
             </Button>
           </div>
