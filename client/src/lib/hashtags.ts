@@ -9,6 +9,7 @@ import {
   onSnapshot,
   query,
   orderBy,
+  where,
   serverTimestamp,
   QuerySnapshot,
   DocumentData
@@ -16,16 +17,17 @@ import {
 import { db } from "../firebase";
 import { HashtagCollection, CreateHashtagCollectionData, UpdateHashtagCollectionData } from "../types/hashtag";
 
-const getHashtagCollectionsCollection = (userId: string) => 
-  collection(db, `users/${userId}/hashtagCollections`);
+const getHashtagCollectionsCollection = () => 
+  collection(db, 'hashtagCollections');
 
-const getHashtagCollectionDoc = (userId: string, collectionId: string) => 
-  doc(db, `users/${userId}/hashtagCollections/${collectionId}`);
+const getHashtagCollectionDoc = (collectionId: string) => 
+  doc(db, `hashtagCollections/${collectionId}`);
 
 export const createHashtagCollection = async (userId: string, data: CreateHashtagCollectionData): Promise<string> => {
-  const collectionsRef = getHashtagCollectionsCollection(userId);
+  const collectionsRef = getHashtagCollectionsCollection();
   const docRef = await addDoc(collectionsRef, {
     ...data,
+    userId,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -33,7 +35,7 @@ export const createHashtagCollection = async (userId: string, data: CreateHashta
 };
 
 export const updateHashtagCollection = async (userId: string, collectionId: string, data: UpdateHashtagCollectionData): Promise<void> => {
-  const collectionRef = getHashtagCollectionDoc(userId, collectionId);
+  const collectionRef = getHashtagCollectionDoc(collectionId);
   await updateDoc(collectionRef, {
     ...data,
     updatedAt: serverTimestamp(),
@@ -41,12 +43,12 @@ export const updateHashtagCollection = async (userId: string, collectionId: stri
 };
 
 export const deleteHashtagCollection = async (userId: string, collectionId: string): Promise<void> => {
-  const collectionRef = getHashtagCollectionDoc(userId, collectionId);
+  const collectionRef = getHashtagCollectionDoc(collectionId);
   await deleteDoc(collectionRef);
 };
 
 export const getHashtagCollection = async (userId: string, collectionId: string): Promise<HashtagCollection | null> => {
-  const collectionRef = getHashtagCollectionDoc(userId, collectionId);
+  const collectionRef = getHashtagCollectionDoc(collectionId);
   const docSnap = await getDoc(collectionRef);
   
   if (docSnap.exists()) {
@@ -63,8 +65,8 @@ export const getHashtagCollection = async (userId: string, collectionId: string)
 };
 
 export const getHashtagCollections = async (userId: string): Promise<HashtagCollection[]> => {
-  const collectionsRef = getHashtagCollectionsCollection(userId);
-  const q = query(collectionsRef, orderBy("name"));
+  const collectionsRef = getHashtagCollectionsCollection();
+  const q = query(collectionsRef, where("userId", "==", userId), orderBy("name"));
   const querySnapshot = await getDocs(q);
   
   return querySnapshot.docs.map(doc => {
@@ -80,21 +82,31 @@ export const getHashtagCollections = async (userId: string): Promise<HashtagColl
 
 export const subscribeToHashtagCollections = (
   userId: string, 
-  callback: (collections: HashtagCollection[]) => void
+  callback: (collections: HashtagCollection[]) => void,
+  errorCallback?: (error: any) => void
 ): (() => void) => {
-  const collectionsRef = getHashtagCollectionsCollection(userId);
-  const q = query(collectionsRef, orderBy("name"));
+  const collectionsRef = getHashtagCollectionsCollection();
+  const q = query(collectionsRef, where("userId", "==", userId), orderBy("name"));
   
-  return onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
-    const collections = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate() || new Date(),
-        updatedAt: data.updatedAt?.toDate() || new Date(),
-      } as HashtagCollection;
-    });
-    callback(collections);
-  });
+  return onSnapshot(
+    q, 
+    (querySnapshot: QuerySnapshot<DocumentData>) => {
+      const collections = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+        } as HashtagCollection;
+      });
+      callback(collections);
+    },
+    (error) => {
+      console.error('Firestore subscription error:', error);
+      if (errorCallback) {
+        errorCallback(error);
+      }
+    }
+  );
 };
