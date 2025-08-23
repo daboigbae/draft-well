@@ -58,10 +58,10 @@ export async function getUserSubscription(userId: string): Promise<UserSubscript
     
     const subscription = {
       ...data,
-      createdAt: data.createdAt?.toDate() || new Date(),
-      updatedAt: data.updatedAt?.toDate() || new Date(),
-      currentPeriodStart: data.currentPeriodStart?.toDate(),
-      currentPeriodEnd: data.currentPeriodEnd?.toDate(),
+      createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+      updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
+      currentPeriodStart: data.currentPeriodStart?.toDate ? data.currentPeriodStart.toDate() : (data.currentPeriodStart ? new Date(data.currentPeriodStart) : undefined),
+      currentPeriodEnd: data.currentPeriodEnd?.toDate ? data.currentPeriodEnd.toDate() : (data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : undefined),
     } as UserSubscription;
     
     console.log('Processed subscription:', subscription);
