@@ -516,8 +516,7 @@ export default function Editor() {
                 </div>
               </div>
               
-              {/* Commented out temporarily to debug crash */}
-              {/* {rating.suggestions.length > 0 && (
+              {rating.suggestions && rating.suggestions.length > 0 && (
                 <div>
                   <h5 className="text-sm font-medium text-slate-600 mb-2">Suggestions:</h5>
                   <ul className="space-y-1" data-testid="rating-suggestions">
@@ -529,12 +528,7 @@ export default function Editor() {
                     ))}
                   </ul>
                 </div>
-              )} */}
-              
-              {/* Debug logging */}
-              <div className="mt-2 p-2 bg-gray-100 rounded text-xs">
-                <strong>Debug:</strong> {JSON.stringify(rating, null, 2)}
-              </div>
+              )}
             </div>
           )}
           
