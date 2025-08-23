@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash } from "lucide-react";
+import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -20,6 +20,7 @@ import { renderMarkdown, markdownToLinkedInText } from "../utils/markdown";
 import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
 import { useDebounce } from "@/hooks/use-debounce";
+import { getRating, RatingResponse } from "../lib/rating";
 
 export default function Editor() {
   const params = useParams();
@@ -40,6 +41,8 @@ export default function Editor() {
   const [error, setError] = useState<string | null>(null);
   const [previewExpanded, setPreviewExpanded] = useState(false);
   const [showHashtagManager, setShowHashtagManager] = useState(false);
+  const [rating, setRating] = useState<RatingResponse | null>(null);
+  const [loadingRating, setLoadingRating] = useState(false);
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const debouncedTitle = useDebounce(title, 800);
@@ -242,6 +245,28 @@ export default function Editor() {
     }
   };
 
+  const handleGetRating = async () => {
+    if (!body.trim() || loadingRating) return;
+
+    setLoadingRating(true);
+    try {
+      const ratingResult = await getRating(body);
+      setRating(ratingResult);
+      toast({
+        title: "Rating received",
+        description: `Your post received a rating of ${ratingResult.rating}/10`,
+      });
+    } catch (error) {
+      toast({
+        title: "Rating failed",
+        description: "Failed to get rating for your post.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingRating(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -312,6 +337,25 @@ export default function Editor() {
             <Button variant="outline" onClick={handleExport} data-testid="button-export">
               <Download className="h-4 w-4 mr-2" />
               Export .txt
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={handleGetRating}
+              disabled={!body.trim() || loadingRating}
+              data-testid="button-get-rating"
+            >
+              {loadingRating ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                  Getting Rating...
+                </>
+              ) : (
+                <>
+                  <Star className="h-4 w-4 mr-2" />
+                  Get Rating
+                </>
+              )}
             </Button>
             
             <Button
@@ -433,6 +477,35 @@ export default function Editor() {
           <div className="bg-white border-b border-gray-200 p-4">
             <h3 className="font-semibold text-slate-700">Live Preview</h3>
           </div>
+          
+          {/* Rating Display */}
+          {rating && (
+            <div className="bg-white border-b border-gray-200 p-4" data-testid="rating-display">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-medium text-slate-700">Post Rating</h4>
+                <div className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                  <span className="text-lg font-bold text-slate-800" data-testid="rating-score">
+                    {rating.rating}/10
+                  </span>
+                </div>
+              </div>
+              
+              {rating.suggestions.length > 0 && (
+                <div>
+                  <h5 className="text-sm font-medium text-slate-600 mb-2">Suggestions:</h5>
+                  <ul className="space-y-1" data-testid="rating-suggestions">
+                    {rating.suggestions.map((suggestion, index) => (
+                      <li key={index} className="text-sm text-slate-600 flex items-start gap-2">
+                        <span className="text-slate-400 mt-1">•</span>
+                        <span>{suggestion}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
           
           <div className="flex-1 p-6 overflow-y-auto">
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm" data-testid="preview-panel">
