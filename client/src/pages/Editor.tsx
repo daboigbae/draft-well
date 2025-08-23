@@ -274,11 +274,22 @@ export default function Editor() {
     setLoadingRating(true);
     try {
       const ratingResult = await getRating(body);
-      console.log('Rating response:', ratingResult);
+      console.log('=== FULL RATING RESPONSE ===');
+      console.log('Raw response:', ratingResult);
+      console.log('Response type:', typeof ratingResult);
+      console.log('Response keys:', Object.keys(ratingResult || {}));
+      if (ratingResult) {
+        console.log('Has rating?', 'rating' in ratingResult);
+        console.log('Has suggestions?', 'suggestions' in ratingResult);
+        console.log('Rating value:', ratingResult.rating);
+        console.log('Suggestions value:', ratingResult.suggestions);
+      }
+      console.log('=== END RATING RESPONSE ===');
+      
       setRating(ratingResult);
       toast({
         title: "Rating received",
-        description: `Your post received a rating of ${ratingResult.rating}/10`,
+        description: `Your post received a rating of ${ratingResult?.rating || 'N/A'}/10`,
       });
     } catch (error) {
       console.error('Rating error:', error);
