@@ -20,14 +20,10 @@ service cloud.firestore {
     }
 
     match /hashtagCollections/{collectionId} {
-      allow create: if isSignedIn() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.keys().hasAll(['userId','name','hashtags','createdAt','updatedAt']) &&
-        request.resource.data.name is string &&
-        request.resource.data.hashtags is list;
-
-      allow read, update, delete: if isSignedIn() && 
-        resource.data.userId == request.auth.uid;
+      allow read, write: if isSignedIn() && 
+        request.auth != null &&
+        (resource == null || resource.data.userId == request.auth.uid) &&
+        (request.resource == null || request.resource.data.userId == request.auth.uid);
     }
   }
 }
