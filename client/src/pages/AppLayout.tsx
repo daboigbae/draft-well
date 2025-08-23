@@ -95,7 +95,16 @@ export default function AppLayout({
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Linkedin className="text-white h-4 w-4" />
               </div>
-              <h1 className="text-xl font-bold text-slate-800">Linkedraft</h1>
+              <div>
+                <h1 className="text-xl font-bold text-slate-800">Linkedraft</h1>
+                <button
+                  onClick={() => setLocation('/app/release-notes')}
+                  className="text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer"
+                  data-testid="button-version"
+                >
+                  v1.0.0
+                </button>
+              </div>
             </div>
             <Popover>
               <PopoverTrigger asChild>

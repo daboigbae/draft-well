@@ -6,12 +6,14 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import AuthGuard from "./components/AuthGuard";
 import PostList from "./pages/PostList";
 import Editor from "./pages/Editor";
+import ReleaseNotes from "./pages/ReleaseNotes";
 import NotFound from "./pages/not-found";
 
 function Router() {
   return (
     <Switch>
       <Route path="/app/post/:id" component={Editor} />
+      <Route path="/app/release-notes" component={ReleaseNotes} />
       <Route path="/app" component={PostList} />
       <Route path="/" component={() => <PostList />} />
       <Route component={NotFound} />

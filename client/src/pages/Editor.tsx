@@ -376,12 +376,11 @@ export default function Editor() {
             
             <div className="bg-white border-t border-gray-200 p-4">
               <CharacterCounter
-                text={previewExpanded || !shouldShowMore ? body : previewText}
-                maxLength={previewExpanded || !shouldShowMore ? 3000 : body.length}
+                text={body}
+                maxLength={3000}
                 warningThreshold={2600 / 3000}
                 showProgressBar={true}
                 showWordCount={true}
-                isPreviewMode={!previewExpanded && shouldShowMore}
               />
             </div>
           </div>
