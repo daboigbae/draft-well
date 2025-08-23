@@ -35,13 +35,61 @@ export default function ReleaseNotes() {
               </p>
             </div>
 
+            {/* Version 1.2.0 */}
+            <div className="mb-8" data-testid="version-1-2-0">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-2xl font-semibold text-slate-800">Version 1.2.0</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  Latest
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🎨 Brand Refresh: Welcome to Draftwell</h3>
+                  <p className="text-slate-600 mb-4">
+                    We've rebranded from Linkedraft to <strong>Draftwell</strong>! Our new name better reflects our mission to help you draft well-crafted LinkedIn content.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li>Updated application name throughout the interface</li>
+                    <li>Refreshed welcome messages and branding</li>
+                    <li>New identity focused on quality content creation</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🌈 New Color Palette</h3>
+                  <p className="text-slate-600 mb-4">
+                    Introducing a fresh, modern color scheme designed for better usability and visual appeal.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Primary:</strong> Professional Indigo 600 for brand consistency</li>
+                    <li><strong>Accent:</strong> Vibrant Sky Blue 400 for highlights and actions</li>
+                    <li><strong>Neutral:</strong> Clean Slate tones for optimal readability</li>
+                    <li><strong>Success:</strong> Fresh Emerald 500 for positive confirmations</li>
+                    <li>Enhanced contrast and accessibility across light and dark modes</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">✨ Enhanced User Experience</h3>
+                  <p className="text-slate-600 mb-4">
+                    The new design language provides a more cohesive and professional experience.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li>Consistent color application across all components</li>
+                    <li>Improved visual hierarchy and readability</li>
+                    <li>Professional appearance suitable for business use</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Version 1.1.1 */}
             <div className="mb-8" data-testid="version-1-1-1">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl font-semibold text-slate-800">Version 1.1.1</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  Latest
-                </span>
               </div>
               <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
               
