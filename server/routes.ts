@@ -2,8 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
-import { initializeApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+// Removed Firebase Admin - using client-side Firestore updates instead
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -11,23 +10,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Initialize Firebase Admin
-let adminApp: any;
-let adminDb: any = null;
-try {
-  // Check if we have the Firebase config as environment variables
-  if (process.env.VITE_FIREBASE_PROJECT_ID) {
-    adminApp = initializeApp({
-      projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-    });
-    adminDb = getFirestore(adminApp);
-  } else {
-    throw new Error('Missing Firebase project configuration');
-  }
-} catch (error) {
-  console.warn('Firebase Admin not configured, subscription updates will be skipped');
-  adminDb = null;
-}
+// Firebase Admin removed - client handles Firestore updates
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe checkout session creation
@@ -83,29 +66,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const session = await stripe.checkout.sessions.retrieve(sessionId);
       
       if (session.payment_status === 'paid' && session.client_reference_id === userId) {
-        // Update subscription in Firestore
         const planType = session.metadata?.planType || 'starter';
         
-        if (adminDb) {
-          try {
-            await adminDb.collection('subscriptions').doc(userId).set({
-              customerId: session.customer,
-              planType,
-              status: 'active',
-              stripeSessionId: sessionId,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            });
-            console.log(`Verified and updated subscription for user ${userId} to ${planType}`);
-          } catch (dbError) {
-            console.error('Firestore write error:', dbError);
-            // Continue anyway - payment was successful
-          }
-        } else {
-          console.log('Firestore not available, skipping subscription update');
-        }
+        console.log(`Verified successful payment for user ${userId} to ${planType}`);
         
-        res.json({ success: true, planType, customerId: session.customer });
+        // Return subscription data for client to update Firestore
+        res.json({ 
+          success: true, 
+          planType,
+          customerId: session.customer,
+          subscriptionData: {
+            customerId: session.customer,
+            planType,
+            status: 'active',
+            stripeSessionId: sessionId,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          }
+        });
       } else {
         res.status(400).json({ error: 'Payment not completed or user mismatch' });
       }
@@ -137,58 +115,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Stripe webhook handler
+  // Stripe webhook handler (optional - using client-side verification instead)
   app.post("/api/stripe-webhook", async (req, res) => {
-    console.log('Webhook received:', req.body);
-    let event;
-
-    try {
-      // In production, you'd verify the webhook signature
-      event = req.body;
-    } catch (err: any) {
-      console.log(`Webhook signature verification failed.`, err.message);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    // Handle the event
-    switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object;
-        console.log('Checkout session completed:', session);
-        
-        // Update user subscription in Firestore
-        try {
-          const userId = session.client_reference_id;
-          const planType = session.metadata?.planType || 'starter';
-          
-          if (userId) {
-            await adminDb.collection('subscriptions').doc(userId).set({
-              customerId: session.customer,
-              planType,
-              status: 'active',
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            });
-            console.log(`Updated subscription for user ${userId} to ${planType}`);
-          }
-        } catch (error) {
-          console.error('Error updating subscription:', error);
-        }
-        break;
-      case 'customer.subscription.updated':
-        const subscription = event.data.object;
-        console.log('Subscription updated:', subscription);
-        // Update user subscription status
-        break;
-      case 'customer.subscription.deleted':
-        const deletedSubscription = event.data.object;
-        console.log('Subscription canceled:', deletedSubscription);
-        // Downgrade user to free plan
-        break;
-      default:
-        console.log(`Unhandled event type ${event.type}`);
-    }
-
+    console.log('Webhook received (but not processed - using client-side verification)');
     res.json({ received: true });
   });
 
