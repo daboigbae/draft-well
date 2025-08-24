@@ -122,7 +122,7 @@ export default function UsageIndicator() {
         
         {isUnlimited && (
           <span className="text-sm text-slate-600" data-testid="usage-count">
-            {usage.current} used
+            Unlimited
           </span>
         )}
       </div>
