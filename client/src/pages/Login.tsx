@@ -185,7 +185,7 @@ export default function Login() {
                   className="text-sm lg:text-base text-slate-500 hover:text-slate-700 hover:underline cursor-pointer font-medium"
                   data-testid="button-release-notes"
                 >
-                  v1.1.2 Release Notes
+                  v3.0.0 Release Notes
                 </button>
                 <span className="text-slate-300">•</span>
                 <span className="text-sm lg:text-base text-slate-500">Closed Beta</span>

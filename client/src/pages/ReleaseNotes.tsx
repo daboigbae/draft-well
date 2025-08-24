@@ -35,13 +35,69 @@ export default function ReleaseNotes() {
               </p>
             </div>
 
+            {/* Version 3.0.0 */}
+            <div className="mb-8" data-testid="version-3-0-0">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-2xl font-semibold text-slate-800">Version 3.0.0</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  Latest
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">Released: August 24, 2025</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">📱 Mobile-First Responsive Design</h3>
+                  <p className="text-slate-600 mb-4">
+                    Complete mobile responsiveness overhaul with touch-optimized interface and adaptive layouts.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Responsive Sidebar:</strong> Collapsible sidebar with hamburger menu for mobile devices</li>
+                    <li><strong>Mobile-Optimized Cards:</strong> Post cards redesigned for touch interaction with improved spacing</li>
+                    <li><strong>Vertical Editor Layout:</strong> Editor automatically adapts to vertical layout on smaller screens</li>
+                    <li><strong>Touch Targets:</strong> All interactive elements meet accessibility standards for mobile use</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">💬 User Feedback System</h3>
+                  <p className="text-slate-600 mb-4">
+                    Integrated feedback collection system allowing users to share suggestions and report issues directly from the app.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Footer Integration:</strong> "Send Feedback" button accessible from every page</li>
+                    <li><strong>Modal Dialog:</strong> Clean, professional feedback form with email and text inputs</li>
+                    <li><strong>Firebase Storage:</strong> Feedback stored securely in Firestore with timestamps</li>
+                    <li><strong>Form Validation:</strong> Email validation and character limits (10-1000 characters) with real-time feedback</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">✨ User Experience Improvements</h3>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Simplified Pro Display:</strong> Pro users now see "Unlimited" instead of token counts for cleaner UI</li>
+                    <li><strong>Enhanced Subscription Management:</strong> Improved error handling for subscription operations</li>
+                    <li><strong>Cleaner Branding:</strong> Removed promotional text for more professional appearance</li>
+                    <li><strong>Fixed Mobile Scrolling:</strong> Resolved menu scrolling issues on mobile devices</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🔧 Technical Updates</h3>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li>Updated Firestore security rules for feedback collection</li>
+                    <li>New feedback.ts library for Firebase integration</li>
+                    <li>Enhanced responsive breakpoints and CSS optimization</li>
+                    <li>Improved touch and accessibility standards compliance</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Version 2.0.0 */}
             <div className="mb-8" data-testid="version-2-0-0">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl font-semibold text-slate-800">Version 2.0.0</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  Latest
-                </span>
               </div>
               <p className="text-sm text-slate-500 mb-6">Released: August 23, 2025</p>
               
