@@ -202,23 +202,7 @@ export default function Settings() {
   const getTokenDisplay = () => {
     if (!subscription) return '0/2';
     
-    // Get default tokens based on plan if reportTokens is missing
-    let reportTokens = subscription.reportTokens;
-    if (reportTokens === undefined || reportTokens === null) {
-      switch (subscription.planType) {
-        case 'free':
-          reportTokens = 2;
-          break;
-        case 'starter':
-          reportTokens = 20;
-          break;
-        case 'pro':
-          reportTokens = 999999;
-          break;
-        default:
-          reportTokens = 2;
-      }
-    }
+    const reportTokens = subscription.reportTokens ?? 0;
     
     switch (subscription.planType) {
       case 'free':

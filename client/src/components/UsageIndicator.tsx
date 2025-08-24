@@ -49,24 +49,7 @@ export default function UsageIndicator() {
       
       if (subscription) {
         const plan = getPlanById(subscription.planType);
-        
-        // Get proper default tokens based on plan if reportTokens is missing
-        let reportTokens = subscription.reportTokens;
-        if (reportTokens === undefined || reportTokens === null) {
-          switch (subscription.planType) {
-            case 'free':
-              reportTokens = 2;
-              break;
-            case 'starter':
-              reportTokens = 20;
-              break;
-            case 'pro':
-              reportTokens = 999999;
-              break;
-            default:
-              reportTokens = plan.features.aiRatingsPerMonth;
-          }
-        }
+        const reportTokens = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
         
         // For pro plan, check if reportTokens indicates unlimited (999999)
         const isUnlimited = reportTokens === 999999 || reportTokens === 'unlimited';
