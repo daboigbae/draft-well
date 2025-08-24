@@ -48,9 +48,10 @@ export default function UsageIndicator() {
       
       if (subscription) {
         const plan = getPlanById(subscription.planType);
+        const limit = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
         setUsage({
           current: currentUsage?.ratingsUsed || 0,
-          limit: plan.features.aiRatingsPerMonth,
+          limit: limit,
           planName: plan.name,
           canUse: quotaCheck.canUse
         });
