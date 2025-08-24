@@ -84,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           planType,
           customerId: session.customer,
           subscriptionData: {
-            customerId: session.customer,
+            stripeCustomerId: session.customer,
             planType,
             reportTokens,
             status: 'active',
