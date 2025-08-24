@@ -4,6 +4,7 @@ import { ArrowUpDown, AlertCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import PostCard from "../components/PostCard";
+import UsageIndicator from "../components/UsageIndicator";
 import AppLayout from "./AppLayout";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
@@ -191,6 +192,10 @@ export default function PostList() {
     >
       <div className="flex-1 p-8" data-testid="post-list">
         <div className="max-w-4xl mx-auto">
+          {/* Usage Indicator */}
+          <div className="mb-6">
+            <UsageIndicator />
+          </div>
 
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
