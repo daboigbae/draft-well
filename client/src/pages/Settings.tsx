@@ -191,6 +191,24 @@ export default function Settings() {
 
   const currentPlan = subscription ? getPlanById(subscription.planType) : PLANS[0];
   const currentUsage = usage?.ratingsUsed || 0;
+  
+  // Calculate token display based on reportTokens and plan
+  const getTokenDisplay = () => {
+    if (!subscription) return '0/2';
+    
+    const reportTokens = subscription.reportTokens ?? 0;
+    
+    switch (subscription.planType) {
+      case 'free':
+        return `${reportTokens}/2`;
+      case 'starter':
+        return `${reportTokens}/20`;
+      case 'pro':
+        return 'Unlimited';
+      default:
+        return `${reportTokens}/2`;
+    }
+  };
 
   return (
     <AppLayout>
@@ -219,17 +237,17 @@ export default function Settings() {
                     </Badge>
                   </div>
                   <p className="text-slate-600 mb-4">
-                    {currentPlan.features.aiRatingsPerMonth === 'unlimited' 
-                      ? `${currentUsage} AI ratings used this month (unlimited)`
-                      : `${currentUsage} of ${currentPlan.features.aiRatingsPerMonth} AI ratings used this month`
+                    {subscription?.planType === 'pro'
+                      ? 'Unlimited AI ratings available'
+                      : `${getTokenDisplay()} AI ratings available`
                     }
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="outline" className="text-xs">
                       <Zap className="w-3 h-3 mr-1" />
-                      {currentPlan.features.aiRatingsPerMonth === 'unlimited' 
+                      {subscription?.planType === 'pro'
                         ? 'Unlimited AI ratings'
-                        : `${currentPlan.features.aiRatingsPerMonth} AI ratings/month`
+                        : `${getTokenDisplay()} AI ratings`
                       }
                     </Badge>
                     {currentPlan.features.postReminders && (
