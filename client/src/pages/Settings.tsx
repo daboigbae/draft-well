@@ -1,26 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Crown, CreditCard, Check, Zap, Calendar, FileSpreadsheet, MessageSquare, User, Save } from 'lucide-react';
+import { Crown, CreditCard, Check, Zap, Calendar, FileSpreadsheet, MessageSquare } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
 import { useAuth } from '../hooks/use-auth';
 import { getUserSubscription, getCurrentUsage } from '../lib/subscription';
 import { db } from '../firebase';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { createCheckoutSession, createCustomerPortalSession } from '../lib/stripe';
 import { PLANS, type UserSubscription, type UsageRecord, getPlanById } from '../types/subscription';
 import { useToast } from '../hooks/use-toast';
 import AppLayout from './AppLayout';
-
-interface UserProfile {
-  displayName: string;
-  email: string;
-  company: string;
-  jobTitle: string;
-}
 
 export default function Settings() {
   const { user } = useAuth();
@@ -30,19 +21,10 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [verifyingSubscription, setVerifyingSubscription] = useState(false);
-  const [profile, setProfile] = useState<UserProfile>({
-    displayName: '',
-    email: '',
-    company: '',
-    jobTitle: ''
-  });
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [savingProfile, setSavingProfile] = useState(false);
 
   useEffect(() => {
     if (user?.uid) {
       loadSubscriptionData();
-      loadUserProfile();
     }
   }, [user?.uid]);
 
@@ -78,67 +60,6 @@ export default function Settings() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const loadUserProfile = async () => {
-    if (!user?.uid) return;
-    
-    setProfileLoading(true);
-    try {
-      const profileDoc = await getDoc(doc(db, 'userProfiles', user.uid));
-      if (profileDoc.exists()) {
-        const data = profileDoc.data();
-        setProfile({
-          displayName: data.displayName || user.displayName || '',
-          email: data.email || user.email || '',
-          company: data.company || '',
-          jobTitle: data.jobTitle || ''
-        });
-      } else {
-        // Initialize with user auth data
-        setProfile({
-          displayName: user.displayName || '',
-          email: user.email || '',
-          company: '',
-          jobTitle: ''
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load user profile:', error);
-    } finally {
-      setProfileLoading(false);
-    }
-  };
-
-  const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user?.uid) return;
-    
-    setSavingProfile(true);
-    try {
-      await setDoc(doc(db, 'userProfiles', user.uid), {
-        ...profile,
-        updatedAt: new Date().toISOString()
-      });
-      
-      toast({
-        title: 'Profile Updated',
-        description: 'Your profile information has been saved successfully.',
-      });
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update profile. Please try again.',
-        variant: 'destructive'
-      });
-    } finally {
-      setSavingProfile(false);
-    }
-  };
-
-  const handleProfileChange = (field: keyof UserProfile, value: string) => {
-    setProfile(prev => ({ ...prev, [field]: value }));
   };
 
   const verifySubscription = async (sessionId: string) => {
@@ -269,87 +190,8 @@ export default function Settings() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-slate-800 mb-2">Settings</h1>
-            <p className="text-slate-600">Manage your profile, subscription and billing</p>
+            <p className="text-slate-600">Manage your subscription and billing</p>
           </div>
-
-          {/* User Profile Settings */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5 text-indigo-600" />
-                Profile Settings
-              </CardTitle>
-              <CardDescription>
-                Update your personal information and preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="displayName">Display Name</Label>
-                    <Input
-                      id="displayName"
-                      value={profile.displayName}
-                      onChange={(e) => handleProfileChange('displayName', e.target.value)}
-                      placeholder="Your display name"
-                      data-testid="input-display-name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={profile.email}
-                      onChange={(e) => handleProfileChange('email', e.target.value)}
-                      placeholder="your.email@example.com"
-                      data-testid="input-email"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="company">Company</Label>
-                    <Input
-                      id="company"
-                      value={profile.company}
-                      onChange={(e) => handleProfileChange('company', e.target.value)}
-                      placeholder="Your company name"
-                      data-testid="input-company"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="jobTitle">Job Title</Label>
-                    <Input
-                      id="jobTitle"
-                      value={profile.jobTitle}
-                      onChange={(e) => handleProfileChange('jobTitle', e.target.value)}
-                      placeholder="Your job title"
-                      data-testid="input-job-title"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end">
-                  <Button 
-                    type="submit" 
-                    disabled={savingProfile || profileLoading}
-                    data-testid="button-save-profile"
-                  >
-                    {savingProfile ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Saving...
-                      </div>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4 mr-2" />
-                        Save Profile
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
 
           {/* Current Plan Status */}
           <Card className="mb-8">
