@@ -48,10 +48,14 @@ export default function UsageIndicator() {
       
       if (subscription) {
         const plan = getPlanById(subscription.planType);
-        const limit = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
+        const reportTokens = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
+        
+        // For pro plan, check if reportTokens indicates unlimited (999999)
+        const isUnlimited = reportTokens === 999999 || reportTokens === 'unlimited';
+        
         setUsage({
-          current: currentUsage?.ratingsUsed || 0,
-          limit: limit,
+          current: isUnlimited ? 999999 : (reportTokens as number), // Show remaining tokens, not used tokens
+          limit: isUnlimited ? 'unlimited' : plan.features.aiRatingsPerMonth,
           planName: plan.name,
           canUse: quotaCheck.canUse
         });

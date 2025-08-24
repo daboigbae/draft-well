@@ -114,7 +114,37 @@ export async function getCurrentUsage(userId: string): Promise<UsageRecord | nul
   } as UsageRecord;
 }
 
+// Decrement reportTokens when AI rating is used
+export async function useAiRatingToken(userId: string): Promise<boolean> {
+  const subscription = await getUserSubscription(userId);
+  if (!subscription) {
+    throw new Error('No subscription found');
+  }
+
+  const reportTokens = subscription.reportTokens ?? 0;
+  
+  // Check if unlimited (999999)
+  if (reportTokens === 999999) {
+    return true; // Unlimited, no need to decrement
+  }
+
+  // Check if tokens available
+  if (reportTokens <= 0) {
+    throw new Error('No tokens remaining');
+  }
+
+  // Decrement token count
+  await updateUserSubscription(userId, {
+    reportTokens: reportTokens - 1
+  });
+
+  return true;
+}
+
 export async function incrementUsage(userId: string, planType: PlanType): Promise<UsageRecord> {
+  // Use the new token system instead
+  await useAiRatingToken(userId);
+  
   const monthKey = getCurrentMonthKey();
   const usageId = `${userId}_${monthKey}`;
   const usageRef = doc(db, 'usage', usageId);
@@ -167,22 +197,20 @@ export async function canUserUseAiRating(userId: string): Promise<{ canUse: bool
   }
 
   const plan = getPlanById(subscription.planType);
-  const usage = await getCurrentUsage(userId);
-  const currentUsage = usage?.ratingsUsed || 0;
+  const reportTokens = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
 
-  // Use reportTokens from subscription if available, otherwise fall back to plan limit
-  const limit = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
-
-  if (limit === 'unlimited') {
-    return { canUse: true, current: currentUsage, limit: 'unlimited' };
+  // Check if unlimited (999999 or 'unlimited')
+  if (reportTokens === 999999 || reportTokens === 'unlimited') {
+    return { canUse: true, current: 999999, limit: 'unlimited' };
   }
 
-  const canUse = currentUsage < (limit as number);
+  // Check if user has tokens remaining
+  const canUse = (reportTokens as number) > 0;
   return {
     canUse,
-    reason: canUse ? undefined : 'Token limit exceeded',
-    current: currentUsage,
-    limit: limit as number,
+    reason: canUse ? undefined : 'No tokens remaining',
+    current: reportTokens as number,
+    limit: plan.features.aiRatingsPerMonth as number,
   };
 }
 
