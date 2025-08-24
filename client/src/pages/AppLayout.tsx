@@ -99,14 +99,24 @@ export default function AppLayout({
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <button 
+                onClick={() => setLocation('/app')}
+                className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors"
+                data-testid="button-logo"
+              >
                 <Linkedin className="text-white h-4 w-4" />
-              </div>
+              </button>
               <div>
-                <h1 className="text-xl font-bold text-slate-800">Draftwell</h1>
+                <button 
+                  onClick={() => setLocation('/app')}
+                  className="text-xl font-bold text-slate-800 hover:text-slate-600 cursor-pointer"
+                  data-testid="button-home"
+                >
+                  Draftwell
+                </button>
                 <button
                   onClick={() => setLocation('/app/release-notes')}
-                  className="text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer"
+                  className="text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer block"
                   data-testid="button-version"
                 >
                   v2.0.0
@@ -146,97 +156,104 @@ export default function AppLayout({
           </Button>
         </div>
         
-        {/* Search */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search posts..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              data-testid="input-search"
-            />
-          </div>
-        </div>
-        
-        {/* Filter Tabs */}
-        <div className="px-6 py-4">
-          <nav className="space-y-1">
-            {filterButtons.map((filter) => (
-              <Button
-                key={filter.key}
-                variant={currentFilter === filter.key ? "default" : "ghost"}
-                className="w-full justify-between"
-                onClick={() => onFilterChange?.(filter.key)}
-                data-testid={`button-filter-${filter.key}`}
-              >
-                <span>{filter.label}</span>
-                <Badge 
-                  variant={currentFilter === filter.key ? "secondary" : "outline"}
-                  className="ml-2"
-                >
-                  {filter.count}
-                </Badge>
-              </Button>
-            ))}
-          </nav>
-          
-          {/* Tag Filter */}
-          {allTags.length > 0 && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <h3 className="text-sm font-medium text-slate-700 mb-3">Filter by Tag</h3>
-              <div className="space-y-1 max-h-32 overflow-y-auto">
-                <Button
-                  variant={currentTagFilter === null ? "default" : "ghost"}
-                  className="w-full justify-start text-xs"
-                  onClick={() => onTagFilterChange?.(null)}
-                  data-testid="button-tag-all"
-                >
-                  All Tags
-                </Button>
-                {allTags.slice(0, 10).map((tag) => (
-                  <Button
-                    key={tag}
-                    variant={currentTagFilter === tag ? "default" : "ghost"}
-                    className="w-full justify-start text-xs"
-                    onClick={() => onTagFilterChange?.(tag)}
-                    data-testid={`button-tag-${tag}`}
-                  >
-                    {tag}
-                  </Button>
-                ))}
-                {allTags.length > 10 && (
-                  <p className="text-xs text-slate-500 px-3 py-1">
-                    +{allTags.length - 10} more tags
-                  </p>
-                )}
-              </div>
+        {/* Search - only show if onSearchChange prop is provided */}
+        {onSearchChange && (
+          <div className="p-6 border-b border-gray-200">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search posts..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                data-testid="input-search"
+              />
             </div>
-          )}
-
-          {/* Additional Navigation */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation('/app/hashtag-collections')}
-              data-testid="button-hashtag-collections"
-            >
-              <Hash className="mr-3 h-4 w-4" />
-              Hashtag Collections
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setLocation('/app/settings')}
-              data-testid="button-settings"
-            >
-              <Settings className="mr-3 h-4 w-4" />
-              Settings
-            </Button>
           </div>
+        )}
+        
+        {/* Filter Tabs - only show if onFilterChange prop is provided */}
+        {onFilterChange && (
+          <div className="px-6 py-4">
+            <nav className="space-y-1">
+              {filterButtons.map((filter) => (
+                <Button
+                  key={filter.key}
+                  variant={currentFilter === filter.key ? "default" : "ghost"}
+                  className="w-full justify-between"
+                  onClick={() => {
+                    onFilterChange(filter.key);
+                    setLocation('/app');
+                  }}
+                  data-testid={`button-filter-${filter.key}`}
+                >
+                  <span>{filter.label}</span>
+                  <Badge 
+                    variant={currentFilter === filter.key ? "secondary" : "outline"}
+                    className="ml-2"
+                  >
+                    {filter.count}
+                  </Badge>
+                </Button>
+              ))}
+            </nav>
+          </div>
+        )}
+        
+        {/* Tag Filter */}
+        {onFilterChange && allTags.length > 0 && (
+          <div className="px-6 mt-6 pt-6 border-t border-gray-200">
+            <h3 className="text-sm font-medium text-slate-700 mb-3">Filter by Tag</h3>
+            <div className="space-y-1 max-h-32 overflow-y-auto">
+              <Button
+                variant={currentTagFilter === null ? "default" : "ghost"}
+                className="w-full justify-start text-xs"
+                onClick={() => onTagFilterChange?.(null)}
+                data-testid="button-tag-all"
+              >
+                All Tags
+              </Button>
+              {allTags.slice(0, 10).map((tag) => (
+                <Button
+                  key={tag}
+                  variant={currentTagFilter === tag ? "default" : "ghost"}
+                  className="w-full justify-start text-xs"
+                  onClick={() => onTagFilterChange?.(tag)}
+                  data-testid={`button-tag-${tag}`}
+                >
+                  {tag}
+                </Button>
+              ))}
+              {allTags.length > 10 && (
+                <p className="text-xs text-slate-500 px-3 py-1">
+                  +{allTags.length - 10} more tags
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Additional Navigation */}
+        <div className="px-6 mt-6 pt-6 border-t border-gray-200">
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={() => setLocation('/app/hashtag-collections')}
+            data-testid="button-hashtag-collections"
+          >
+            <Hash className="mr-3 h-4 w-4" />
+            Hashtag Collections
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={() => setLocation('/app/settings')}
+            data-testid="button-settings"
+          >
+            <Settings className="mr-3 h-4 w-4" />
+            Settings
+          </Button>
         </div>
       </div>
       
