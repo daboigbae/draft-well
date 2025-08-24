@@ -96,8 +96,8 @@ export default function UsageIndicator() {
   const reportTokens = usage.current; // This is now the remaining tokens
   const totalTokens = usage.limit as number;
   
-  // Calculate percentage based on remaining tokens vs total
-  const percentage = isUnlimited ? 0 : Math.min(((totalTokens - reportTokens) / totalTokens) * 100, 100);
+  // Calculate percentage based on remaining tokens (full bar = all tokens available)
+  const percentage = isUnlimited ? 100 : Math.max((reportTokens / totalTokens) * 100, 0);
   const isNearLimit = !isUnlimited && reportTokens <= 3 && reportTokens > 0; // Show warning when 3 or fewer tokens left
   const isAtLimit = !usage.canUse;
 
@@ -106,7 +106,7 @@ export default function UsageIndicator() {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 text-indigo-600" />
-          <span className="font-medium text-slate-700">AI Ratings</span>
+          <span className="font-medium text-slate-700">Rating Credits</span>
           <Badge variant="outline" className="text-xs">
             {usage.planName}
           </Badge>
