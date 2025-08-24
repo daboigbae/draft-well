@@ -34,9 +34,15 @@ export default function Settings() {
       const urlParams = new URLSearchParams(window.location.search);
       const success = urlParams.get('success');
       const sessionId = urlParams.get('session_id');
+      const canceled = urlParams.get('canceled');
       
       if (success && sessionId) {
         verifySubscription(sessionId);
+      } else if (canceled) {
+        // Clear the canceled parameter from URL after showing message briefly
+        setTimeout(() => {
+          window.history.replaceState({}, '', '/app/settings');
+        }, 3000);
       }
     }
   }, [user?.uid]); // Remove verifyingSubscription dependency to prevent loop
