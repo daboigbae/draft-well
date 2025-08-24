@@ -127,10 +127,10 @@ export default function Settings() {
     if (!user?.uid) return;
 
     // For existing subscribers, use customer portal to manage upgrades
-    if (subscription && subscription.status === 'active' && subscription.customerId) {
+    if (subscription && subscription.status === 'active' && subscription.stripeCustomerId) {
       setUpgrading(planType);
       try {
-        await createCustomerPortalSession(subscription.customerId);
+        await createCustomerPortalSession(subscription.stripeCustomerId);
       } catch (error: any) {
         toast({
           title: 'Portal Access Failed',
