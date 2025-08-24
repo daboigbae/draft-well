@@ -151,16 +151,19 @@ export async function canUserUseAiRating(userId: string): Promise<{ canUse: bool
   const usage = await getCurrentUsage(userId);
   const currentUsage = usage?.ratingsUsed || 0;
 
-  if (plan.features.aiRatingsPerMonth === 'unlimited') {
+  // Use reportTokens from subscription if available, otherwise fall back to plan limit
+  const limit = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
+
+  if (limit === 'unlimited') {
     return { canUse: true, current: currentUsage, limit: 'unlimited' };
   }
 
-  const canUse = canUseAiRating(plan, currentUsage);
+  const canUse = currentUsage < (limit as number);
   return {
     canUse,
-    reason: canUse ? undefined : 'Monthly quota exceeded',
+    reason: canUse ? undefined : 'Token limit exceeded',
     current: currentUsage,
-    limit: plan.features.aiRatingsPerMonth as number,
+    limit: limit as number,
   };
 }
 
