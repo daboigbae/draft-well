@@ -133,7 +133,7 @@ export default function AppLayout({
       <div className={`
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50
-        w-80 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out
+        w-80 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out overflow-hidden
       `} data-testid="sidebar">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
@@ -213,87 +213,103 @@ export default function AppLayout({
           </div>
         )}
         
-        {/* Filter Tabs - only show if onFilterChange prop is provided */}
-        {onFilterChange && (
-          <div className="px-6 py-4">
-            <nav className="space-y-1">
-              {filterButtons.map((filter) => (
-                <Button
-                  key={filter.key}
-                  variant={currentFilter === filter.key ? "default" : "ghost"}
-                  className="w-full justify-between"
-                  onClick={() => {
-                    onFilterChange(filter.key);
-                    setLocation('/app');
-                  }}
-                  data-testid={`button-filter-${filter.key}`}
-                >
-                  <span>{filter.label}</span>
-                  <Badge 
-                    variant={currentFilter === filter.key ? "secondary" : "outline"}
-                    className="ml-2"
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Filter Tabs - only show if onFilterChange prop is provided */}
+          {onFilterChange && (
+            <div className="px-6 py-4">
+              <nav className="space-y-1">
+                {filterButtons.map((filter) => (
+                  <Button
+                    key={filter.key}
+                    variant={currentFilter === filter.key ? "default" : "ghost"}
+                    className="w-full justify-between"
+                    onClick={() => {
+                      onFilterChange(filter.key);
+                      setLocation('/app');
+                      setSidebarOpen(false); // Close mobile sidebar after selection
+                    }}
+                    data-testid={`button-filter-${filter.key}`}
                   >
-                    {filter.count}
-                  </Badge>
-                </Button>
-              ))}
-            </nav>
-          </div>
-        )}
-        
-        {/* Tag Filter */}
-        {onFilterChange && allTags.length > 0 && (
-          <div className="px-6 mt-6 pt-6 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-slate-700 mb-3">Filter by Tag</h3>
-            <div className="space-y-1 max-h-32 overflow-y-auto">
-              <Button
-                variant={currentTagFilter === null ? "default" : "ghost"}
-                className="w-full justify-start text-xs"
-                onClick={() => onTagFilterChange?.(null)}
-                data-testid="button-tag-all"
-              >
-                All Tags
-              </Button>
-              {allTags.slice(0, 10).map((tag) => (
-                <Button
-                  key={tag}
-                  variant={currentTagFilter === tag ? "default" : "ghost"}
-                  className="w-full justify-start text-xs"
-                  onClick={() => onTagFilterChange?.(tag)}
-                  data-testid={`button-tag-${tag}`}
-                >
-                  {tag}
-                </Button>
-              ))}
-              {allTags.length > 10 && (
-                <p className="text-xs text-slate-500 px-3 py-1">
-                  +{allTags.length - 10} more tags
-                </p>
-              )}
+                    <span>{filter.label}</span>
+                    <Badge 
+                      variant={currentFilter === filter.key ? "secondary" : "outline"}
+                      className="ml-2"
+                    >
+                      {filter.count}
+                    </Badge>
+                  </Button>
+                ))}
+              </nav>
             </div>
-          </div>
-        )}
+          )}
+          
+          {/* Tag Filter */}
+          {onFilterChange && allTags.length > 0 && (
+            <div className="px-6 mt-6 pt-6 border-t border-gray-200">
+              <h3 className="text-sm font-medium text-slate-700 mb-3">Filter by Tag</h3>
+              <div className="space-y-1 max-h-32 overflow-y-auto">
+                <Button
+                  variant={currentTagFilter === null ? "default" : "ghost"}
+                  className="w-full justify-start text-xs"
+                  onClick={() => {
+                    onTagFilterChange?.(null);
+                    setSidebarOpen(false); // Close mobile sidebar after selection
+                  }}
+                  data-testid="button-tag-all"
+                >
+                  All Tags
+                </Button>
+                {allTags.slice(0, 10).map((tag) => (
+                  <Button
+                    key={tag}
+                    variant={currentTagFilter === tag ? "default" : "ghost"}
+                    className="w-full justify-start text-xs"
+                    onClick={() => {
+                      onTagFilterChange?.(tag);
+                      setSidebarOpen(false); // Close mobile sidebar after selection
+                    }}
+                    data-testid={`button-tag-${tag}`}
+                  >
+                    {tag}
+                  </Button>
+                ))}
+                {allTags.length > 10 && (
+                  <p className="text-xs text-slate-500 px-3 py-1">
+                    +{allTags.length - 10} more tags
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
-        {/* Additional Navigation */}
-        <div className="px-6 mt-6 pt-6 border-t border-gray-200">
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={() => setLocation('/app/hashtag-collections')}
-            data-testid="button-hashtag-collections"
-          >
-            <Hash className="mr-3 h-4 w-4" />
-            Hashtag Collections
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={() => setLocation('/app/settings')}
-            data-testid="button-settings"
-          >
-            <Settings className="mr-3 h-4 w-4" />
-            Settings
-          </Button>
+          {/* Additional Navigation */}
+          <div className="px-6 mt-6 pt-6 border-t border-gray-200">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                setLocation('/app/hashtag-collections');
+                setSidebarOpen(false); // Close mobile sidebar after navigation
+              }}
+              data-testid="button-hashtag-collections"
+            >
+              <Hash className="mr-3 h-4 w-4" />
+              Hashtag Collections
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                setLocation('/app/settings');
+                setSidebarOpen(false); // Close mobile sidebar after navigation
+              }}
+              data-testid="button-settings"
+            >
+              <Settings className="mr-3 h-4 w-4" />
+              Settings
+            </Button>
+          </div>
         </div>
       </div>
       
