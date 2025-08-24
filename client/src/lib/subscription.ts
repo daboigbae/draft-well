@@ -142,9 +142,7 @@ export async function useAiRatingToken(userId: string): Promise<boolean> {
 }
 
 export async function incrementUsage(userId: string, planType: PlanType): Promise<UsageRecord> {
-  // Use the new token system instead
-  await useAiRatingToken(userId);
-  
+  // Just track usage for analytics, don't consume reportTokens
   const monthKey = getCurrentMonthKey();
   const usageId = `${userId}_${monthKey}`;
   const usageRef = doc(db, 'usage', usageId);
