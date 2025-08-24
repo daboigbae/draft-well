@@ -126,16 +126,24 @@ export default function Settings() {
   const handleUpgrade = async (planType: 'starter' | 'pro') => {
     if (!user?.uid) return;
 
-    // Prevent duplicate subscriptions
-    if (subscription && subscription.status === 'active') {
-      toast({
-        title: 'Already Subscribed',
-        description: 'You already have an active subscription. Use the customer portal to manage it.',
-        variant: 'destructive'
-      });
+    // For existing subscribers, use customer portal to manage upgrades
+    if (subscription && subscription.status === 'active' && subscription.customerId) {
+      setUpgrading(planType);
+      try {
+        await createCustomerPortalSession(subscription.customerId);
+      } catch (error: any) {
+        toast({
+          title: 'Portal Access Failed',
+          description: error.message || 'Failed to access customer portal',
+          variant: 'destructive'
+        });
+      } finally {
+        setUpgrading(null);
+      }
       return;
     }
 
+    // For new subscribers, use checkout flow
     setUpgrading(planType);
     try {
       await createCheckoutSession(planType, user.uid);

@@ -46,14 +46,15 @@ export async function createCheckoutSession(planType: PlanType, userId: string) 
   }
 }
 
-export async function createCustomerPortalSession() {
+export async function createCustomerPortalSession(customerId?: string) {
   const response = await fetch('/api/create-portal-session', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      returnUrl: `${window.location.origin}/settings`,
+      customerId,
+      returnUrl: `${window.location.origin}/app/settings`,
     }),
   });
 
