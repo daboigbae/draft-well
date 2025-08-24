@@ -132,6 +132,8 @@ export default function Settings() {
   const handleUpgrade = async (planType: 'starter' | 'pro') => {
     if (!user?.uid) return;
 
+    console.log('Subscription data:', subscription); // Debug log
+
     // For existing subscribers, use customer portal to manage upgrades
     if (subscription && subscription.status === 'active' && subscription.stripeCustomerId) {
       setUpgrading(planType);
@@ -146,6 +148,16 @@ export default function Settings() {
       } finally {
         setUpgrading(null);
       }
+      return;
+    }
+
+    // For existing paid subscribers without stripeCustomerId, show message
+    if (subscription && subscription.status === 'active' && subscription.planType !== 'free' && !subscription.stripeCustomerId) {
+      toast({
+        title: 'Use Customer Portal',
+        description: 'Please use the direct customer portal link to manage your subscription: billing.stripe.com',
+        variant: 'default'
+      });
       return;
     }
 
