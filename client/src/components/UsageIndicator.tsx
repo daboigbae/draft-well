@@ -91,8 +91,14 @@ export default function UsageIndicator() {
   }
 
   const isUnlimited = usage.limit === 'unlimited';
-  const percentage = isUnlimited ? 0 : Math.min((usage.current / (usage.limit as number)) * 100, 100);
-  const isNearLimit = !isUnlimited && percentage >= 80;
+  
+  // For the new token system, check reportTokens directly
+  const reportTokens = usage.current; // This is now the remaining tokens
+  const totalTokens = usage.limit as number;
+  
+  // Calculate percentage based on remaining tokens vs total
+  const percentage = isUnlimited ? 0 : Math.min(((totalTokens - reportTokens) / totalTokens) * 100, 100);
+  const isNearLimit = !isUnlimited && reportTokens <= 3 && reportTokens > 0; // Show warning when 3 or fewer tokens left
   const isAtLimit = !usage.canUse;
 
   return (
@@ -132,7 +138,7 @@ export default function UsageIndicator() {
       {isAtLimit && (
         <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mb-3">
           <p className="text-sm text-amber-800 mb-2">
-            You've reached your monthly limit of {usage.limit} AI ratings.
+            You've used all your AI rating tokens.
           </p>
           <div className="flex gap-2">
             <Button 
@@ -159,7 +165,7 @@ export default function UsageIndicator() {
       {isNearLimit && !isAtLimit && (
         <div className="bg-orange-50 border border-orange-200 rounded-md p-3 mb-3">
           <p className="text-sm text-orange-800 mb-2">
-            You're close to your monthly limit. Consider upgrading for unlimited ratings.
+            You're close to your token limit. Consider upgrading for unlimited ratings.
           </p>
           <Button 
             size="sm" 
