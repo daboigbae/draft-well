@@ -17,6 +17,7 @@ export default function UsageIndicator() {
     current: 0,
     limit: 0 as number | 'unlimited',
     planName: 'Free',
+    planType: 'free' as 'free' | 'starter' | 'pro',
     canUse: true
   });
 
@@ -57,6 +58,7 @@ export default function UsageIndicator() {
           current: isUnlimited ? 999999 : (reportTokens as number), // Show remaining tokens, not used tokens
           limit: isUnlimited ? 'unlimited' : plan.features.aiRatingsPerMonth,
           planName: plan.name,
+          planType: subscription.planType,
           canUse: quotaCheck.canUse
         });
       }
@@ -141,23 +143,27 @@ export default function UsageIndicator() {
             You've used all your AI rating tokens.
           </p>
           <div className="flex gap-2">
-            <Button 
-              size="sm" 
-              onClick={() => handleUpgrade('starter')}
-              className="bg-indigo-600 hover:bg-indigo-700"
-              data-testid="button-upgrade-starter"
-            >
-              <TrendingUp className="w-3 h-3 mr-1" />
-              Upgrade to Starter
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={() => handleUpgrade('pro')}
-              data-testid="button-upgrade-pro"
-            >
-              Go Pro
-            </Button>
+            {usage.planType === 'free' && (
+              <Button 
+                size="sm" 
+                onClick={() => handleUpgrade('starter')}
+                className="bg-indigo-600 hover:bg-indigo-700"
+                data-testid="button-upgrade-starter"
+              >
+                <TrendingUp className="w-3 h-3 mr-1" />
+                Upgrade to Starter
+              </Button>
+            )}
+            {(usage.planType === 'free' || usage.planType === 'starter') && (
+              <Button 
+                size="sm" 
+                variant={usage.planType === 'starter' ? 'default' : 'outline'}
+                onClick={() => handleUpgrade('pro')}
+                data-testid="button-upgrade-pro"
+              >
+                Go Pro
+              </Button>
+            )}
           </div>
         </div>
       )}
