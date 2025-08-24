@@ -28,20 +28,6 @@ export default function Footer() {
             © {currentYear} Draftwell. All rights reserved.
           </div>
 
-          {/* Right - Replit referral */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-600">Want to help?</span>
-            <a
-              href="https://replit.com/refer/ghigareda"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-green-600 hover:text-green-700 hover:underline flex items-center gap-1"
-              data-testid="link-replit-refer"
-            >
-              Sign up for Replit
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
         </div>
 
         {/* Bottom Disclaimer Row */}
