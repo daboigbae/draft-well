@@ -177,8 +177,17 @@ export default function Settings() {
   };
 
   const handleManageSubscription = async () => {
+    if (!subscription?.stripeCustomerId) {
+      toast({
+        title: 'Error',
+        description: 'No customer ID found. Please contact support.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     try {
-      await createCustomerPortalSession();
+      await createCustomerPortalSession(subscription.stripeCustomerId);
     } catch (error: any) {
       toast({
         title: 'Error',
