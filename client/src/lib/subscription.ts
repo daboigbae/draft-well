@@ -78,6 +78,25 @@ export async function updateUserSubscription(
   });
 }
 
+// Fix missing reportTokens for existing subscriptions
+export async function fixMissingReportTokens(userId: string): Promise<void> {
+  const subscription = await getUserSubscription(userId);
+  
+  if (subscription && subscription.reportTokens === undefined) {
+    console.log('Adding missing reportTokens to subscription');
+    
+    let reportTokens = 2; // Default for free
+    if (subscription.planType === 'starter') {
+      reportTokens = 20;
+    } else if (subscription.planType === 'pro') {
+      reportTokens = 999999; // Unlimited
+    }
+    
+    await updateUserSubscription(userId, { reportTokens });
+    console.log(`Added reportTokens: ${reportTokens} to subscription`);
+  }
+}
+
 // Usage tracking
 export async function getCurrentUsage(userId: string): Promise<UsageRecord | null> {
   const monthKey = getCurrentMonthKey();

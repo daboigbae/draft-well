@@ -130,6 +130,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ received: true });
   });
 
+  // Debug endpoint to fix missing reportTokens
+  app.post("/api/fix-subscription", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: 'Missing userId' });
+      }
+      
+      console.log(`Fixing subscription for user ${userId}`);
+      
+      // This would normally use Firebase Admin, but we're using client-side approach
+      // Just return success and let client handle it
+      res.json({ 
+        success: true, 
+        message: 'Use client-side update' 
+      });
+    } catch (error: any) {
+      console.error('Error fixing subscription:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
