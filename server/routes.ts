@@ -70,6 +70,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log(`Verified successful payment for user ${userId} to ${planType}`);
         
+        // Set report tokens based on plan type
+        let reportTokens = 2; // Default for free
+        if (planType === 'starter') {
+          reportTokens = 20;
+        } else if (planType === 'pro') {
+          reportTokens = 999999; // Unlimited for pro (large number)
+        }
+        
         // Return subscription data for client to update Firestore
         res.json({ 
           success: true, 
@@ -78,6 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           subscriptionData: {
             customerId: session.customer,
             planType,
+            reportTokens,
             status: 'active',
             stripeSessionId: sessionId,
             createdAt: new Date().toISOString(),
