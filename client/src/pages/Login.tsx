@@ -190,9 +190,6 @@ export default function Login() {
                 <span className="text-slate-300">•</span>
                 <span className="text-sm lg:text-base text-slate-500">Closed Beta</span>
               </div>
-              <p className="text-xs lg:text-sm text-slate-500 leading-relaxed">
-                Built with React, TypeScript, and Firebase for professionals who take their LinkedIn presence seriously.
-              </p>
             </div>
           </CardContent>
         </Card>
