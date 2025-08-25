@@ -6,8 +6,6 @@ import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../hooks/use-auth';
 import { getUserSubscription, getCurrentUsage } from '../lib/subscription';
-import { db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
 import { createCheckoutSession, createCustomerPortalSession } from '../lib/stripe';
 import { PLANS, type UserSubscription, type UsageRecord, getPlanById } from '../types/subscription';
 import { useToast } from '../hooks/use-toast';
@@ -91,15 +89,6 @@ export default function Settings() {
       if (response.ok) {
         const result = await response.json();
         
-        // Update Firestore with subscription data
-        if (result.subscriptionData && user?.uid) {
-          try {
-            await setDoc(doc(db, 'subscriptions', user.uid), result.subscriptionData);
-            console.log('Subscription updated in Firestore:', result.subscriptionData);
-          } catch (firestoreError) {
-            console.error('Error updating Firestore:', firestoreError);
-          }
-        }
         
         toast({
           title: 'Subscription Activated!',

@@ -1,13 +1,10 @@
 import { 
   doc, 
-  setDoc, 
   getDoc, 
-  updateDoc, 
   collection, 
   query, 
   where, 
   getDocs,
-  serverTimestamp,
   Timestamp 
 } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -20,27 +17,6 @@ import {
   canUseAiRating 
 } from '../types/subscription';
 
-// User subscription management
-export async function createUserSubscription(
-  userId: string, 
-  planType: PlanType = 'free'
-): Promise<UserSubscription> {
-  const subscription: UserSubscription = {
-    planType,
-    status: 'active',
-    reportTokens: 2, // Give all new users 2 report tokens
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  await setDoc(doc(db, 'subscriptions', userId), {
-    ...subscription,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-
-  return subscription;
-}
 
 export async function getUserSubscription(userId: string): Promise<UserSubscription | null> {
   try {
@@ -67,34 +43,7 @@ export async function getUserSubscription(userId: string): Promise<UserSubscript
   }
 }
 
-export async function updateUserSubscription(
-  userId: string, 
-  updates: Partial<UserSubscription>
-): Promise<void> {
-  await updateDoc(doc(db, 'subscriptions', userId), {
-    ...updates,
-    updatedAt: serverTimestamp(),
-  });
-}
 
-// Fix missing reportTokens for existing subscriptions
-export async function fixMissingReportTokens(userId: string): Promise<void> {
-  const subscription = await getUserSubscription(userId);
-  
-  if (subscription && subscription.reportTokens === undefined) {
-    console.log('Adding missing reportTokens to subscription');
-    
-    let reportTokens = 2; // Default for free
-    if (subscription.planType === 'starter') {
-      reportTokens = 20;
-    } else if (subscription.planType === 'pro') {
-      reportTokens = 999999; // Unlimited
-    }
-    
-    await updateUserSubscription(userId, { reportTokens });
-    console.log(`Added reportTokens: ${reportTokens} to subscription`);
-  }
-}
 
 // Usage tracking
 export async function getCurrentUsage(userId: string): Promise<UsageRecord | null> {
@@ -113,79 +62,7 @@ export async function getCurrentUsage(userId: string): Promise<UsageRecord | nul
   } as UsageRecord;
 }
 
-// Decrement reportTokens when AI rating is used
-export async function useAiRatingToken(userId: string): Promise<boolean> {
-  const subscription = await getUserSubscription(userId);
-  if (!subscription) {
-    throw new Error('No subscription found');
-  }
 
-  const reportTokens = subscription.reportTokens ?? 0;
-  
-  // Check if unlimited (999999)
-  if (reportTokens === 999999) {
-    return true; // Unlimited, no need to decrement
-  }
-
-  // Check if tokens available
-  if (reportTokens <= 0) {
-    throw new Error('No tokens remaining');
-  }
-
-  // Decrement token count
-  await updateUserSubscription(userId, {
-    reportTokens: reportTokens - 1
-  });
-
-  return true;
-}
-
-export async function incrementUsage(userId: string, planType: PlanType): Promise<UsageRecord> {
-  // Just track usage for analytics, don't consume reportTokens
-  const monthKey = getCurrentMonthKey();
-  const usageId = `${userId}_${monthKey}`;
-  const usageRef = doc(db, 'usage', usageId);
-  
-  const existingUsage = await getDoc(usageRef);
-  
-  if (existingUsage.exists()) {
-    const currentCount = existingUsage.data().ratingsUsed || 0;
-    const newUsage = {
-      ratingsUsed: currentCount + 1,
-      updatedAt: serverTimestamp(),
-    };
-    
-    await updateDoc(usageRef, newUsage);
-    
-    return {
-      userId,
-      month: monthKey,
-      planType,
-      ratingsUsed: currentCount + 1,
-      createdAt: existingUsage.data().createdAt?.toDate() || new Date(),
-      updatedAt: new Date(),
-    };
-  } else {
-    const newUsage: Omit<UsageRecord, 'createdAt' | 'updatedAt'> = {
-      userId,
-      month: monthKey,
-      planType,
-      ratingsUsed: 1,
-    };
-    
-    await setDoc(usageRef, {
-      ...newUsage,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-    
-    return {
-      ...newUsage,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-  }
-}
 
 export async function canUserUseAiRating(userId: string): Promise<{ canUse: boolean; reason?: string; current?: number; limit?: number | 'unlimited' }> {
   const subscription = await getUserSubscription(userId);

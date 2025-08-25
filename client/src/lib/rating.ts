@@ -1,6 +1,6 @@
 import { httpsCallable } from "firebase/functions";
 import { functions } from "../firebase";
-import { canUserUseAiRating, incrementUsage, getUserSubscription } from './subscription';
+import { canUserUseAiRating, getUserSubscription } from './subscription';
 
 export interface RatingData {
   rating: number;
@@ -36,13 +36,7 @@ export const getRating = async (draft: string, postId: string, userId: string): 
     const getRatingFunction = httpsCallable<RatingRequest, RatingResponse>(functions, 'getRating');
     const result = await getRatingFunction({ draft, postId, userId });
     
-    if (result.data.success) {
-      // Increment usage counter on successful rating
-      const subscription = await getUserSubscription(userId);
-      if (subscription) {
-        await incrementUsage(userId, subscription.planType);
-      }
-    }
+    // Backend will handle usage tracking
     
     return result.data;
   } catch (error: any) {
