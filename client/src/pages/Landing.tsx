@@ -394,68 +394,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Creators love Draftwell</h2>
-            <p className="text-xl text-slate-600">See how professionals are growing their LinkedIn presence.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-slate-700 mb-4">
-                  "Draftwell gave me confidence my posts would land — my impressions doubled in a week."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">JD</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-slate-900">Jamie Davis</div>
-                    <div className="text-sm text-slate-600">Marketing Director</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-slate-700 mb-4">
-                  "The AI ratings are spot-on. I finally know which posts will perform before I hit publish."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">MC</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-slate-900">Mike Chen</div>
-                    <div className="text-sm text-slate-600">Tech Consultant</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-slate-700 mb-4">
-                  "Game-changer for consistency. The reminders keep me posting regularly and my network is growing."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-teal-400 rounded-full flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">SL</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-slate-900">Sarah Lee</div>
-                    <div className="text-sm text-slate-600">Product Manager</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* Final CTA Section */}
       <section className="py-20 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
