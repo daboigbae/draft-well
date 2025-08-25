@@ -209,32 +209,6 @@ export default function PostList() {
     >
       <div className="flex-1 p-8" data-testid="post-list">
         <div className="max-w-4xl mx-auto">
-          {/* Onboarding Banner */}
-          {!firstDraftCompleted && (
-            <div className="mb-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white" data-testid="onboarding-banner">
-              <div className="flex items-start gap-4">
-                <div className="bg-white/20 rounded-lg p-3">
-                  <PenTool className="w-6 h-6" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                    Welcome to Draftwell! <Sparkles className="w-5 h-5" />
-                  </h3>
-                  <p className="text-indigo-100 mb-4 leading-relaxed">
-                    Ready to create amazing LinkedIn content? Start by writing your first post and discover the power of AI-powered feedback to make every post shine.
-                  </p>
-                  <Button 
-                    onClick={handleNewPost}
-                    className="bg-white text-indigo-600 hover:bg-indigo-50 font-medium"
-                    data-testid="button-onboarding-create-post"
-                  >
-                    <PenTool className="w-4 h-4 mr-2" />
-                    Write Your First Post
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
 
 
           {/* Header */}
