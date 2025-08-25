@@ -21,21 +21,29 @@ import {
 
 export async function getUserSubscription(userId: string): Promise<UserSubscription | null> {
   try {
-    console.log('Getting subscription for userId:', userId);
-    
-    // Try the original structure first: subscriptions/{userId}
-    const subscriptionDoc = await getDoc(doc(db, 'subscriptions', userId));
+    // First, get the user's stripeCustomerId from users collection
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (!userDoc.exists()) {
+      return null;
+    }
+
+    const stripeCustomerId = userDoc.data()?.stripeCustomerId;
+    if (!stripeCustomerId) {
+      return null;
+    }
+
+    // Then, get subscription data using stripeCustomerId
+    const subscriptionDoc = await getDoc(doc(db, 'subscriptions', stripeCustomerId));
     
     if (!subscriptionDoc.exists()) {
-      console.log('No subscription found at subscriptions/' + userId);
       return null;
     }
 
     const data = subscriptionDoc.data();
-    console.log('Found subscription data:', data);
     
     const subscription = {
       ...data,
+      stripeCustomerId, // Ensure this is included
       createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
       updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
       currentPeriodStart: data.currentPeriodStart?.toDate ? data.currentPeriodStart.toDate() : (data.currentPeriodStart ? new Date(data.currentPeriodStart) : undefined),
@@ -108,29 +116,57 @@ export function subscribeToUserSubscription(
   userId: string, 
   callback: (subscription: UserSubscription | null) => void
 ): (() => void) {
-  console.log('Setting up subscription listener for userId:', userId);
+  // First, get the user's stripeCustomerId
+  let userUnsubscribe: (() => void) | null = null;
+  let subscriptionUnsubscribe: (() => void) | null = null;
+
+  const userDoc = doc(db, 'users', userId);
   
-  const subscriptionDoc = doc(db, 'subscriptions', userId);
-  
-  return onSnapshot(subscriptionDoc, (docSnapshot) => {
-    if (!docSnapshot.exists()) {
-      console.log('No subscription document found for:', userId);
+  userUnsubscribe = onSnapshot(userDoc, (userSnapshot) => {
+    if (!userSnapshot.exists()) {
       callback(null);
       return;
     }
 
-    console.log('Subscription data updated:', docSnapshot.data());
-    const data = docSnapshot.data();
-    const subscription = {
-      ...data,
-      createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
-      updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
-      currentPeriodStart: data.currentPeriodStart?.toDate ? data.currentPeriodStart.toDate() : (data.currentPeriodStart ? new Date(data.currentPeriodStart) : undefined),
-      currentPeriodEnd: data.currentPeriodEnd?.toDate ? data.currentPeriodEnd.toDate() : (data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : undefined),
-    } as UserSubscription;
+    const stripeCustomerId = userSnapshot.data()?.stripeCustomerId;
+    if (!stripeCustomerId) {
+      callback(null);
+      return;
+    }
+
+    // Clean up previous subscription listener if it exists
+    if (subscriptionUnsubscribe) {
+      subscriptionUnsubscribe();
+    }
+
+    // Set up subscription listener using stripeCustomerId
+    const subscriptionDoc = doc(db, 'subscriptions', stripeCustomerId);
     
-    callback(subscription);
+    subscriptionUnsubscribe = onSnapshot(subscriptionDoc, (docSnapshot) => {
+      if (!docSnapshot.exists()) {
+        callback(null);
+        return;
+      }
+
+      const data = docSnapshot.data();
+      const subscription = {
+        ...data,
+        stripeCustomerId, // Ensure this is included
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
+        currentPeriodStart: data.currentPeriodStart?.toDate ? data.currentPeriodStart.toDate() : (data.currentPeriodStart ? new Date(data.currentPeriodStart) : undefined),
+        currentPeriodEnd: data.currentPeriodEnd?.toDate ? data.currentPeriodEnd.toDate() : (data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : undefined),
+      } as UserSubscription;
+      
+      callback(subscription);
+    });
   });
+
+  // Return cleanup function that unsubscribes both listeners
+  return () => {
+    if (userUnsubscribe) userUnsubscribe();
+    if (subscriptionUnsubscribe) subscriptionUnsubscribe();
+  };
 }
 
 // Real-time usage listener
