@@ -31,6 +31,8 @@ import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getRating, RatingResponse, RatingData } from "../lib/rating";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function Editor() {
   const params = useParams();
@@ -54,6 +56,7 @@ export default function Editor() {
   const [loadingRating, setLoadingRating] = useState(false);
   const [showRatingConfirmDialog, setShowRatingConfirmDialog] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [firstRatingCompleted, setFirstRatingCompleted] = useState<boolean>(true);
   
   // Computed based on whether rating exists - backend handles aiRated flag
   const aiRated = !!rating;
@@ -119,6 +122,21 @@ export default function Editor() {
 
     loadPost();
   }, [user, postId]);
+
+  // Listen to user onboarding state for firstRating
+  useEffect(() => {
+    if (!user) return;
+
+    const userDoc = doc(db, 'users', user.uid);
+    const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        setFirstRatingCompleted(userData.onboarded?.firstRating ?? true); // Default to true if not set
+      }
+    });
+
+    return unsubscribeUser;
+  }, [user]);
 
   // Auto-save
   useEffect(() => {
@@ -306,6 +324,19 @@ export default function Editor() {
       if (ratingResult.success && ratingResult.data) {
         setRating(ratingResult.data);
         // aiRated is automatically computed from rating existence
+        
+        // Mark first rating as completed if this is their first rating
+        if (!firstRatingCompleted) {
+          try {
+            const userDocRef = doc(db, 'users', user!.uid);
+            await updateDoc(userDocRef, {
+              'onboarded.firstRating': true
+            });
+          } catch (error) {
+            console.error('Error updating firstRating status:', error);
+          }
+        }
+        
         toast({
           title: "Rating received",
           description: `Your post received a rating of ${ratingResult.data.rating}/10`,
@@ -534,6 +565,43 @@ export default function Editor() {
               onSelectCollection={handleInsertHashtags}
               showInsertButtons={true}
             />
+          </div>
+        )}
+
+        {/* First Rating Encouragement Banner */}
+        {!firstRatingCompleted && body.trim().length >= 100 && body.trim().length <= 1000 && (
+          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-4 mb-4" data-testid="first-rating-encouragement">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <Star className="h-6 w-6 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-purple-900 mb-1">
+                  Ready to discover your post's potential?
+                </h3>
+                <p className="text-purple-700 text-sm mb-3">
+                  Get your first AI-powered rating and unlock personalized suggestions to make your LinkedIn posts more engaging. Your content looks great – let's see how it scores!
+                </p>
+                <Button
+                  onClick={handleGetRating}
+                  disabled={loadingRating}
+                  className="bg-purple-600 hover:bg-purple-700 text-white text-sm"
+                  data-testid="button-first-rating-cta"
+                >
+                  {loadingRating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Getting your first rating...
+                    </>
+                  ) : (
+                    <>
+                      <Star className="h-4 w-4 mr-2" />
+                      Get Your First Rating
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
