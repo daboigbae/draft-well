@@ -113,10 +113,12 @@ export default function Landing() {
                   </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-purple-100 to-indigo-100 p-8 rounded-2xl">
-                <div className="text-center text-slate-600">
-                  [Feature mockup placeholder]
-                </div>
+              <div className="bg-gradient-to-br from-purple-100 to-indigo-100 p-4 rounded-2xl">
+                <img 
+                  src="/attached_assets/Screenshot 2025-08-25 at 5.30.03 PM_1756164610128.png" 
+                  alt="Draftwell AI rating interface showing 9/10 rating" 
+                  className="w-full rounded-lg shadow-lg"
+                />
               </div>
             </div>
 
