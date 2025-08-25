@@ -153,12 +153,12 @@ export default function UsageIndicator() {
           <p className="text-sm text-amber-800 mb-2">
             You've used all your AI rating tokens.
           </p>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             {usage.planType === 'free' && (
               <Button 
                 size="sm" 
                 onClick={() => handleUpgrade('starter')}
-                className="bg-indigo-600 hover:bg-indigo-700"
+                className="bg-indigo-600 hover:bg-indigo-700 flex-1 sm:flex-none"
                 data-testid="button-upgrade-starter"
               >
                 <TrendingUp className="w-3 h-3 mr-1" />
@@ -170,6 +170,7 @@ export default function UsageIndicator() {
                 size="sm" 
                 variant={usage.planType === 'starter' ? 'default' : 'outline'}
                 onClick={() => handleUpgrade('pro')}
+                className="flex-1 sm:flex-none"
                 data-testid="button-upgrade-pro"
               >
                 Go Pro
