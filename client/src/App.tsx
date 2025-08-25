@@ -30,7 +30,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
-      <Route path="/signup" component={() => <Login />} />
+      <Route path="/signup" component={Landing} />
       <Route path="/" component={Landing} />
       <Route>
         <AuthGuard>

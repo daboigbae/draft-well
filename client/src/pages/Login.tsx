@@ -15,21 +15,12 @@ import Footer from "../components/Footer";
 const authSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().optional(),
-}).refine((data) => {
-  // Only require password confirmation for signup
-  return true;
-}, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
 });
 
 type AuthForm = z.infer<typeof authSchema>;
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
-  const [location] = useLocation();
-  const [isSignUp, setIsSignUp] = useState(location === '/signup');
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -38,38 +29,20 @@ export default function Login() {
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: "",
     },
   });
 
   const onSubmit = async (data: AuthForm) => {
     setIsLoading(true);
     try {
-      if (isSignUp) {
-        // Validate password confirmation for signup
-        if (data.password !== data.confirmPassword) {
-          toast({
-            title: "Sign up failed",
-            description: "Passwords don't match",
-            variant: "destructive",
-          });
-          return;
-        }
-        await signUpWithEmail(data.email, data.password);
-        toast({
-          title: "Account created!",
-          description: "Welcome to Draftwell! You're now signed in.",
-        });
-      } else {
-        await signInWithEmail(data.email, data.password);
-        toast({
-          title: "Signed in",
-          description: "Welcome back to Draftwell!",
-        });
-      }
+      await signInWithEmail(data.email, data.password);
+      toast({
+        title: "Signed in",
+        description: "Welcome back to Draftwell!",
+      });
     } catch (error: any) {
       toast({
-        title: isSignUp ? "Sign up failed" : "Authentication failed",
+        title: "Authentication failed",
         description: getAuthErrorMessage(error),
         variant: "destructive",
       });
@@ -91,7 +64,7 @@ export default function Login() {
             </div>
             <CardTitle className="text-2xl font-bold text-slate-800">Draftwell</CardTitle>
             <CardDescription>
-              {isSignUp ? "Create your account to start drafting better LinkedIn posts" : "Sign in to your account"}
+              Sign in to your account
             </CardDescription>
           </CardHeader>
           
@@ -124,7 +97,7 @@ export default function Login() {
                   <Input
                     id="password"
                     type="password"
-                    placeholder={isSignUp ? "Create a password (6+ characters)" : "Enter your password"}
+                    placeholder="Enter your password"
                     className="pl-10"
                     {...form.register("password")}
                     data-testid="input-password"
@@ -137,27 +110,6 @@ export default function Login() {
                 )}
               </div>
 
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      placeholder="Confirm your password"
-                      className="pl-10"
-                      {...form.register("confirmPassword")}
-                      data-testid="input-confirm-password"
-                    />
-                  </div>
-                  {form.formState.errors.confirmPassword && (
-                    <p className="text-sm text-red-600" data-testid="error-confirm-password">
-                      {form.formState.errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-              )}
 
               <Button
                 type="submit"
@@ -165,20 +117,20 @@ export default function Login() {
                 disabled={isLoading}
                 data-testid="button-submit"
               >
-                {isLoading ? "Please wait..." : (isSignUp ? "Create Account" : "Sign In")}
+                {isLoading ? "Please wait..." : "Sign In"}
               </Button>
             </form>
 
             <div className="text-center">
               <p className="text-sm text-slate-600">
-                {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+                Don't have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => setIsSignUp(!isSignUp)}
+                  onClick={() => setLocation('/')}
                   className="font-medium text-primary hover:text-primary/80 underline"
-                  data-testid="toggle-auth-mode"
+                  data-testid="link-landing"
                 >
-                  {isSignUp ? "Sign in" : "Sign up"}
+                  Go to home page
                 </button>
               </p>
             </div>
