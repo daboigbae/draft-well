@@ -11,6 +11,7 @@ import { logout } from "../lib/auth";
 import { createPost } from "../lib/posts";
 import { PostStatus } from "../types/post";
 import Footer from "../components/Footer";
+import UsageIndicator from "../components/UsageIndicator";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -194,6 +195,11 @@ export default function AppLayout({
             <Plus className="h-4 w-4" />
             New Post
           </Button>
+        </div>
+
+        {/* Usage Indicator in Toolbar */}
+        <div className="px-6 py-4 border-b border-gray-200">
+          <UsageIndicator />
         </div>
         
         {/* Search - only show if onSearchChange prop is provided */}
