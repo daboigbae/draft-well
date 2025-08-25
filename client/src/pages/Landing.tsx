@@ -27,7 +27,7 @@ export default function Landing() {
             <div className="flex items-center gap-4">
               <Button 
                 variant="ghost" 
-                onClick={() => setLocation('/login')}
+                onClick={() => setLocation('/signin')}
                 data-testid="button-sign-in"
               >
                 Sign In

@@ -86,7 +86,7 @@ export default function Signup() {
             <div className="flex items-center gap-4">
               <Button 
                 variant="ghost" 
-                onClick={() => setLocation('/login')}
+                onClick={() => setLocation('/signin')}
                 data-testid="button-sign-in"
               >
                 Sign In
@@ -194,7 +194,7 @@ export default function Signup() {
                 Already have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => setLocation('/login')}
+                  onClick={() => setLocation('/signin')}
                   className="font-medium text-purple-600 hover:text-purple-800 underline"
                   data-testid="link-sign-in"
                 >

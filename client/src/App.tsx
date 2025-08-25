@@ -30,7 +30,7 @@ function AuthenticatedRouter() {
 function Router() {
   return (
     <Switch>
-      <Route path="/login" component={Login} />
+      <Route path="/signin" component={Login} />
       <Route path="/signup" component={Signup} />
       <Route path="/" component={Landing} />
       <Route>
