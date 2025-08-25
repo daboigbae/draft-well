@@ -22,7 +22,7 @@ export default function PostList() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [onboarded, setOnboarded] = useState<boolean>(true);
+  const [firstDraftCompleted, setFirstDraftCompleted] = useState<boolean>(true);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -54,7 +54,7 @@ export default function PostList() {
     const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
-        setOnboarded(userData.onboarded ?? true); // Default to true if not set
+        setFirstDraftCompleted(userData.onboarded?.firstDraft ?? true); // Default to true if not set
       }
     });
 
@@ -210,7 +210,7 @@ export default function PostList() {
       <div className="flex-1 p-8" data-testid="post-list">
         <div className="max-w-4xl mx-auto">
           {/* Onboarding Banner */}
-          {!onboarded && (
+          {!firstDraftCompleted && (
             <div className="mb-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white" data-testid="onboarding-banner">
               <div className="flex items-start gap-4">
                 <div className="bg-white/20 rounded-lg p-3">
