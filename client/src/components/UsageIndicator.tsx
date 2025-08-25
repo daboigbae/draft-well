@@ -167,7 +167,7 @@ export default function UsageIndicator() {
         </div>
       )}
 
-      {isNearLimit && !isAtLimit && (
+      {isNearLimit && !isAtLimit && usage.planType === 'starter' && (
         <div className="bg-orange-50 border border-orange-200 rounded-md p-3 mb-3">
           <p className="text-sm text-orange-800 mb-2">
             You're close to your token limit. Consider upgrading for unlimited ratings.
