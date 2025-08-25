@@ -47,8 +47,7 @@ export async function getUserSubscription(userId: string): Promise<UserSubscript
     const subscriptionDoc = await getDoc(doc(db, 'subscriptions', userId));
     
     if (!subscriptionDoc.exists()) {
-      // Create default free subscription for new users
-      return await createUserSubscription(userId);
+      return null;
     }
 
     const data = subscriptionDoc.data();
