@@ -311,23 +311,32 @@ export default function PostList() {
                         You
                       </div>
                       <div>
-                        <div className="font-medium text-slate-800">Your Name</div>
-                        <div className="text-sm text-slate-500">Your Professional Title</div>
+                        <div className="font-medium text-slate-800">Gabe</div>
+                        <div className="text-sm text-slate-500">Senior Developer & Top 1% Freelancer</div>
                       </div>
                     </div>
                     
                     <div className="text-slate-800 leading-relaxed mb-4">
-                      <p className="mb-3">🚀 Just realized something that changed how I approach [your expertise]...</p>
-                      <p className="mb-3">The biggest mistake I see professionals make is [common problem]. Here's what I learned after [your experience]:</p>
-                      <p className="mb-3">✅ [Key insight #1]<br/>✅ [Key insight #2]<br/>✅ [Key insight #3]</p>
-                      <p>The result? [Amazing outcome]. Sometimes the simplest shifts create the biggest impact.</p>
-                      <p className="mt-3 text-indigo-600">#YourIndustry #Leadership #Growth</p>
+                      <p className="mb-3">I declined a job this week because they wanted me to do some live coding during the interview.</p>
+                      <p className="mb-3">Look, I get it. Hiring devs is hella hard.</p>
+                      <p className="mb-3">But if your hiring process still involves making senior engineers do LeetCode under pressure.</p>
+                      <p className="mb-3"><strong>You're not hiring. You're hazing.</strong></p>
+                      <p className="mb-3">I've been writing code for almost a decade.</p>
+                      <p className="mb-3">I've shipped real apps, saved dying projects, and built a business off my results.</p>
+                      <p className="mb-3">I'm a top 1% freelancer on UpWork with almost 10,000 hours billed and over $700k earned.</p>
+                      <p className="mb-3">You can Google me. My resume is public.</p>
+                      <p className="mb-3">If that's not enough proof that I know what I'm doing.</p>
+                      <p className="mb-3"><strong>You're not the kind of client I want to work with.</strong></p>
+                      <p className="mb-3 italic">= = = gabe was here = =</p>
+                      <p className="mb-3">Sorry not sorry.</p>
+                      <p className="mb-3">What do y'all think? Are live coding interviews still legit in 2025 — or are they just lazy vetting?</p>
+                      <p className="mt-3 text-indigo-600">#freelancing #programming #innovation #artificialintelligence #ai</p>
                     </div>
                     
                     <div className="flex items-center gap-6 text-sm text-slate-500 pt-3 border-t border-gray-100">
-                      <span>💬 127 comments</span>
-                      <span>🔄 89 shares</span>
-                      <span>❤️ 2.4K reactions</span>
+                      <span>💬 284 comments</span>
+                      <span>🔄 156 shares</span>
+                      <span>❤️ 3.7K reactions</span>
                     </div>
                   </div>
                   
