@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Linkedin, Plus, User, LogOut, Hash, Settings, Menu, X, FileText } from "lucide-react";
+import { Linkedin, Plus, User, Hash, Settings, Menu, X, FileText } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { logout } from "../lib/auth";
@@ -132,18 +131,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 </button>
               </div>
             </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" data-testid="button-user-menu">
-                  <User className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-56" align="end">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">{user?.email}</p>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => {
+                setLocation('/app/settings');
+                setSidebarOpen(false);
+              }}
+              data-testid="button-user-account"
+            >
+              <User className="h-4 w-4" />
+            </Button>
           </div>
           
           <Button
