@@ -279,65 +279,83 @@ export default function PostList() {
                   </p>
                 </>
               ) : currentFilter === "all" ? (
-                <div className="max-w-2xl mx-auto">
-                  <h3 className="text-2xl font-bold text-slate-800 mb-2">Your next viral post starts here</h3>
-                  <p className="text-slate-600 mb-8">
-                    Imagine sharing insights that spark conversations, build your network, and establish your expertise. Here's what your post could look like:
-                  </p>
-                  
-                  {/* Example Post Preview */}
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8 text-left">
-                    <div className="flex items-center gap-3 mb-4">
-                      <img 
-                        src="https://media.licdn.com/dms/image/v2/D5603AQGeotNHHd8VhQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1723385389068?e=1758758400&v=beta&t=U7d-58A04Mhu8VyxHDNOIrA-j21HghJwsB0GR4oGUz0"
-                        alt="Gabe's profile"
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <div>
-                        <div className="font-medium text-slate-800">Gabe</div>
-                        <div className="text-sm text-slate-500">Senior Developer & Top 1% Freelancer</div>
+                firstDraftCompleted ? (
+                  <div className="text-center">
+                    <div className="text-slate-400 mb-4">
+                      <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-slate-800 mb-2">Ready to write?</h3>
+                    <p className="text-slate-600 mb-6">
+                      You haven't created any posts yet. Start writing your next LinkedIn post.
+                    </p>
+                    <Button onClick={handleNewPost} data-testid="button-create-first-post">
+                      <PenTool className="w-4 h-4 mr-2" />
+                      New Post
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="max-w-2xl mx-auto">
+                    <h3 className="text-2xl font-bold text-slate-800 mb-2">Your next viral post starts here</h3>
+                    <p className="text-slate-600 mb-8">
+                      Imagine sharing insights that spark conversations, build your network, and establish your expertise. Here's what your post could look like:
+                    </p>
+                    
+                    {/* Example Post Preview */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8 text-left">
+                      <div className="flex items-center gap-3 mb-4">
+                        <img 
+                          src="https://media.licdn.com/dms/image/v2/D5603AQGeotNHHd8VhQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1723385389068?e=1758758400&v=beta&t=U7d-58A04Mhu8VyxHDNOIrA-j21HghJwsB0GR4oGUz0"
+                          alt="Gabe's profile"
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div>
+                          <div className="font-medium text-slate-800">Gabe</div>
+                          <div className="text-sm text-slate-500">Senior Developer & Top 1% Freelancer</div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-slate-800 leading-relaxed mb-4">
+                        <p className="mb-3">I declined a job this week because they wanted me to do some live coding during the interview.</p>
+                        <p className="mb-3">Look, I get it. Hiring devs is hella hard.</p>
+                        <p className="mb-3">But if your hiring process still involves making senior engineers do LeetCode under pressure.</p>
+                        <p className="mb-3"><strong>You're not hiring. You're hazing.</strong></p>
+                        <p className="mb-3">I've been writing code for almost a decade.</p>
+                        <p className="mb-3">I've shipped real apps, saved dying projects, and built a business off my results.</p>
+                        <p className="mb-3">I'm a top 1% freelancer on UpWork with almost 10,000 hours billed and over $700k earned.</p>
+                        <p className="mb-3">You can Google me. My resume is public.</p>
+                        <p className="mb-3">If that's not enough proof that I know what I'm doing.</p>
+                        <p className="mb-3"><strong>You're not the kind of client I want to work with.</strong></p>
+                        <p className="mb-3 italic">= = = gabe was here = =</p>
+                        <p className="mb-3">Sorry not sorry.</p>
+                        <p className="mb-3">What do y'all think? Are live coding interviews still legit in 2025 — or are they just lazy vetting?</p>
+                        <p className="mt-3 text-indigo-600">#freelancing #programming #innovation #artificialintelligence #ai</p>
+                      </div>
+                      
+                      <div className="flex items-center gap-6 text-sm text-slate-500 pt-3 border-t border-gray-100">
+                        <span>💬 284 comments</span>
+                        <span>🔄 156 shares</span>
+                        <span>❤️ 3.7K reactions</span>
                       </div>
                     </div>
                     
-                    <div className="text-slate-800 leading-relaxed mb-4">
-                      <p className="mb-3">I declined a job this week because they wanted me to do some live coding during the interview.</p>
-                      <p className="mb-3">Look, I get it. Hiring devs is hella hard.</p>
-                      <p className="mb-3">But if your hiring process still involves making senior engineers do LeetCode under pressure.</p>
-                      <p className="mb-3"><strong>You're not hiring. You're hazing.</strong></p>
-                      <p className="mb-3">I've been writing code for almost a decade.</p>
-                      <p className="mb-3">I've shipped real apps, saved dying projects, and built a business off my results.</p>
-                      <p className="mb-3">I'm a top 1% freelancer on UpWork with almost 10,000 hours billed and over $700k earned.</p>
-                      <p className="mb-3">You can Google me. My resume is public.</p>
-                      <p className="mb-3">If that's not enough proof that I know what I'm doing.</p>
-                      <p className="mb-3"><strong>You're not the kind of client I want to work with.</strong></p>
-                      <p className="mb-3 italic">= = = gabe was here = =</p>
-                      <p className="mb-3">Sorry not sorry.</p>
-                      <p className="mb-3">What do y'all think? Are live coding interviews still legit in 2025 — or are they just lazy vetting?</p>
-                      <p className="mt-3 text-indigo-600">#freelancing #programming #innovation #artificialintelligence #ai</p>
+                    <div className="text-slate-600 mb-6">
+                      <strong>Your story matters.</strong> Share your unique perspective, lessons learned, and insights that only you can provide. 
+                      The LinkedIn community is waiting to hear from you.
                     </div>
                     
-                    <div className="flex items-center gap-6 text-sm text-slate-500 pt-3 border-t border-gray-100">
-                      <span>💬 284 comments</span>
-                      <span>🔄 156 shares</span>
-                      <span>❤️ 3.7K reactions</span>
-                    </div>
+                    <Button 
+                      onClick={handleNewPost} 
+                      size="lg"
+                      className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium px-8"
+                      data-testid="button-create-first-post"
+                    >
+                      <PenTool className="w-5 h-5 mr-2" />
+                      Start Writing Your Story
+                    </Button>
                   </div>
-                  
-                  <div className="text-slate-600 mb-6">
-                    <strong>Your story matters.</strong> Share your unique perspective, lessons learned, and insights that only you can provide. 
-                    The LinkedIn community is waiting to hear from you.
-                  </div>
-                  
-                  <Button 
-                    onClick={handleNewPost} 
-                    size="lg"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium px-8"
-                    data-testid="button-create-first-post"
-                  >
-                    <PenTool className="w-5 h-5 mr-2" />
-                    Start Writing Your Story
-                  </Button>
-                </div>
+                )
               ) : (
                 <>
                   <div className="text-slate-400 mb-4">
