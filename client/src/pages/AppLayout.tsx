@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Linkedin, Plus, Search, User, LogOut, Hash } from "lucide-react";
+import { Linkedin, Plus, Search, User, LogOut, Hash, Settings, Menu, X } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
@@ -38,6 +38,7 @@ export default function AppLayout({
   currentTagFilter = null
 }: AppLayoutProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -93,23 +94,72 @@ export default function AppLayout({
 
   return (
     <div className="min-h-screen bg-background flex" data-testid="app-layout">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setLocation('/app')}
+            className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center"
+            data-testid="button-logo-mobile"
+          >
+            <Linkedin className="text-white h-4 w-4" />
+          </button>
+          <button 
+            onClick={() => setLocation('/app')}
+            className="text-lg font-bold text-slate-800"
+            data-testid="button-home-mobile"
+          >
+            Draftwell
+          </button>
+        </div>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 text-slate-600"
+          data-testid="button-menu-toggle"
+        >
+          {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40" 
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col" data-testid="sidebar">
+      <div className={`
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50
+        w-80 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out overflow-hidden
+      `} data-testid="sidebar">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <button 
+                onClick={() => setLocation('/app')}
+                className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors"
+                data-testid="button-logo"
+              >
                 <Linkedin className="text-white h-4 w-4" />
-              </div>
+              </button>
               <div>
-                <h1 className="text-xl font-bold text-slate-800">Draftwell</h1>
+                <button 
+                  onClick={() => setLocation('/app')}
+                  className="text-xl font-bold text-slate-800 hover:text-slate-600 cursor-pointer"
+                  data-testid="button-home"
+                >
+                  Draftwell
+                </button>
                 <button
                   onClick={() => setLocation('/app/release-notes')}
-                  className="text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer"
+                  className="text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer block"
                   data-testid="button-version"
                 >
-                  v2.0.0
+                  v3.0.0
                 </button>
               </div>
             </div>
@@ -146,52 +196,66 @@ export default function AppLayout({
           </Button>
         </div>
         
-        {/* Search */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search posts..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              data-testid="input-search"
-            />
+        {/* Search - only show if onSearchChange prop is provided */}
+        {onSearchChange && (
+          <div className="p-6 border-b border-gray-200">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search posts..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                data-testid="input-search"
+              />
+            </div>
           </div>
-        </div>
+        )}
         
-        {/* Filter Tabs */}
-        <div className="px-6 py-4">
-          <nav className="space-y-1">
-            {filterButtons.map((filter) => (
-              <Button
-                key={filter.key}
-                variant={currentFilter === filter.key ? "default" : "ghost"}
-                className="w-full justify-between"
-                onClick={() => onFilterChange?.(filter.key)}
-                data-testid={`button-filter-${filter.key}`}
-              >
-                <span>{filter.label}</span>
-                <Badge 
-                  variant={currentFilter === filter.key ? "secondary" : "outline"}
-                  className="ml-2"
-                >
-                  {filter.count}
-                </Badge>
-              </Button>
-            ))}
-          </nav>
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Filter Tabs - only show if onFilterChange prop is provided */}
+          {onFilterChange && (
+            <div className="px-6 py-4">
+              <nav className="space-y-1">
+                {filterButtons.map((filter) => (
+                  <Button
+                    key={filter.key}
+                    variant={currentFilter === filter.key ? "default" : "ghost"}
+                    className="w-full justify-between"
+                    onClick={() => {
+                      onFilterChange(filter.key);
+                      setLocation('/app');
+                      setSidebarOpen(false); // Close mobile sidebar after selection
+                    }}
+                    data-testid={`button-filter-${filter.key}`}
+                  >
+                    <span>{filter.label}</span>
+                    <Badge 
+                      variant={currentFilter === filter.key ? "secondary" : "outline"}
+                      className="ml-2"
+                    >
+                      {filter.count}
+                    </Badge>
+                  </Button>
+                ))}
+              </nav>
+            </div>
+          )}
           
           {/* Tag Filter */}
-          {allTags.length > 0 && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
+          {onFilterChange && allTags.length > 0 && (
+            <div className="px-6 mt-6 pt-6 border-t border-gray-200">
               <h3 className="text-sm font-medium text-slate-700 mb-3">Filter by Tag</h3>
               <div className="space-y-1 max-h-32 overflow-y-auto">
                 <Button
                   variant={currentTagFilter === null ? "default" : "ghost"}
                   className="w-full justify-start text-xs"
-                  onClick={() => onTagFilterChange?.(null)}
+                  onClick={() => {
+                    onTagFilterChange?.(null);
+                    setSidebarOpen(false); // Close mobile sidebar after selection
+                  }}
                   data-testid="button-tag-all"
                 >
                   All Tags
@@ -201,7 +265,10 @@ export default function AppLayout({
                     key={tag}
                     variant={currentTagFilter === tag ? "default" : "ghost"}
                     className="w-full justify-start text-xs"
-                    onClick={() => onTagFilterChange?.(tag)}
+                    onClick={() => {
+                      onTagFilterChange?.(tag);
+                      setSidebarOpen(false); // Close mobile sidebar after selection
+                    }}
                     data-testid={`button-tag-${tag}`}
                   >
                     {tag}
@@ -217,22 +284,37 @@ export default function AppLayout({
           )}
 
           {/* Additional Navigation */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
+          <div className="px-6 mt-6 pt-6 border-t border-gray-200">
             <Button
               variant="ghost"
               className="w-full justify-start"
-              onClick={() => setLocation('/app/hashtag-collections')}
+              onClick={() => {
+                setLocation('/app/hashtag-collections');
+                setSidebarOpen(false); // Close mobile sidebar after navigation
+              }}
               data-testid="button-hashtag-collections"
             >
               <Hash className="mr-3 h-4 w-4" />
               Hashtag Collections
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                setLocation('/app/settings');
+                setSidebarOpen(false); // Close mobile sidebar after navigation
+              }}
+              data-testid="button-settings"
+            >
+              <Settings className="mr-3 h-4 w-4" />
+              Settings
             </Button>
           </div>
         </div>
       </div>
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col" data-testid="main-content">
+      <div className="flex-1 flex flex-col lg:ml-0 pt-16 lg:pt-0" data-testid="main-content">
         <div className="flex-1">
           {children}
         </div>

@@ -53,6 +53,7 @@ export default function Editor() {
   const [rating, setRating] = useState<RatingData | null>(null);
   const [loadingRating, setLoadingRating] = useState(false);
   const [showRatingConfirmDialog, setShowRatingConfirmDialog] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
   
   // Computed based on whether rating exists - backend handles aiRated flag
   const aiRated = !!rating;
@@ -368,7 +369,8 @@ export default function Editor() {
   return (
     <div className="min-h-screen bg-background flex flex-col" data-testid="editor">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-6">
+      <div className="bg-white border-b border-gray-200 p-4 sm:p-6">
+        {/* First row: Back button and save status */}
         <div className="flex items-center justify-between mb-4">
           <Button
             variant="ghost"
@@ -377,67 +379,105 @@ export default function Editor() {
             data-testid="button-back"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Posts
+            <span className="hidden sm:inline">Back to Posts</span>
+            <span className="sm:hidden">Back</span>
           </Button>
           
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-sm text-slate-500" data-testid="save-status">
-              {saving ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                  <span>Saving...</span>
-                </>
-              ) : lastSaved ? (
-                <>
-                  <Save className="h-4 w-4 text-green-600" />
-                  <span>Saved • {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                </>
-              ) : null}
-            </div>
-            
-            <Button variant="outline" onClick={handleCopy} data-testid="button-copy">
-              <Copy className="h-4 w-4 mr-2" />
-              Copy Post
-            </Button>
-            
-            <Button variant="outline" onClick={handleExport} data-testid="button-export">
-              <Download className="h-4 w-4 mr-2" />
-              Export .txt
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={handleGetRating}
-              disabled={!body.trim() || loadingRating}
-              data-testid="button-get-rating"
-            >
-              {loadingRating ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                  Getting Rating...
-                </>
-              ) : (
-                <>
-                  <Star className="h-4 w-4 mr-2" />
-                  Get Rating
-                </>
-              )}
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={() => setShowPublishModal(true)}
-              data-testid="button-open-publish-modal"
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              Mark as Published
-            </Button>
-            
-            <Button onClick={handlePublish} data-testid="button-publish">
-              <Share className="h-4 w-4 mr-2" />
-              Publish
-            </Button>
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500" data-testid="save-status">
+            {saving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                <span className="hidden sm:inline">Saving...</span>
+              </>
+            ) : lastSaved ? (
+              <>
+                <Save className="h-4 w-4 text-green-600" />
+                <span className="hidden sm:inline">Saved • {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <span className="sm:hidden">Saved</span>
+              </>
+            ) : null}
           </div>
+        </div>
+        
+        {/* Action buttons - responsive layout */}
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <Button 
+            variant="outline" 
+            onClick={handleCopy} 
+            size="sm"
+            className="text-xs sm:text-sm"
+            data-testid="button-copy"
+          >
+            <Copy className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline ml-2">Copy Post</span>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            onClick={handleExport} 
+            size="sm"
+            className="text-xs sm:text-sm"
+            data-testid="button-export"
+          >
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline ml-2">Export</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={handleGetRating}
+            disabled={!body.trim() || loadingRating}
+            size="sm"
+            className="text-xs sm:text-sm"
+            data-testid="button-get-rating"
+          >
+            {loadingRating ? (
+              <>
+                <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-primary"></div>
+                <span className="hidden sm:inline ml-2">Getting Rating...</span>
+              </>
+            ) : (
+              <>
+                <Star className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                <span className="hidden sm:inline ml-2">Get Rating</span>
+              </>
+            )}
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={() => setShowPublishModal(true)}
+            size="sm"
+            className="text-xs sm:text-sm"
+            data-testid="button-open-publish-modal"
+          >
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline ml-2">Mark Published</span>
+          </Button>
+          
+          <Button 
+            onClick={handlePublish} 
+            size="sm"
+            className="text-xs sm:text-sm"
+            data-testid="button-publish"
+          >
+            <Share className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline ml-2">Publish</span>
+          </Button>
+          
+          {/* Mobile Preview Toggle */}
+          <Button
+            variant="outline"
+            onClick={() => setShowMobilePreview(!showMobilePreview)}
+            size="sm"
+            className="lg:hidden text-xs"
+            data-testid="button-toggle-mobile-preview"
+          >
+            <div className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2">
+              {showMobilePreview ? '👁️' : '👁️'}
+            </div>
+            <span className="ml-2">{showMobilePreview ? 'Hide Preview' : 'Show Preview'}</span>
+          </Button>
         </div>
         
         {/* Title Input */}
@@ -448,15 +488,15 @@ export default function Editor() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={handleKeyboardShortcuts}
-            className="text-2xl font-bold border-none p-0 focus-visible:ring-0"
+            className="text-xl sm:text-2xl font-bold border-none p-0 focus-visible:ring-0"
             maxLength={120}
             data-testid="input-title"
           />
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-sm text-slate-500" data-testid="title-char-count">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-2">
+            <span className="text-xs sm:text-sm text-slate-500" data-testid="title-char-count">
               {title.length}/120 characters
             </span>
-            <div className="flex items-center gap-4 text-sm text-slate-500">
+            <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-500">
               <span data-testid="word-count">
                 {body.trim() ? body.trim().split(/\s+/).length : 0} words
               </span>
@@ -499,9 +539,9 @@ export default function Editor() {
       </div>
 
       {/* Editor Content */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex flex-col lg:flex-row">
         {/* Editor Panel */}
-        <div className="flex-1 flex flex-col border-r border-gray-200">
+        <div className="flex-1 flex flex-col lg:border-r border-gray-200">
           <EditorToolbar onInsertMarkdown={handleInsertMarkdown} />
           
           <div className="flex-1 flex flex-col">
@@ -511,11 +551,11 @@ export default function Editor() {
               value={body}
               onChange={(e) => setBody(e.target.value)}
               onKeyDown={handleKeyboardShortcuts}
-              className="flex-1 border-none resize-none font-mono text-sm leading-relaxed focus-visible:ring-0"
+              className="flex-1 border-none resize-none font-mono text-sm leading-relaxed focus-visible:ring-0 min-h-[300px] lg:min-h-0"
               data-testid="textarea-body"
             />
             
-            <div className="bg-white border-t border-gray-200 p-4">
+            <div className="bg-white border-t border-gray-200 p-3 sm:p-4">
               <CharacterCounter
                 text={body}
                 maxLength={3000}
@@ -527,8 +567,78 @@ export default function Editor() {
           </div>
         </div>
         
-        {/* Preview Panel */}
-        <div className="w-1/2 bg-gray-50 flex flex-col">
+        {/* Mobile Preview Panel - Toggleable */}
+        {showMobilePreview && (
+          <div className="lg:hidden bg-gray-50 border-t border-gray-200">
+            <div className="bg-white border-b border-gray-200 p-3 flex items-center justify-between">
+              <h3 className="font-semibold text-slate-700 text-sm">Live Preview</h3>
+              <button 
+                onClick={() => setShowMobilePreview(false)}
+                className="text-slate-500 hover:text-slate-700"
+                data-testid="button-close-mobile-preview"
+              >
+                ✕
+              </button>
+            </div>
+            
+            {/* Rating Display */}
+            {rating && (
+              <div className="bg-white border-b border-gray-200 p-3" data-testid="rating-display-mobile">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-slate-700 text-sm">Post Rating</h4>
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="text-lg font-bold text-slate-800" data-testid="rating-score-mobile">
+                      {rating.rating}/10
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="p-4 max-h-96 overflow-y-auto">
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm" data-testid="preview-panel-mobile">
+                <div className="p-3">
+                  {/* Mock LinkedIn Header */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                    <div>
+                      <div className="font-semibold text-slate-800 text-sm">{user?.email?.split('@')[0] || 'Your Name'}</div>
+                      <div className="text-xs text-slate-500">Your Title • 1st</div>
+                      <div className="text-xs text-slate-400">2m • 🌍</div>
+                    </div>
+                  </div>
+                  
+                  {/* Post Content Preview */}
+                  <div className="prose max-w-none prose-slate prose-sm" data-testid="markdown-preview-mobile">
+                    <div dangerouslySetInnerHTML={{ __html: renderedMarkdown }} />
+                    {shouldShowMore && !previewExpanded && (
+                      <button
+                        onClick={() => setPreviewExpanded(true)}
+                        className="text-slate-500 hover:text-slate-700 font-medium text-sm mt-1 cursor-pointer"
+                        data-testid="button-show-more-mobile"
+                      >
+                        ...more
+                      </button>
+                    )}
+                    {shouldShowMore && previewExpanded && (
+                      <button
+                        onClick={() => setPreviewExpanded(false)}
+                        className="text-slate-500 hover:text-slate-700 font-medium text-sm mt-2 cursor-pointer"
+                        data-testid="button-show-less-mobile"
+                      >
+                        Show less
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Desktop Preview Panel */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gray-50 flex-col">
           <div className="bg-white border-b border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-slate-700">Live Preview</h3>

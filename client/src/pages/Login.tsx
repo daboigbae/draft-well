@@ -9,40 +9,66 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { useToast } from "../hooks/use-toast";
-import { signInWithEmail, getAuthErrorMessage } from "../lib/auth";
+import { signInWithEmail, signUpWithEmail, getAuthErrorMessage } from "../lib/auth";
 import Footer from "../components/Footer";
 
-const loginSchema = z.object({
+const authSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().optional(),
+}).refine((data) => {
+  // Only require password confirmation for signup
+  return true;
+}, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
+type AuthForm = z.infer<typeof authSchema>;
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const form = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<AuthForm>({
+    resolver: zodResolver(authSchema),
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = async (data: LoginForm) => {
+  const onSubmit = async (data: AuthForm) => {
     setIsLoading(true);
     try {
-      await signInWithEmail(data.email, data.password);
-      toast({
-        title: "Signed in",
-        description: "Welcome back to Draftwell!",
-      });
+      if (isSignUp) {
+        // Validate password confirmation for signup
+        if (data.password !== data.confirmPassword) {
+          toast({
+            title: "Sign up failed",
+            description: "Passwords don't match",
+            variant: "destructive",
+          });
+          return;
+        }
+        await signUpWithEmail(data.email, data.password);
+        toast({
+          title: "Account created!",
+          description: "Welcome to Draftwell! You're now signed in.",
+        });
+      } else {
+        await signInWithEmail(data.email, data.password);
+        toast({
+          title: "Signed in",
+          description: "Welcome back to Draftwell!",
+        });
+      }
     } catch (error: any) {
       toast({
-        title: "Authentication failed",
+        title: isSignUp ? "Sign up failed" : "Authentication failed",
         description: getAuthErrorMessage(error),
         variant: "destructive",
       });
@@ -64,7 +90,7 @@ export default function Login() {
             </div>
             <CardTitle className="text-2xl font-bold text-slate-800">Draftwell</CardTitle>
             <CardDescription>
-              Closed Beta - Sign in to access
+              {isSignUp ? "Create your account to start drafting better LinkedIn posts" : "Sign in to your account"}
             </CardDescription>
           </CardHeader>
           
@@ -97,7 +123,7 @@ export default function Login() {
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder={isSignUp ? "Create a password (6+ characters)" : "Enter your password"}
                     className="pl-10"
                     {...form.register("password")}
                     data-testid="input-password"
@@ -110,15 +136,51 @@ export default function Login() {
                 )}
               </div>
 
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="Confirm your password"
+                      className="pl-10"
+                      {...form.register("confirmPassword")}
+                      data-testid="input-confirm-password"
+                    />
+                  </div>
+                  {form.formState.errors.confirmPassword && (
+                    <p className="text-sm text-red-600" data-testid="error-confirm-password">
+                      {form.formState.errors.confirmPassword.message}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <Button
                 type="submit"
                 className="w-full"
                 disabled={isLoading}
                 data-testid="button-submit"
               >
-                {isLoading ? "Please wait..." : "Sign In"}
+                {isLoading ? "Please wait..." : (isSignUp ? "Create Account" : "Sign In")}
               </Button>
             </form>
+
+            <div className="text-center">
+              <p className="text-sm text-slate-600">
+                {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="font-medium text-primary hover:text-primary/80 underline"
+                  data-testid="toggle-auth-mode"
+                >
+                  {isSignUp ? "Sign in" : "Sign up"}
+                </button>
+              </p>
+            </div>
 
           </CardContent>
         </Card>
@@ -185,14 +247,11 @@ export default function Login() {
                   className="text-sm lg:text-base text-slate-500 hover:text-slate-700 hover:underline cursor-pointer font-medium"
                   data-testid="button-release-notes"
                 >
-                  v1.1.2 Release Notes
+                  v3.0.0 Release Notes
                 </button>
                 <span className="text-slate-300">•</span>
                 <span className="text-sm lg:text-base text-slate-500">Closed Beta</span>
               </div>
-              <p className="text-xs lg:text-sm text-slate-500 leading-relaxed">
-                Built with React, TypeScript, and Firebase for professionals who take their LinkedIn presence seriously.
-              </p>
             </div>
           </CardContent>
         </Card>

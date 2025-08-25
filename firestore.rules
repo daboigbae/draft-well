@@ -22,5 +22,16 @@ service cloud.firestore {
         allow create, read, update, delete: if isSignedIn() && isOwner(uid);
       }
     }
+
+    // Subscription management - users can only access their own subscription
+    match /subscriptions/{userId} {
+      allow read, write: if isSignedIn() && isOwner(userId);
+    }
+    
+    // Usage tracking - users can only access their own usage data
+    match /usage/{usageId} {
+      allow read, write: if isSignedIn() && 
+        usageId.matches('^' + request.auth.uid + '_.*');
+    }
   }
 }
