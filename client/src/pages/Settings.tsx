@@ -256,6 +256,8 @@ export default function Settings() {
                   <p className="text-slate-600 mb-4">
                     {subscription?.planType === 'pro'
                       ? 'Unlimited AI ratings available'
+                      : subscription?.planType === 'free'
+                      ? `${getTokenDisplay()} AI ratings available (2 per week)`
                       : `${getTokenDisplay()} AI ratings available`
                     }
                   </p>
@@ -329,7 +331,7 @@ export default function Settings() {
                           <span className="text-2xl font-bold">${plan.price}/mo</span>
                         </CardTitle>
                         <CardDescription>
-                          Perfect for {plan.id === 'starter' ? 'regular creators' : 'power users'}
+                          {plan.id === 'starter' ? '20 ratings/mo + reminders' : 'unlimited + analytics + generator'}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -339,7 +341,9 @@ export default function Settings() {
                             <span className="text-sm">
                               {plan.features.aiRatingsPerMonth === 'unlimited'
                                 ? 'Unlimited AI ratings'
-                                : `${plan.features.aiRatingsPerMonth} AI ratings per month`
+                                : plan.id === 'starter'
+                                ? '20 AI ratings per month'
+                                : '8 AI ratings per month (2/week)'
                               }
                             </span>
                           </li>
@@ -352,13 +356,13 @@ export default function Settings() {
                           {plan.features.advancedAiFeedback && (
                             <li className="flex items-center gap-2">
                               <Check className="w-4 h-4 text-green-600" />
-                              <span className="text-sm">Advanced AI feedback & comparisons</span>
+                              <span className="text-sm">Analytics & advanced AI feedback</span>
                             </li>
                           )}
                           {plan.features.csvExport && (
                             <li className="flex items-center gap-2">
                               <Check className="w-4 h-4 text-green-600" />
-                              <span className="text-sm">Export drafts & ratings to CSV</span>
+                              <span className="text-sm">Content generator & CSV export</span>
                             </li>
                           )}
                         </ul>

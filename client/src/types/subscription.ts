@@ -40,7 +40,7 @@ export const PLANS: Plan[] = [
     name: 'Free',
     price: 0,
     features: {
-      aiRatingsPerMonth: 2,
+      aiRatingsPerMonth: 8, // 2 per week * 4 weeks
       postReminders: false,
       advancedAiFeedback: false,
       csvExport: false,
@@ -53,7 +53,7 @@ export const PLANS: Plan[] = [
     stripePriceId: import.meta.env.VITE_STRIPE_STARTER_PRICE_ID,
     features: {
       aiRatingsPerMonth: 20,
-      postReminders: false,
+      postReminders: true,
       advancedAiFeedback: false,
       csvExport: false,
     },
