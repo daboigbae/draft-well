@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { ArrowUpDown, AlertCircle } from "lucide-react";
+import { ArrowUpDown, AlertCircle, PenTool, Sparkles } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import PostCard from "../components/PostCard";
@@ -10,6 +10,8 @@ import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
 import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags, createPost } from "../lib/posts";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -21,6 +23,7 @@ export default function PostList() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [onboarded, setOnboarded] = useState<boolean>(true);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -42,6 +45,21 @@ export default function PostList() {
       unsubscribePosts();
       unsubscribeTags();
     };
+  }, [user]);
+
+  // Subscribe to user onboarded status
+  useEffect(() => {
+    if (!user) return;
+
+    const userDoc = doc(db, 'users', user.uid);
+    const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        setOnboarded(userData.onboarded ?? true); // Default to true if not set
+      }
+    });
+
+    return unsubscribeUser;
   }, [user]);
 
   // Filter and search posts
@@ -192,6 +210,33 @@ export default function PostList() {
     >
       <div className="flex-1 p-8" data-testid="post-list">
         <div className="max-w-4xl mx-auto">
+          {/* Onboarding Banner */}
+          {!onboarded && (
+            <div className="mb-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white" data-testid="onboarding-banner">
+              <div className="flex items-start gap-4">
+                <div className="bg-white/20 rounded-lg p-3">
+                  <PenTool className="w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                    Welcome to Draftwell! <Sparkles className="w-5 h-5" />
+                  </h3>
+                  <p className="text-indigo-100 mb-4 leading-relaxed">
+                    Ready to create amazing LinkedIn content? Start by writing your first post and discover the power of AI-powered feedback to make every post shine.
+                  </p>
+                  <Button 
+                    onClick={handleNewPost}
+                    className="bg-white text-indigo-600 hover:bg-indigo-50 font-medium"
+                    data-testid="button-onboarding-create-post"
+                  >
+                    <PenTool className="w-4 h-4 mr-2" />
+                    Write Your First Post
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Usage Indicator */}
           <div className="mb-6">
             <UsageIndicator />
