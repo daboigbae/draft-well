@@ -301,13 +301,13 @@ export default function Settings() {
           </Card>
 
           {/* Upgrade Plans */}
-          {subscription?.planType !== 'pro' && (
+          {(!subscription || subscription?.planType !== 'pro') && (
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-slate-800 mb-6">Upgrade Your Plan</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {PLANS.slice(1).map((plan) => {
                   const isCurrentPlan = subscription?.planType === plan.id;
-                  const shouldShow = subscription?.planType === 'free' || 
+                  const shouldShow = !subscription || subscription?.planType === 'free' || 
                     (subscription?.planType === 'starter' && plan.id === 'pro');
                   
                   if (!shouldShow) return null;
