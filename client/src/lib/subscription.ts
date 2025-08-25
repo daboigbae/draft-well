@@ -85,15 +85,16 @@ export async function canUserUseAiRating(userId: string): Promise<{ canUse: bool
   }
 
   const plan = getPlanById(subscription.planType);
-  const reportTokens = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
-
-  // Check if unlimited (999999 or 'unlimited')
-  if (reportTokens === 999999 || reportTokens === 'unlimited') {
+  
+  // Pro users always have unlimited access regardless of reportTokens value
+  if (plan.features.aiRatingsPerMonth === 'unlimited') {
     return { canUse: true, current: 999999, limit: 'unlimited' };
   }
 
-  // Check if user has tokens remaining
+  // For non-unlimited plans, check reportTokens
+  const reportTokens = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
   const canUse = (reportTokens as number) > 0;
+  
   return {
     canUse,
     reason: canUse ? undefined : 'No tokens remaining',
