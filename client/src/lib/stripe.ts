@@ -8,16 +8,19 @@ if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export async function createCheckoutSession(planType: PlanType, userId: string) {
-  // Import here to avoid circular dependencies
-  const { getUserSubscription } = await import('./subscription');
+  // Import Firebase functions
+  const { doc, getDoc } = await import('firebase/firestore');
+  const { db } = await import('../firebase');
   
-  // Check if user has existing Stripe customer ID
+  // Check if user has existing Stripe customer ID from users collection
   let existingCustomerId: string | undefined;
   try {
-    const subscription = await getUserSubscription(userId);
-    existingCustomerId = subscription?.stripeCustomerId;
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists()) {
+      existingCustomerId = userDoc.data()?.stripeCustomerId;
+    }
   } catch (error) {
-    console.log('No existing subscription found, will create new customer');
+    console.log('No existing user found or error fetching user data, will create new customer');
   }
 
   const response = await fetch('/api/create-checkout-session', {
