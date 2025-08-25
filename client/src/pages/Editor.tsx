@@ -131,11 +131,8 @@ export default function Editor() {
     const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
-        console.log('Editor - User onboarding data:', userData.onboarded);
-        console.log('Editor - First rating completed:', userData.onboarded?.firstRating);
         setFirstRatingCompleted(userData.onboarded?.firstRating ?? false); // Default to false to show onboarding
       } else {
-        console.log('Editor - User document does not exist, showing onboarding');
         setFirstRatingCompleted(false);
       }
     });
@@ -143,12 +140,6 @@ export default function Editor() {
     return unsubscribeUser;
   }, [user]);
 
-  // Debug state changes
-  useEffect(() => {
-    console.log('Editor - firstRatingCompleted state changed to:', firstRatingCompleted);
-    console.log('Editor - body length:', body.trim().length);
-    console.log('Editor - should show banner:', !firstRatingCompleted && body.trim().length >= 100 && body.trim().length <= 1000);
-  }, [firstRatingCompleted, body]);
 
   // Auto-save
   useEffect(() => {

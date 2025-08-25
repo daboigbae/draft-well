@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Linkedin, Plus, Search, User, LogOut, Hash, Settings, Menu, X } from "lucide-react";
+import { Linkedin, Plus, User, LogOut, Hash, Settings, Menu, X } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Badge } from "../components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
@@ -15,39 +13,14 @@ import UsageIndicator from "../components/UsageIndicator";
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  onFilterChange?: (filter: PostStatus | "all") => void;
-  onTagFilterChange?: (tag: string | null) => void;
-  onSearchChange?: (query: string) => void;
-  postCounts?: {
-    all: number;
-    draft: number;
-    published: number;
-  };
-  allTags?: string[];
-  currentFilter?: PostStatus | "all";
-  currentTagFilter?: string | null;
 }
 
-export default function AppLayout({ 
-  children, 
-  onFilterChange,
-  onTagFilterChange,
-  onSearchChange, 
-  postCounts = { all: 0, draft: 0, published: 0 },
-  allTags = [],
-  currentFilter = "all",
-  currentTagFilter = null
-}: AppLayoutProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    onSearchChange?.(query);
-  };
 
   const handleNewPost = async () => {
     if (!user) return;
@@ -87,11 +60,6 @@ export default function AppLayout({
     }
   };
 
-  const filterButtons = [
-    { key: "all" as const, label: "All Posts", count: postCounts.all },
-    { key: "draft" as const, label: "Drafts", count: postCounts.draft },
-    { key: "published" as const, label: "Published", count: postCounts.published },
-  ];
 
   return (
     <div className="min-h-screen bg-background flex" data-testid="app-layout">
@@ -202,92 +170,10 @@ export default function AppLayout({
           <UsageIndicator />
         </div>
         
-        {/* Search - only show if onSearchChange prop is provided */}
-        {onSearchChange && (
-          <div className="p-6 border-b border-gray-200">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search posts..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                data-testid="input-search"
-              />
-            </div>
-          </div>
-        )}
         
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto">
-          {/* Filter Tabs - only show if onFilterChange prop is provided */}
-          {onFilterChange && (
-            <div className="px-6 py-4">
-              <nav className="space-y-1">
-                {filterButtons.map((filter) => (
-                  <Button
-                    key={filter.key}
-                    variant={currentFilter === filter.key ? "default" : "ghost"}
-                    className="w-full justify-between"
-                    onClick={() => {
-                      onFilterChange(filter.key);
-                      setLocation('/app');
-                      setSidebarOpen(false); // Close mobile sidebar after selection
-                    }}
-                    data-testid={`button-filter-${filter.key}`}
-                  >
-                    <span>{filter.label}</span>
-                    <Badge 
-                      variant={currentFilter === filter.key ? "secondary" : "outline"}
-                      className="ml-2"
-                    >
-                      {filter.count}
-                    </Badge>
-                  </Button>
-                ))}
-              </nav>
-            </div>
-          )}
           
-          {/* Tag Filter */}
-          {onFilterChange && allTags.length > 0 && (
-            <div className="px-6 mt-6 pt-6 border-t border-gray-200">
-              <h3 className="text-sm font-medium text-slate-700 mb-3">Filter by Tag</h3>
-              <div className="space-y-1 max-h-32 overflow-y-auto">
-                <Button
-                  variant={currentTagFilter === null ? "default" : "ghost"}
-                  className="w-full justify-start text-xs"
-                  onClick={() => {
-                    onTagFilterChange?.(null);
-                    setSidebarOpen(false); // Close mobile sidebar after selection
-                  }}
-                  data-testid="button-tag-all"
-                >
-                  All Tags
-                </Button>
-                {allTags.slice(0, 10).map((tag) => (
-                  <Button
-                    key={tag}
-                    variant={currentTagFilter === tag ? "default" : "ghost"}
-                    className="w-full justify-start text-xs"
-                    onClick={() => {
-                      onTagFilterChange?.(tag);
-                      setSidebarOpen(false); // Close mobile sidebar after selection
-                    }}
-                    data-testid={`button-tag-${tag}`}
-                  >
-                    {tag}
-                  </Button>
-                ))}
-                {allTags.length > 10 && (
-                  <p className="text-xs text-slate-500 px-3 py-1">
-                    +{allTags.length - 10} more tags
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Additional Navigation */}
           <div className="px-6 mt-6 pt-6 border-t border-gray-200">

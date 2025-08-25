@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { ArrowUpDown, AlertCircle, PenTool, Sparkles } from "lucide-react";
+import { ArrowUpDown, AlertCircle, PenTool, Sparkles, Search } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Badge } from "../components/ui/badge";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import PostCard from "../components/PostCard";
 import AppLayout from "./AppLayout";
@@ -56,11 +58,9 @@ export default function PostList() {
     const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
-        console.log('PostList - User onboarding data:', userData.onboarded);
         setFirstDraftCompleted(userData.onboarded?.firstDraft ?? false); // Default to false to show onboarding
         setTutorialCompleted(userData.onboarded?.tutorial ?? false); // Default to false to show onboarding
       } else {
-        console.log('PostList - User document does not exist, showing onboarding');
         setFirstDraftCompleted(false);
         setTutorialCompleted(false);
       }
@@ -69,14 +69,6 @@ export default function PostList() {
     return unsubscribeUser;
   }, [user]);
 
-  // Debug state changes
-  useEffect(() => {
-    console.log('PostList - tutorialCompleted state changed to:', tutorialCompleted);
-  }, [tutorialCompleted]);
-
-  useEffect(() => {
-    console.log('PostList - firstDraftCompleted state changed to:', firstDraftCompleted);
-  }, [firstDraftCompleted]);
 
   // Filter and search posts
   useEffect(() => {
@@ -202,15 +194,7 @@ export default function PostList() {
 
   if (error) {
     return (
-      <AppLayout
-        onFilterChange={setCurrentFilter}
-        onTagFilterChange={setCurrentTagFilter}
-        onSearchChange={setSearchQuery}
-        postCounts={getPostCounts()}
-        allTags={allTags}
-        currentFilter={currentFilter}
-        currentTagFilter={currentTagFilter}
-      >
+      <AppLayout>
         <div className="flex-1 p-8">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
@@ -222,21 +206,13 @@ export default function PostList() {
   }
 
   return (
-    <AppLayout
-      onFilterChange={setCurrentFilter}
-      onTagFilterChange={setCurrentTagFilter}
-      onSearchChange={setSearchQuery}
-      postCounts={getPostCounts()}
-      allTags={allTags}
-      currentFilter={currentFilter}
-      currentTagFilter={currentTagFilter}
-    >
+    <AppLayout>
       <div className="flex-1 p-8" data-testid="post-list">
         <div className="max-w-4xl mx-auto">
 
 
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold text-slate-800" data-testid="text-filter-title">
                 {getFilterTitle()}
@@ -254,6 +230,92 @@ export default function PostList() {
               <ArrowUpDown className="h-4 w-4" />
               {sortOrder === "desc" ? "Newest First" : "Oldest First"}
             </Button>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="space-y-6 mb-8">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search posts..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                data-testid="input-search"
+              />
+            </div>
+
+            {/* Post Status Filters */}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={currentFilter === "all" ? "default" : "outline"}
+                onClick={() => setCurrentFilter("all")}
+                className="flex items-center gap-2"
+                data-testid="button-filter-all"
+              >
+                All Posts
+                <Badge variant="secondary" className="ml-1">
+                  {getPostCounts().all}
+                </Badge>
+              </Button>
+              <Button
+                variant={currentFilter === "draft" ? "default" : "outline"}
+                onClick={() => setCurrentFilter("draft")}
+                className="flex items-center gap-2"
+                data-testid="button-filter-draft"
+              >
+                Drafts
+                <Badge variant="secondary" className="ml-1">
+                  {getPostCounts().draft}
+                </Badge>
+              </Button>
+              <Button
+                variant={currentFilter === "published" ? "default" : "outline"}
+                onClick={() => setCurrentFilter("published")}
+                className="flex items-center gap-2"
+                data-testid="button-filter-published"
+              >
+                Published
+                <Badge variant="secondary" className="ml-1">
+                  {getPostCounts().published}
+                </Badge>
+              </Button>
+            </div>
+
+            {/* Tag Filters */}
+            {allTags.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium text-slate-700 mb-3">Filter by Tag</h3>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant={currentTagFilter === null ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentTagFilter(null)}
+                    data-testid="button-tag-all"
+                  >
+                    All Tags
+                  </Button>
+                  {allTags.slice(0, 10).map((tag) => (
+                    <Button
+                      key={tag}
+                      variant={currentTagFilter === tag ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentTagFilter(tag)}
+                      data-testid={`button-tag-${tag}`}
+                    >
+                      {tag}
+                    </Button>
+                  ))}
+                  {allTags.length > 10 && (
+                    <span className="text-xs text-slate-500 px-3 py-2">
+                      +{allTags.length - 10} more tags
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Posts */}
