@@ -16,8 +16,8 @@ export async function createCheckoutSession(planType: PlanType, userId: string) 
     body: JSON.stringify({
       planType,
       userId,
-      successUrl: `${window.location.origin}/app/settings?success=true`,
-      cancelUrl: `${window.location.origin}/app/settings?canceled=true`,
+      successUrl: `${window.location.origin}/app?success=true`,
+      cancelUrl: `${window.location.origin}/app?canceled=true`,
     }),
   });
 
