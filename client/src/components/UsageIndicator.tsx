@@ -84,9 +84,21 @@ export default function UsageIndicator() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-slate-500">
-        <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
-        Loading usage...
+      <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm" data-testid="usage-indicator-loading">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded w-24 animate-pulse" />
+            <div className="h-5 bg-gray-200 rounded w-12 animate-pulse" />
+          </div>
+          <div className="h-4 bg-gray-200 rounded w-16 animate-pulse" />
+        </div>
+        
+        <div className="mb-3">
+          <div className="h-2 bg-gray-200 rounded-full w-full animate-pulse" />
+        </div>
+        
+        <div className="h-3 bg-gray-200 rounded w-32 animate-pulse" />
       </div>
     );
   }
