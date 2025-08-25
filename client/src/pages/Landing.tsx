@@ -77,40 +77,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <section className="py-12 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div className="flex items-center justify-center gap-3">
-              <div className="bg-green-100 p-2 rounded-lg">
-                <BarChart3 className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-slate-900">860k+</div>
-                <div className="text-sm text-slate-600">LinkedIn impressions</div>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-3">
-              <div className="bg-blue-100 p-2 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-slate-900">3.1k+</div>
-                <div className="text-sm text-slate-600">followers grown</div>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-3">
-              <div className="bg-purple-100 p-2 rounded-lg">
-                <Award className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-slate-900">Top 1%</div>
-                <div className="text-sm text-slate-600">Upwork freelancer</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section id="features" className="py-20 bg-gray-50">
