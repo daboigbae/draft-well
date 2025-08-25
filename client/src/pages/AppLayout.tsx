@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Linkedin, Plus, User, Hash, Settings, Menu, X, FileText } from "lucide-react";
+import { Plus, User, Hash, Settings, Menu, X, FileText } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
@@ -70,7 +70,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center"
             data-testid="button-logo-mobile"
           >
-            <Linkedin className="text-white h-4 w-4" />
+            <span className="text-white text-sm font-bold">DW</span>
           </button>
           <button 
             onClick={() => setLocation('/app')}
@@ -112,7 +112,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors"
                 data-testid="button-logo"
               >
-                <Linkedin className="text-white h-4 w-4" />
+                <span className="text-white text-sm font-bold">DW</span>
               </button>
               <div>
                 <button 
