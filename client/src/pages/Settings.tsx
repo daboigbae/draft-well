@@ -320,7 +320,7 @@ export default function Settings() {
                       key={plan.id} 
                       className={`relative ${plan.id === 'pro' ? 'border-indigo-200 shadow-lg' : ''}`}
                     >
-                      {plan.id === 'pro' && (
+                      {plan.id === 'starter' && (
                         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                           <Badge className="bg-indigo-600 text-white">Most Popular</Badge>
                         </div>
