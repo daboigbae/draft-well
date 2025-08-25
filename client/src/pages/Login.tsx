@@ -64,24 +64,46 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm" data-testid="login-card">
-        <CardHeader className="text-center space-y-2">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => setLocation('/')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-4 w-4 text-gray-600" />
-            </button>
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
-              <span className="text-white text-sm font-bold">DW</span>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 flex flex-col">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-sm font-bold">DW</span>
+              </div>
+              <h1 className="text-xl font-bold text-slate-800">Draftwell</h1>
             </div>
-            <div className="w-8"></div> {/* Spacer for centering */}
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => setLocation('/signup')}
+                data-testid="button-sign-up"
+              >
+                Sign Up
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={() => setLocation('/')}
+                data-testid="button-back-home"
+              >
+                Back to Home
+              </Button>
+            </div>
           </div>
-          <CardTitle className="text-xl font-bold text-slate-800">Sign in</CardTitle>
-        </CardHeader>
+        </div>
+      </header>
+
+      {/* Sign-in Form */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
+        <Card className="w-full max-w-md" data-testid="login-card">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-slate-800">Sign in to your account</CardTitle>
+            <CardDescription>
+              Welcome back to Draftwell
+            </CardDescription>
+          </CardHeader>
           
           <CardContent className="space-y-4">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -137,7 +159,13 @@ export default function Login() {
             </p>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
+
+      {/* Footer */}
+      <footer className="text-center py-6 text-sm text-slate-500">
+        <p>© 2025 Draftwell. Built by Digital Art Dealers.</p>
+      </footer>
     </div>
   );
 }
