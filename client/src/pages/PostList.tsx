@@ -9,7 +9,7 @@ import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
 import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags, createPost } from "../lib/posts";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 export default function PostList() {
@@ -111,6 +111,13 @@ export default function PostList() {
         scheduledAt: null,
         aiRated: false,
       });
+
+      // Mark first draft as completed
+      const userDocRef = doc(db, 'users', user.uid);
+      await updateDoc(userDocRef, {
+        'onboarded.firstDraft': true
+      });
+
       setLocation(`/app/post/${newPostId}`);
     } catch (error) {
       toast({
