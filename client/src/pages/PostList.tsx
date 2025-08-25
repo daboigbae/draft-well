@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import PostCard from "../components/PostCard";
 import AppLayout from "./AppLayout";
+import TutorialModal from "../components/TutorialModal";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
@@ -23,6 +24,7 @@ export default function PostList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [firstDraftCompleted, setFirstDraftCompleted] = useState<boolean>(true);
+  const [tutorialCompleted, setTutorialCompleted] = useState<boolean>(true);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -55,6 +57,7 @@ export default function PostList() {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
         setFirstDraftCompleted(userData.onboarded?.firstDraft ?? true); // Default to true if not set
+        setTutorialCompleted(userData.onboarded?.tutorial ?? true); // Default to true if not set
       }
     });
 
@@ -373,6 +376,15 @@ export default function PostList() {
           )}
         </div>
       </div>
+
+      {/* Tutorial Modal */}
+      {user && (
+        <TutorialModal
+          userId={user.uid}
+          open={!tutorialCompleted}
+          onClose={() => setTutorialCompleted(true)}
+        />
+      )}
     </AppLayout>
   );
 }
