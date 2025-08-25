@@ -307,9 +307,11 @@ export default function PostList() {
                   {/* Example Post Preview */}
                   <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8 text-left">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
-                        You
-                      </div>
+                      <img 
+                        src="https://media.licdn.com/dms/image/v2/D5603AQGeotNHHd8VhQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1723385389068?e=1758758400&v=beta&t=U7d-58A04Mhu8VyxHDNOIrA-j21HghJwsB0GR4oGUz0"
+                        alt="Gabe's profile"
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
                       <div>
                         <div className="font-medium text-slate-800">Gabe</div>
                         <div className="text-sm text-slate-500">Senior Developer & Top 1% Freelancer</div>
