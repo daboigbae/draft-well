@@ -141,15 +141,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <PopoverContent className="w-56" align="end">
                 <div className="space-y-2">
                   <p className="text-sm font-medium">{user?.email}</p>
-                  <Button 
-                    variant="ghost" 
-                    onClick={handleLogout}
-                    className="w-full justify-start"
-                    data-testid="button-logout"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
-                  </Button>
                 </div>
               </PopoverContent>
             </Popover>
@@ -208,10 +199,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 setLocation('/app/settings');
                 setSidebarOpen(false); // Close mobile sidebar after navigation
               }}
-              data-testid="button-settings"
+              data-testid="button-account"
             >
               <Settings className="mr-3 h-4 w-4" />
-              Settings
+              Account
             </Button>
           </div>
         </div>
