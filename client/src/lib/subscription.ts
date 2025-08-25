@@ -5,6 +5,7 @@ import {
   query, 
   where, 
   getDocs,
+  onSnapshot,
   Timestamp 
 } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -95,4 +96,55 @@ export function isSubscriptionActive(subscription: UserSubscription): boolean {
 
 export function isPaidPlan(planType: PlanType): boolean {
   return planType === 'starter' || planType === 'pro';
+}
+
+// Real-time subscription listener
+export function subscribeToUserSubscription(
+  userId: string, 
+  callback: (subscription: UserSubscription | null) => void
+): (() => void) {
+  const subscriptionDoc = doc(db, 'subscriptions', userId);
+  
+  return onSnapshot(subscriptionDoc, (docSnapshot) => {
+    if (!docSnapshot.exists()) {
+      callback(null);
+      return;
+    }
+
+    const data = docSnapshot.data();
+    const subscription = {
+      ...data,
+      createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+      updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
+      currentPeriodStart: data.currentPeriodStart?.toDate ? data.currentPeriodStart.toDate() : (data.currentPeriodStart ? new Date(data.currentPeriodStart) : undefined),
+      currentPeriodEnd: data.currentPeriodEnd?.toDate ? data.currentPeriodEnd.toDate() : (data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : undefined),
+    } as UserSubscription;
+    
+    callback(subscription);
+  });
+}
+
+// Real-time usage listener
+export function subscribeToUserUsage(
+  userId: string, 
+  callback: (usage: UsageRecord | null) => void
+): (() => void) {
+  const monthKey = getCurrentMonthKey();
+  const usageDoc = doc(db, 'usage', `${userId}_${monthKey}`);
+  
+  return onSnapshot(usageDoc, (docSnapshot) => {
+    if (!docSnapshot.exists()) {
+      callback(null);
+      return;
+    }
+
+    const data = docSnapshot.data();
+    const usage = {
+      ...data,
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
+    } as UsageRecord;
+    
+    callback(usage);
+  });
 }

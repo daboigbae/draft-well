@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { Zap, TrendingUp } from 'lucide-react';
 import { useAuth } from '../hooks/use-auth';
-import { getUserSubscription, getCurrentUsage, canUserUseAiRating } from '../lib/subscription';
+import { getUserSubscription, getCurrentUsage, canUserUseAiRating, subscribeToUserSubscription } from '../lib/subscription';
 import { createCheckoutSession } from '../lib/stripe';
 import { getPlanById } from '../types/subscription';
 import { useToast } from '../hooks/use-toast';
@@ -22,52 +22,51 @@ export default function UsageIndicator() {
   });
 
   useEffect(() => {
-    if (user?.uid) {
-      loadUsage();
-    }
-  }, [user?.uid]);
-
-  // Listen for subscription updates from other components
-  useEffect(() => {
-    const handleSubscriptionUpdate = () => {
-      if (user?.uid) {
-        loadUsage();
-      }
-    };
-
-    window.addEventListener('subscriptionUpdated', handleSubscriptionUpdate);
-    return () => window.removeEventListener('subscriptionUpdated', handleSubscriptionUpdate);
-  }, [user?.uid]);
-
-  const loadUsage = async () => {
-    if (!user?.uid) return;
-    
-    try {
-      const subscription = await getUserSubscription(user.uid);
-      const currentUsage = await getCurrentUsage(user.uid);
-      const quotaCheck = await canUserUseAiRating(user.uid);
-      
-      if (subscription) {
-        const plan = getPlanById(subscription.planType);
-        const reportTokens = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
-        
-        // For pro plan, check if reportTokens indicates unlimited (999999)
-        const isUnlimited = reportTokens === 999999 || reportTokens === 'unlimited';
-        
-        setUsage({
-          current: isUnlimited ? 999999 : (reportTokens as number), // Show remaining tokens, not used tokens
-          limit: isUnlimited ? 'unlimited' : plan.features.aiRatingsPerMonth,
-          planName: plan.name,
-          planType: subscription.planType,
-          canUse: quotaCheck.canUse
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load usage:', error);
-    } finally {
+    if (!user?.uid) {
       setLoading(false);
+      return;
     }
-  };
+
+    // Set up real-time subscription listener
+    const unsubscribe = subscribeToUserSubscription(user.uid, async (subscription) => {
+      try {
+        if (subscription) {
+          const plan = getPlanById(subscription.planType);
+          const reportTokens = subscription.reportTokens ?? plan.features.aiRatingsPerMonth;
+          
+          // For pro plan, check if reportTokens indicates unlimited (999999)
+          const isUnlimited = reportTokens === 999999 || reportTokens === 'unlimited';
+          
+          // Check quota in real-time
+          const quotaCheck = await canUserUseAiRating(user.uid);
+          
+          setUsage({
+            current: isUnlimited ? 999999 : (reportTokens as number), // Show remaining tokens, not used tokens
+            limit: isUnlimited ? 'unlimited' : plan.features.aiRatingsPerMonth,
+            planName: plan.name,
+            planType: subscription.planType,
+            canUse: quotaCheck.canUse
+          });
+        } else {
+          // No subscription found, set to free plan defaults
+          setUsage({
+            current: 2,
+            limit: 2,
+            planName: 'Free',
+            planType: 'free',
+            canUse: true
+          });
+        }
+      } catch (error) {
+        console.error('Failed to update usage from subscription:', error);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    return unsubscribe;
+  }, [user?.uid]);
+
 
   const handleUpgrade = async (planType: 'starter' | 'pro') => {
     if (!user?.uid) return;
