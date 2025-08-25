@@ -2,47 +2,52 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Linkedin, Mail, Lock, FileText, Sparkles, Users, Shield } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { useToast } from "../hooks/use-toast";
-import { signInWithEmail, getAuthErrorMessage } from "../lib/auth";
+import { signUpWithEmail, getAuthErrorMessage } from "../lib/auth";
 import Footer from "../components/Footer";
 
-const loginSchema = z.object({
+const signUpSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
+type SignUpForm = z.infer<typeof signUpSchema>;
 
-export default function Login() {
+export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const form = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<SignUpForm>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = async (data: LoginForm) => {
+  const onSubmit = async (data: SignUpForm) => {
     setIsLoading(true);
     try {
-      await signInWithEmail(data.email, data.password);
+      await signUpWithEmail(data.email, data.password);
       toast({
-        title: "Signed in",
-        description: "Welcome back to Draftwell!",
+        title: "Account created!",
+        description: "Welcome to Draftwell! You're now signed in.",
       });
     } catch (error: any) {
       toast({
-        title: "Authentication failed",
+        title: "Sign up failed",
         description: getAuthErrorMessage(error),
         variant: "destructive",
       });
@@ -51,20 +56,19 @@ export default function Login() {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
       <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
         <div className="w-full max-w-4xl space-y-16 lg:space-y-20">
-        {/* Login Card */}
-        <Card className="w-full max-w-md mx-auto" data-testid="login-card">
+        {/* Sign Up Card */}
+        <Card className="w-full max-w-md mx-auto" data-testid="signup-card">
           <CardHeader className="text-center">
             <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
               <Linkedin className="text-white h-6 w-6" />
             </div>
-            <CardTitle className="text-2xl font-bold text-slate-800">Draftwell</CardTitle>
+            <CardTitle className="text-2xl font-bold text-slate-800">Join Draftwell</CardTitle>
             <CardDescription>
-              Sign in to your account
+              Create your account to start drafting better LinkedIn posts
             </CardDescription>
           </CardHeader>
           
@@ -97,7 +101,7 @@ export default function Login() {
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder="Create a password (6+ characters)"
                     className="pl-10"
                     {...form.register("password")}
                     data-testid="input-password"
@@ -110,33 +114,52 @@ export default function Login() {
                 )}
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm your password"
+                    className="pl-10"
+                    {...form.register("confirmPassword")}
+                    data-testid="input-confirm-password"
+                  />
+                </div>
+                {form.formState.errors.confirmPassword && (
+                  <p className="text-sm text-red-600" data-testid="error-confirm-password">
+                    {form.formState.errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
+
               <Button
                 type="submit"
                 className="w-full"
                 disabled={isLoading}
                 data-testid="button-submit"
               >
-                {isLoading ? "Please wait..." : "Sign In"}
+                {isLoading ? "Creating account..." : "Create Account"}
               </Button>
             </form>
 
             <div className="text-center">
               <p className="text-sm text-slate-600">
-                Don't have an account?{" "}
-                <button
-                  onClick={() => setLocation('/signup')}
+                Already have an account?{" "}
+                <Link
+                  href="/login"
                   className="font-medium text-primary hover:text-primary/80 underline"
-                  data-testid="link-signup"
+                  data-testid="link-login"
                 >
-                  Sign up
-                </button>
+                  Sign in
+                </Link>
               </p>
             </div>
-
           </CardContent>
         </Card>
 
-        {/* About Linkedraft */}
+        {/* About Draftwell */}
         <Card className="w-full max-w-3xl mx-auto bg-white/80 backdrop-blur-sm border-slate-200">
           <CardContent className="p-8 lg:p-12">
             <div className="text-center mb-12 lg:mb-16">
@@ -164,9 +187,9 @@ export default function Login() {
                 <div className="w-16 h-16 lg:w-20 lg:h-20 bg-green-100 rounded-xl flex items-center justify-center mx-auto">
                   <Sparkles className="h-8 w-8 lg:h-10 lg:w-10 text-green-600" />
                 </div>
-                <h3 className="font-semibold text-slate-800 text-lg">Smart Tags</h3>
+                <h3 className="font-semibold text-slate-800 text-lg">AI Rating</h3>
                 <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Auto-complete tags from previous posts and organize content by topic
+                  Get your posts rated 1-10 with personalized improvement suggestions
                 </p>
               </div>
 
@@ -174,9 +197,9 @@ export default function Login() {
                 <div className="w-16 h-16 lg:w-20 lg:h-20 bg-purple-100 rounded-xl flex items-center justify-center mx-auto">
                   <Users className="h-8 w-8 lg:h-10 lg:w-10 text-purple-600" />
                 </div>
-                <h3 className="font-semibold text-slate-800 text-lg">AI Vetting</h3>
+                <h3 className="font-semibold text-slate-800 text-lg">Smart Organization</h3>
                 <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Mark and track posts reviewed or enhanced by AI tools
+                  Auto-complete tags from previous posts and organize content by topic
                 </p>
               </div>
 
@@ -201,7 +224,7 @@ export default function Login() {
                   v3.0.0 Release Notes
                 </button>
                 <span className="text-slate-300">•</span>
-                <span className="text-sm lg:text-base text-slate-500">Closed Beta</span>
+                <span className="text-sm lg:text-base text-slate-500">Start Free</span>
               </div>
             </div>
           </CardContent>

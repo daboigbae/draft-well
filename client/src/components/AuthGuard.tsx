@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
+import { Switch, Route } from "wouter";
 import { useAuth } from "../hooks/use-auth";
 import Login from "../pages/Login";
+import SignUp from "../pages/SignUp";
 import { Skeleton } from "./ui/skeleton";
 
 interface AuthGuardProps {
@@ -22,7 +24,13 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }
 
   if (!user) {
-    return <Login />;
+    return (
+      <Switch>
+        <Route path="/signup" component={SignUp} />
+        <Route path="/login" component={Login} />
+        <Route component={Login} />
+      </Switch>
+    );
   }
 
   return <>{children}</>;
