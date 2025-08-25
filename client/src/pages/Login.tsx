@@ -64,164 +64,70 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
-        <div className="w-full max-w-4xl space-y-16 lg:space-y-20">
-        {/* Login Card */}
-        <Card className="w-full max-w-md mx-auto" data-testid="login-card">
-          <CardHeader className="text-center">
-            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Linkedin className="text-white h-6 w-6" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-slate-800">Draftwell</CardTitle>
-            <CardDescription>
-              Sign in to your account
-            </CardDescription>
-          </CardHeader>
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <Card className="w-full max-w-sm" data-testid="login-card">
+        <CardHeader className="text-center space-y-2">
+          <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center mx-auto">
+            <span className="text-white text-sm font-bold">DW</span>
+          </div>
+          <CardTitle className="text-xl font-bold text-slate-800">Sign in</CardTitle>
+        </CardHeader>
           
-          <CardContent className="space-y-6">
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    className="pl-10"
-                    {...form.register("email")}
-                    data-testid="input-email"
-                  />
-                </div>
-                {form.formState.errors.email && (
-                  <p className="text-sm text-red-600" data-testid="error-email">
-                    {form.formState.errors.email.message}
-                  </p>
-                )}
-              </div>
+          <CardContent className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Email"
+                {...form.register("email")}
+                data-testid="input-email"
+              />
+              {form.formState.errors.email && (
+                <p className="text-sm text-red-600" data-testid="error-email">
+                  {form.formState.errors.email.message}
+                </p>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    className="pl-10"
-                    {...form.register("password")}
-                    data-testid="input-password"
-                  />
-                </div>
-                {form.formState.errors.password && (
-                  <p className="text-sm text-red-600" data-testid="error-password">
-                    {form.formState.errors.password.message}
-                  </p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Password"
+                {...form.register("password")}
+                data-testid="input-password"
+              />
+              {form.formState.errors.password && (
+                <p className="text-sm text-red-600" data-testid="error-password">
+                  {form.formState.errors.password.message}
+                </p>
+              )}
+            </div>
 
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              disabled={isLoading}
+              data-testid="button-submit"
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-                data-testid="button-submit"
+          <div className="text-center">
+            <p className="text-sm text-slate-600">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => setLocation('/signup')}
+                className="font-medium text-purple-600 hover:text-purple-800 underline"
+                data-testid="link-signup"
               >
-                {isLoading ? "Please wait..." : "Sign In"}
-              </Button>
-            </form>
-
-            <div className="text-center">
-              <p className="text-sm text-slate-600">
-                Don't have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => setLocation('/')}
-                  className="font-medium text-primary hover:text-primary/80 underline"
-                  data-testid="link-landing"
-                >
-                  Go to home page
-                </button>
-              </p>
-            </div>
-
-          </CardContent>
-        </Card>
-
-        {/* About Linkedraft */}
-        <Card className="w-full max-w-3xl mx-auto bg-white/80 backdrop-blur-sm border-slate-200">
-          <CardContent className="p-8 lg:p-12">
-            <div className="text-center mb-12 lg:mb-16">
-              <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-6">
-                The Complete LinkedIn Post Management Platform
-              </h2>
-              <p className="text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                Draftwell helps content creators and professionals draft, organize, and perfect their LinkedIn posts 
-                with powerful features designed for social media excellence.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-12 lg:mb-16">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-blue-100 rounded-xl flex items-center justify-center mx-auto">
-                  <FileText className="h-8 w-8 lg:h-10 lg:w-10 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-slate-800 text-lg">Rich Editor</h3>
-                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Markdown-powered editor with live preview and LinkedIn-style formatting
-                </p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-green-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Sparkles className="h-8 w-8 lg:h-10 lg:w-10 text-green-600" />
-                </div>
-                <h3 className="font-semibold text-slate-800 text-lg">Smart Tags</h3>
-                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Auto-complete tags from previous posts and organize content by topic
-                </p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-purple-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Users className="h-8 w-8 lg:h-10 lg:w-10 text-purple-600" />
-                </div>
-                <h3 className="font-semibold text-slate-800 text-lg">AI Vetting</h3>
-                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Mark and track posts reviewed or enhanced by AI tools
-                </p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-orange-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Shield className="h-8 w-8 lg:h-10 lg:w-10 text-orange-600" />
-                </div>
-                <h3 className="font-semibold text-slate-800 text-lg">Real-time Sync</h3>
-                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Your posts sync across all devices with automatic saving
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center space-y-6">
-              <div className="flex items-center justify-center gap-6">
-                <button
-                  onClick={() => setLocation('/app/release-notes')}
-                  className="text-sm lg:text-base text-slate-500 hover:text-slate-700 hover:underline cursor-pointer font-medium"
-                  data-testid="button-release-notes"
-                >
-                  v3.0.0 Release Notes
-                </button>
-                <span className="text-slate-300">•</span>
-                <span className="text-sm lg:text-base text-slate-500">Closed Beta</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        </div>
-      </div>
-      <Footer />
+                Sign up
+              </button>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
