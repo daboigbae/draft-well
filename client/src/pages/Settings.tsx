@@ -343,7 +343,7 @@ export default function Settings() {
                                 ? 'Unlimited AI ratings'
                                 : plan.id === 'starter'
                                 ? '20 AI ratings per month'
-                                : '8 AI ratings per month (2/week)'
+                                : '2 AI ratings per week'
                               }
                             </span>
                           </li>

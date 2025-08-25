@@ -40,7 +40,7 @@ export const PLANS: Plan[] = [
     name: 'Free',
     price: 0,
     features: {
-      aiRatingsPerMonth: 8, // 2 per week * 4 weeks
+      aiRatingsPerMonth: 2, // 2 per week
       postReminders: false,
       advancedAiFeedback: false,
       csvExport: false,
