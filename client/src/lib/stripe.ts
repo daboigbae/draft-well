@@ -8,6 +8,18 @@ if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export async function createCheckoutSession(planType: PlanType, userId: string) {
+  // Import here to avoid circular dependencies
+  const { getUserSubscription } = await import('./subscription');
+  
+  // Check if user has existing Stripe customer ID
+  let existingCustomerId: string | undefined;
+  try {
+    const subscription = await getUserSubscription(userId);
+    existingCustomerId = subscription?.stripeCustomerId;
+  } catch (error) {
+    console.log('No existing subscription found, will create new customer');
+  }
+
   const response = await fetch('/api/create-checkout-session', {
     method: 'POST',
     headers: {
@@ -16,6 +28,7 @@ export async function createCheckoutSession(planType: PlanType, userId: string) 
     body: JSON.stringify({
       planType,
       userId,
+      existingCustomerId,
       successUrl: `${window.location.origin}/app?success=true`,
       cancelUrl: `${window.location.origin}/app?canceled=true`,
     }),

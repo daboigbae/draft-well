@@ -16,7 +16,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe checkout session creation
   app.post("/api/create-checkout-session", async (req, res) => {
     try {
-      const { planType, userId, successUrl, cancelUrl } = req.body;
+      const { planType, userId, existingCustomerId, successUrl, cancelUrl } = req.body;
 
       // Price IDs mapping 
       const priceIdMapping: Record<string, string> = {
@@ -28,7 +28,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid plan type' });
       }
 
-      const session = await stripe.checkout.sessions.create({
+      const sessionConfig: any = {
         mode: 'subscription',
         payment_method_types: ['card'],
         line_items: [
@@ -44,7 +44,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userId,
           planType,
         },
-      });
+      };
+
+      // If user has existing Stripe customer ID, link it to the session
+      if (existingCustomerId) {
+        sessionConfig.customer = existingCustomerId;
+        console.log(`Linking checkout session to existing customer: ${existingCustomerId}`);
+      } else {
+        console.log(`Creating new customer for user: ${userId}`);
+      }
+
+      const session = await stripe.checkout.sessions.create(sessionConfig);
 
       res.json({ sessionId: session.id });
     } catch (error: any) {
