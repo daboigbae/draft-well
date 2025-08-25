@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Linkedin, Plus, User, LogOut, Hash, Settings, Menu, X } from "lucide-react";
+import { Linkedin, Plus, User, LogOut, Hash, Settings, Menu, X, FileText } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { useAuth } from "../hooks/use-auth";
@@ -166,7 +166,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         {/* Usage Indicator in Toolbar */}
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4">
           <UsageIndicator />
         </div>
         
@@ -176,7 +176,19 @@ export default function AppLayout({ children }: AppLayoutProps) {
           
 
           {/* Additional Navigation */}
-          <div className="px-6 mt-6 pt-6 border-t border-gray-200">
+          <div className="px-6 mt-6 pt-6">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                setLocation('/app');
+                setSidebarOpen(false); // Close mobile sidebar after navigation
+              }}
+              data-testid="button-all-posts"
+            >
+              <FileText className="mr-3 h-4 w-4" />
+              All Posts
+            </Button>
             <Button
               variant="ghost"
               className="w-full justify-start"
