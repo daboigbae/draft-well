@@ -152,9 +152,38 @@ export default function Landing() {
             {/* Feature 2: Reminders */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="order-2 lg:order-1">
-                <div className="bg-gradient-to-br from-blue-100 to-indigo-100 p-8 rounded-2xl">
-                  <div className="text-center text-slate-600">
-                    [Reminders mockup placeholder]
+                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-slate-800">Posting Schedule</h4>
+                      <Clock className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-green-800">Post in 2 hours</div>
+                          <div className="text-xs text-green-600">"Every founder thinks their first version..."</div>
+                        </div>
+                        <div className="text-xs text-green-600">9:00 AM</div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-blue-800">Check performance</div>
+                          <div className="text-xs text-blue-600">1h after posting</div>
+                        </div>
+                        <div className="text-xs text-blue-600">10:00 AM</div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-purple-800">Follow-up check</div>
+                          <div className="text-xs text-purple-600">24h performance review</div>
+                        </div>
+                        <div className="text-xs text-purple-600">Tomorrow</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -208,9 +237,39 @@ export default function Landing() {
                   </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-green-100 to-blue-100 p-8 rounded-2xl">
-                <div className="text-center text-slate-600">
-                  [Analytics mockup placeholder]
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-slate-800">Performance Analytics</h4>
+                    <BarChart3 className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">+127%</div>
+                      <div className="text-sm text-green-700">Engagement</div>
+                      <div className="text-xs text-green-600">vs last month</div>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">8.4</div>
+                      <div className="text-sm text-blue-700">Avg Rating</div>
+                      <div className="text-xs text-blue-600">last 10 posts</div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-slate-700">Top Hashtags</div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">#ai</span>
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">#startup</span>
+                      <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">#founder</span>
+                    </div>
+                  </div>
+                  <div className="h-20 bg-gradient-to-r from-green-200 via-blue-200 to-purple-200 rounded-lg flex items-end justify-around p-2">
+                    <div className="w-4 bg-green-500 rounded-t" style={{height: '60%'}}></div>
+                    <div className="w-4 bg-blue-500 rounded-t" style={{height: '80%'}}></div>
+                    <div className="w-4 bg-purple-500 rounded-t" style={{height: '40%'}}></div>
+                    <div className="w-4 bg-green-500 rounded-t" style={{height: '90%'}}></div>
+                    <div className="w-4 bg-blue-500 rounded-t" style={{height: '70%'}}></div>
+                  </div>
                 </div>
               </div>
             </div>
