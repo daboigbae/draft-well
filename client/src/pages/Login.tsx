@@ -28,7 +28,8 @@ type AuthForm = z.infer<typeof authSchema>;
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [location] = useLocation();
+  const [isSignUp, setIsSignUp] = useState(location === '/signup');
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
