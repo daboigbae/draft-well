@@ -113,12 +113,39 @@ export default function Landing() {
                   </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-purple-100 to-indigo-100 p-4 rounded-2xl">
-                <img 
-                  src="/attached_assets/Screenshot 2025-08-25 at 5.30.03 PM_1756164610128.png" 
-                  alt="Draftwell AI rating interface showing 9/10 rating" 
-                  className="w-full rounded-lg shadow-lg"
-                />
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-2">
+                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                    </div>
+                    <div className="flex items-center gap-2 bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      <Star className="h-4 w-4 fill-current" />
+                      Get Rating
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                  <div className="border-t pt-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-2">
+                        <div className="h-2 bg-gray-200 rounded w-20"></div>
+                        <div className="h-2 bg-gray-200 rounded w-16"></div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-yellow-600 flex items-center gap-1">
+                          <Star className="h-6 w-6 fill-current" />
+                          9/10
+                        </div>
+                        <div className="text-sm text-gray-500">AI Rated</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
