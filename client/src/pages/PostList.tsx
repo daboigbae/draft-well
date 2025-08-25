@@ -56,13 +56,27 @@ export default function PostList() {
     const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
-        setFirstDraftCompleted(userData.onboarded?.firstDraft ?? true); // Default to true if not set
-        setTutorialCompleted(userData.onboarded?.tutorial ?? true); // Default to true if not set
+        console.log('PostList - User onboarding data:', userData.onboarded);
+        setFirstDraftCompleted(userData.onboarded?.firstDraft ?? false); // Default to false to show onboarding
+        setTutorialCompleted(userData.onboarded?.tutorial ?? false); // Default to false to show onboarding
+      } else {
+        console.log('PostList - User document does not exist, showing onboarding');
+        setFirstDraftCompleted(false);
+        setTutorialCompleted(false);
       }
     });
 
     return unsubscribeUser;
   }, [user]);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log('PostList - tutorialCompleted state changed to:', tutorialCompleted);
+  }, [tutorialCompleted]);
+
+  useEffect(() => {
+    console.log('PostList - firstDraftCompleted state changed to:', firstDraftCompleted);
+  }, [firstDraftCompleted]);
 
   // Filter and search posts
   useEffect(() => {
