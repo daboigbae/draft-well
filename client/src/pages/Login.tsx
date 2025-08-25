@@ -40,6 +40,8 @@ export default function Login() {
         title: "Signed in",
         description: "Welcome back to Draftwell!",
       });
+      // Redirect to app after successful sign in
+      setLocation('/app');
     } catch (error: any) {
       toast({
         title: "Authentication failed",
