@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLocation } from "wouter";
-import { Linkedin, Mail, Lock, FileText, Sparkles, Users, Shield } from "lucide-react";
+import { Linkedin, Mail, Lock, FileText, Sparkles, Users, Shield, ArrowLeft } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -67,8 +67,18 @@ export default function Login() {
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <Card className="w-full max-w-sm" data-testid="login-card">
         <CardHeader className="text-center space-y-2">
-          <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center mx-auto">
-            <span className="text-white text-sm font-bold">DW</span>
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setLocation('/')}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              data-testid="button-back"
+            >
+              <ArrowLeft className="h-4 w-4 text-gray-600" />
+            </button>
+            <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
+              <span className="text-white text-sm font-bold">DW</span>
+            </div>
+            <div className="w-8"></div> {/* Spacer for centering */}
           </div>
           <CardTitle className="text-xl font-bold text-slate-800">Sign in</CardTitle>
         </CardHeader>
