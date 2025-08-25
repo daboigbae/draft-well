@@ -10,6 +10,7 @@ import Settings from "./pages/Settings";
 import ReleaseNotes from "./pages/ReleaseNotes";
 import HashtagCollections from "./pages/HashtagCollections";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Landing from "./pages/Landing";
 import NotFound from "./pages/not-found";
 
@@ -30,7 +31,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
-      <Route path="/signup" component={Landing} />
+      <Route path="/signup" component={Signup} />
       <Route path="/" component={Landing} />
       <Route>
         <AuthGuard>
