@@ -285,24 +285,79 @@ export default function PostList() {
             </div>
           ) : (
             <div className="text-center py-12" data-testid="empty-state">
-              <div className="text-slate-400 mb-4">
-                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-slate-800 mb-2">No posts found</h3>
-              <p className="text-slate-600 mb-6">
-                {searchQuery 
-                  ? "No posts match your search criteria. Try adjusting your search terms."
-                  : currentFilter === "all"
-                    ? "You haven't created any posts yet. Click 'New Post' to get started!"
-                    : `No ${currentFilter} posts found. Try switching to a different filter.`
-                }
-              </p>
-              {!searchQuery && currentFilter === "all" && (
-                <Button onClick={handleNewPost} data-testid="button-create-first-post">
-                  Create Your First Post
-                </Button>
+              {searchQuery ? (
+                <>
+                  <div className="text-slate-400 mb-4">
+                    <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-2">No posts found</h3>
+                  <p className="text-slate-600 mb-6">
+                    No posts match your search criteria. Try adjusting your search terms.
+                  </p>
+                </>
+              ) : currentFilter === "all" ? (
+                <div className="max-w-2xl mx-auto">
+                  <h3 className="text-2xl font-bold text-slate-800 mb-2">Your next viral post starts here</h3>
+                  <p className="text-slate-600 mb-8">
+                    Imagine sharing insights that spark conversations, build your network, and establish your expertise. Here's what your post could look like:
+                  </p>
+                  
+                  {/* Example Post Preview */}
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8 text-left">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
+                        You
+                      </div>
+                      <div>
+                        <div className="font-medium text-slate-800">Your Name</div>
+                        <div className="text-sm text-slate-500">Your Professional Title</div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-slate-800 leading-relaxed mb-4">
+                      <p className="mb-3">🚀 Just realized something that changed how I approach [your expertise]...</p>
+                      <p className="mb-3">The biggest mistake I see professionals make is [common problem]. Here's what I learned after [your experience]:</p>
+                      <p className="mb-3">✅ [Key insight #1]<br/>✅ [Key insight #2]<br/>✅ [Key insight #3]</p>
+                      <p>The result? [Amazing outcome]. Sometimes the simplest shifts create the biggest impact.</p>
+                      <p className="mt-3 text-indigo-600">#YourIndustry #Leadership #Growth</p>
+                    </div>
+                    
+                    <div className="flex items-center gap-6 text-sm text-slate-500 pt-3 border-t border-gray-100">
+                      <span>💬 127 comments</span>
+                      <span>🔄 89 shares</span>
+                      <span>❤️ 2.4K reactions</span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-slate-600 mb-6">
+                    <strong>Your story matters.</strong> Share your unique perspective, lessons learned, and insights that only you can provide. 
+                    The LinkedIn community is waiting to hear from you.
+                  </div>
+                  
+                  <Button 
+                    onClick={handleNewPost} 
+                    size="lg"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium px-8"
+                    data-testid="button-create-first-post"
+                  >
+                    <PenTool className="w-5 h-5 mr-2" />
+                    Start Writing Your Story
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="text-slate-400 mb-4">
+                    <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-2">No posts found</h3>
+                  <p className="text-slate-600 mb-6">
+                    No {currentFilter} posts found. Try switching to a different filter.
+                  </p>
+                </>
               )}
             </div>
           )}
