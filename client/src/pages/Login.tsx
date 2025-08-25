@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,6 +9,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { useToast } from "../hooks/use-toast";
+import { useAuth } from "../hooks/use-auth";
 import { signInWithEmail, signUpWithEmail, getAuthErrorMessage } from "../lib/auth";
 import Footer from "../components/Footer";
 
@@ -23,6 +24,14 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { user, loading } = useAuth();
+
+  // If user is already authenticated, redirect to app
+  useEffect(() => {
+    if (!loading && user) {
+      setLocation('/app');
+    }
+  }, [user, loading, setLocation]);
 
   const form = useForm<AuthForm>({
     resolver: zodResolver(authSchema),
