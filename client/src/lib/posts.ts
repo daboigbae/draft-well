@@ -148,10 +148,9 @@ export const duplicatePost = async (userId: string, postId: string): Promise<str
 };
 
 export const schedulePost = async (userId: string, postId: string, scheduledAt: Date): Promise<void> => {
-  // For now, just mark as published since we don't need actual scheduling
   await updatePost(userId, postId, {
-    status: "published",
-    scheduledAt: null,
+    status: "scheduled",
+    scheduledAt: Timestamp.fromDate(scheduledAt),
   });
 };
 

@@ -25,7 +25,7 @@ import ScheduleModal from "../components/ScheduleModal";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post } from "../types/post";
-import { getPost, updatePost, publishPost } from "../lib/posts";
+import { getPost, updatePost, publishPost, schedulePost } from "../lib/posts";
 import { renderMarkdown, markdownToLinkedInText } from "../utils/markdown";
 import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
@@ -270,7 +270,7 @@ export default function Editor() {
 
     try {
       await publishPost(user.uid, post.id);
-      setPost(prev => prev ? { ...prev, status: "published" } : null);
+      setPost(prev => prev ? { ...prev, status: "published", scheduledAt: null } : null);
       toast({
         title: "Post published",
         description: "Your post has been marked as published.",
@@ -279,6 +279,25 @@ export default function Editor() {
       toast({
         title: "Publish failed",
         description: "Failed to publish post.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSchedule = async (scheduledDate: Date) => {
+    if (!user || !post) return;
+
+    try {
+      await schedulePost(user.uid, post.id, scheduledDate);
+      setPost(prev => prev ? { ...prev, status: "scheduled", scheduledAt: scheduledDate } : null);
+      toast({
+        title: "Post scheduled",
+        description: `Your post has been scheduled for ${scheduledDate.toLocaleString()}.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Schedule failed",
+        description: "Failed to schedule post.",
         variant: "destructive",
       });
     }
@@ -822,6 +841,8 @@ export default function Editor() {
         isOpen={showPublishModal}
         onClose={() => setShowPublishModal(false)}
         onPublish={handlePublishFromModal}
+        onSchedule={handleSchedule}
+        currentScheduledAt={post?.scheduledAt}
       />
 
       {/* Rating Confirmation Dialog */}

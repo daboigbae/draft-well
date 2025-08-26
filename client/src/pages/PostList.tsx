@@ -182,12 +182,14 @@ export default function PostList() {
     all: posts.length,
     draft: posts.filter(p => p.status === "draft").length,
     published: posts.filter(p => p.status === "published").length,
+    scheduled: posts.filter(p => p.status === "scheduled").length,
   });
 
   const getFilterTitle = () => {
     switch (currentFilter) {
       case "draft": return "Draft Posts";
       case "published": return "Published Posts";
+      case "scheduled": return "Scheduled Posts";
       default: return "All Posts";
     }
   };
@@ -280,6 +282,17 @@ export default function PostList() {
                 Published
                 <Badge variant="secondary" className="ml-1">
                   {getPostCounts().published}
+                </Badge>
+              </Button>
+              <Button
+                variant={currentFilter === "scheduled" ? "default" : "outline"}
+                onClick={() => setCurrentFilter("scheduled")}
+                className="flex items-center gap-2"
+                data-testid="button-filter-scheduled"
+              >
+                Scheduled
+                <Badge variant="secondary" className="ml-1">
+                  {getPostCounts().scheduled}
                 </Badge>
               </Button>
             </div>
