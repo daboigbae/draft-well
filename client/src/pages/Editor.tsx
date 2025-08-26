@@ -506,6 +506,17 @@ export default function Editor() {
           >
             <Calendar className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
             <span className="hidden sm:inline ml-2">Publish / Schedule</span>
+            <span className="sm:hidden">Schedule</span>
+          </Button>
+          
+          <Button 
+            onClick={handlePublish} 
+            size="sm"
+            className="text-xs sm:text-sm"
+            data-testid="button-publish"
+          >
+            <Share className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline ml-2">Mark as Published</span>
             <span className="sm:hidden">Publish</span>
           </Button>
           
