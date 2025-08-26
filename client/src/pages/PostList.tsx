@@ -133,13 +133,16 @@ export default function PostList() {
 
     // Apply sort
     filtered.sort((a, b) => {
-      // For scheduled posts, use scheduledDate if available, otherwise use updatedAt
-      const timeA = (a.status === "scheduled" && a.scheduledDate) 
-        ? a.scheduledDate.getTime() 
-        : a.updatedAt.getTime();
-      const timeB = (b.status === "scheduled" && b.scheduledDate) 
-        ? b.scheduledDate.getTime() 
-        : b.updatedAt.getTime();
+      // If both posts are scheduled, always sort by scheduled date (chronological order)
+      if (a.status === "scheduled" && b.status === "scheduled") {
+        const timeA = a.scheduledDate ? a.scheduledDate.getTime() : a.updatedAt.getTime();
+        const timeB = b.scheduledDate ? b.scheduledDate.getTime() : b.updatedAt.getTime();
+        return timeA - timeB; // Always ascending (chronological) for scheduled posts
+      }
+      
+      // For non-scheduled posts, use normal sorting
+      const timeA = a.updatedAt.getTime();
+      const timeB = b.updatedAt.getTime();
       return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
     });
 
