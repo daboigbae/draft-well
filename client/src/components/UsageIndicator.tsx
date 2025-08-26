@@ -1,3 +1,7 @@
+// COMMENTED OUT: Paid feature - Usage tracking and subscription management
+// This component will be uncommented when implementing paid features
+
+/*
 import { useEffect, useState } from 'react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -194,4 +198,10 @@ export default function UsageIndicator() {
       )}
     </div>
   );
+}
+*/
+
+// Simple placeholder component for free users
+export default function UsageIndicator() {
+  return null; // Hidden for free users
 }

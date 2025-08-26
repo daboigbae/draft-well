@@ -1,3 +1,7 @@
+// COMMENTED OUT: Paid feature - AI Rating system with usage limits
+// This functionality will be uncommented when implementing paid features
+
+/*
 import { httpsCallable } from "firebase/functions";
 import { functions } from "../firebase";
 import { canUserUseAiRating, getUserSubscription } from './subscription';
@@ -46,4 +50,33 @@ export const getRating = async (draft: string, postId: string, userId: string): 
       message: error.message || 'An unexpected error occurred'
     };
   }
+};
+*/
+
+// Simple interfaces for free users (no AI rating functionality)
+export interface RatingData {
+  rating: number;
+  suggestions: string[];
+}
+
+export interface RatingResponse {
+  success: boolean;
+  data?: RatingData;
+  error?: string;
+  message?: string;
+}
+
+export interface RatingRequest {
+  draft: string;
+  postId: string;
+  userId: string;
+}
+
+// Disabled AI rating for free users
+export const getRating = async (draft: string, postId: string, userId: string): Promise<RatingResponse> => {
+  return {
+    success: false,
+    error: 'AI rating feature is currently disabled',
+    message: 'AI rating functionality is not available in the free version.'
+  };
 };
