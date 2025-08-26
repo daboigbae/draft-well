@@ -129,7 +129,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   className="text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer block"
                   data-testid="button-version"
                 >
-                  v3.0.0
+                  v3.1.0
                 </button>
               </div>
             </div>

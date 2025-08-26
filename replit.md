@@ -4,7 +4,7 @@
 
 Draftwell is a full-stack LinkedIn post management application built with React, TypeScript, and Firebase. The application allows users to create, edit, organize, and schedule LinkedIn posts with AI-powered rating system, markdown editing, character counting, and real-time synchronization. The app provides a complete content creation workflow from draft to publication with advanced filtering, search capabilities, and intelligent content analysis.
 
-**Current Version:** v3.0.0 - Mobile-First Responsive Design & User Feedback
+**Current Version:** v3.1.0 - Enhanced UI/UX with Collapsible Menu & Filters
 
 ## User Preferences
 

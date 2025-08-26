@@ -35,13 +35,59 @@ export default function ReleaseNotes() {
               </p>
             </div>
 
+            {/* Version 3.1.0 */}
+            <div className="mb-8" data-testid="version-3-1-0">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-2xl font-semibold text-slate-800">Version 3.1.0</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  Latest
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">Released: August 26, 2025</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🎛️ Enhanced UI/UX Controls</h3>
+                  <p className="text-slate-600 mb-4">
+                    Major interface improvements focused on space optimization and user control over the workspace layout.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Collapsible Sidebar Menu:</strong> Sidebar can now be hidden/shown with a toggle button for maximum content space</li>
+                    <li><strong>Fixed Sidebar Layout:</strong> Left sidebar stays fixed while main content scrolls independently for better navigation</li>
+                    <li><strong>Expandable Filter Section:</strong> Search and filter controls can be collapsed to provide more room for post viewing</li>
+                    <li><strong>Smart Icon Updates:</strong> Toggle buttons show appropriate icons (X when open, Menu when closed) for clear visual feedback</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">📐 Layout Optimizations</h3>
+                  <p className="text-slate-600 mb-4">
+                    Improved workspace management and content organization for better productivity.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Dynamic Content Expansion:</strong> Main content area automatically expands to full width when sidebar is hidden</li>
+                    <li><strong>Filter Status Reordering:</strong> Post filters now appear in logical order: All Posts, Drafts, Scheduled, Published</li>
+                    <li><strong>Cleaner Navigation:</strong> Simplified sidebar with user icon moved to Account section for consistency</li>
+                    <li><strong>Smooth Animations:</strong> All layout changes include smooth transitions for professional feel</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🔧 Technical Improvements</h3>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li>Fixed layout positioning for proper scroll behavior</li>
+                    <li>Enhanced responsive design with better mobile/desktop consistency</li>
+                    <li>Improved state management for UI toggles</li>
+                    <li>Optimized CSS for smoother animations and transitions</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Version 3.0.0 */}
             <div className="mb-8" data-testid="version-3-0-0">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl font-semibold text-slate-800">Version 3.0.0</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  Latest
-                </span>
               </div>
               <p className="text-sm text-slate-500 mb-6">Released: August 24, 2025</p>
               
