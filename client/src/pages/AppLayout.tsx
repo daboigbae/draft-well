@@ -14,6 +14,7 @@ import { useToast } from "../hooks/use-toast";
 import { logout } from "../lib/auth";
 import { createPost } from "../lib/posts";
 import { createFeedback } from "../lib/feedback";
+import { resetFiltersToDefault } from "../lib/filter-utils";
 import { PostStatus } from "../types/post";
 import Footer from "../components/Footer";
 import UsageIndicator from "../components/UsageIndicator";
@@ -71,6 +72,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const handleLogout = async () => {
     try {
       await logout();
+      resetFiltersToDefault(); // Clear all saved filter preferences
       toast({
         title: "Signed out",
         description: "You have been signed out successfully.",

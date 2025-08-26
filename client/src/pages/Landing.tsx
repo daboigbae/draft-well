@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Star, Clock, BarChart3, Check, ChevronDown, ArrowRight, Zap, Users, Award } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import { resetFiltersToDefault } from "../lib/filter-utils";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
+
+  // Reset filters when landing page loads
+  useEffect(() => {
+    resetFiltersToDefault();
+  }, []);
 
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
