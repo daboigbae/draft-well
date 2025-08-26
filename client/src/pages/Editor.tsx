@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star } from "lucide-react";
+import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star, Trash2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -25,7 +25,7 @@ import ScheduleModal from "../components/ScheduleModal";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post } from "../types/post";
-import { getPost, updatePost, publishPost, schedulePost } from "../lib/posts";
+import { getPost, updatePost, publishPost, schedulePost, deletePost } from "../lib/posts";
 import { renderMarkdown, markdownToLinkedInText } from "../utils/markdown";
 import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
@@ -303,6 +303,28 @@ export default function Editor() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!user || !post) return;
+
+    const confirmed = window.confirm('Are you sure you want to delete this post? This action cannot be undone.');
+    if (!confirmed) return;
+
+    try {
+      await deletePost(user.uid, post.id);
+      toast({
+        title: "Post deleted",
+        description: "Your post has been permanently deleted.",
+      });
+      setLocation("/app");
+    } catch (error) {
+      toast({
+        title: "Delete failed",
+        description: "Failed to delete post.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleGetRating = async () => {
     if (!body.trim() || loadingRating) return;
 
@@ -518,6 +540,18 @@ export default function Editor() {
             <Share className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
             <span className="hidden sm:inline ml-2">Mark as Published</span>
             <span className="sm:hidden">Publish</span>
+          </Button>
+          
+          <Button 
+            variant="destructive" 
+            onClick={handleDelete} 
+            size="sm"
+            className="text-xs sm:text-sm"
+            data-testid="button-delete"
+          >
+            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline ml-2">Delete Post</span>
+            <span className="sm:hidden">Delete</span>
           </Button>
           
           {/* Mobile Preview Toggle */}
