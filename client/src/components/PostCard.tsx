@@ -75,8 +75,24 @@ export default function PostCard({ post, onEdit, onDuplicate, onDelete }: PostCa
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't trigger if clicking on buttons or interactive elements
+    if (e.target instanceof HTMLElement && (
+      e.target.closest('button') || 
+      e.target.closest('[role="button"]') ||
+      e.target.closest('a')
+    )) {
+      return;
+    }
+    onEdit(post.id);
+  };
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow" data-testid={`card-post-${post.id}`}>
+    <div 
+      className="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow cursor-pointer" 
+      data-testid={`card-post-${post.id}`}
+      onClick={handleCardClick}
+    >
       <div className="p-4 sm:p-6">
         {/* Header Section */}
         <div className="mb-4">
