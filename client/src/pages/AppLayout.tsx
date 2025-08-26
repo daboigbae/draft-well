@@ -236,7 +236,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start pl-12 text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  className="w-full justify-start"
                   data-testid="button-send-feedback"
                 >
                   <MessageSquare className="mr-3 h-4 w-4" />
