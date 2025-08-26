@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Plus, User, Hash, Settings, Menu, X, FileText } from "lucide-react";
+import { Plus, User, Hash, Settings, Menu, X, FileText, MessageSquare } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { logout } from "../lib/auth";
 import { createPost } from "../lib/posts";
+import { createFeedback } from "../lib/feedback";
 import { PostStatus } from "../types/post";
 import Footer from "../components/Footer";
 import UsageIndicator from "../components/UsageIndicator";
@@ -14,12 +22,28 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
+const feedbackSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  text: z.string().min(10, "Feedback must be at least 10 characters long").max(1000, "Feedback must not exceed 1000 characters"),
+});
+
+type FeedbackForm = z.infer<typeof feedbackSchema>;
+
 export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  const form = useForm<FeedbackForm>({
+    resolver: zodResolver(feedbackSchema),
+    defaultValues: {
+      email: user?.email || "",
+      text: "",
+    },
+  });
 
 
   const handleNewPost = async () => {
@@ -55,6 +79,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
       toast({
         title: "Sign out failed",
         description: "There was an error signing out.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onSubmitFeedback = async (data: FeedbackForm) => {
+    try {
+      await createFeedback(data);
+      toast({
+        title: "Feedback sent!",
+        description: "Thank you for your feedback. We'll review it and get back to you if needed.",
+      });
+      setFeedbackDialogOpen(false);
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Failed to send feedback",
+        description: "There was an error sending your feedback. Please try again.",
         variant: "destructive",
       });
     }
@@ -151,9 +193,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
         
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto flex flex-col">
           {/* Additional Navigation */}
-          <div className="px-6 mt-6">
+          <div className="px-6 mt-6 flex-1">
             <Button
               variant="ghost"
               className="w-full justify-start"
@@ -190,6 +232,90 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <User className="mr-3 h-4 w-4" />
               Account
             </Button>
+            <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start pl-12"
+                  data-testid="button-send-feedback"
+                >
+                  <MessageSquare className="mr-3 h-3 w-3" />
+                  Send Feedback
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Send Feedback</DialogTitle>
+                  <DialogDescription>
+                    Help us improve Draftwell by sharing your thoughts, suggestions, or reporting issues.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <form onSubmit={form.handleSubmit(onSubmitFeedback)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="feedback-email">Email</Label>
+                    <Input
+                      id="feedback-email"
+                      type="email"
+                      placeholder="your.email@example.com"
+                      {...form.register("email")}
+                      data-testid="input-feedback-email"
+                    />
+                    {form.formState.errors.email && (
+                      <p className="text-sm text-red-600" data-testid="error-feedback-email">
+                        {form.formState.errors.email.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="feedback-text">Feedback</Label>
+                    <Textarea
+                      id="feedback-text"
+                      placeholder="Share your thoughts, suggestions, or report any issues..."
+                      rows={4}
+                      {...form.register("text")}
+                      data-testid="textarea-feedback-text"
+                    />
+                    <div className="flex justify-between items-center">
+                      {form.formState.errors.text && (
+                        <p className="text-sm text-red-600" data-testid="error-feedback-text">
+                          {form.formState.errors.text.message}
+                        </p>
+                      )}
+                      <span className="text-xs text-slate-500 ml-auto">
+                        {form.watch("text")?.length || 0}/1000
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setFeedbackDialogOpen(false)}
+                      data-testid="button-feedback-cancel"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={form.formState.isSubmitting}
+                      data-testid="button-feedback-submit"
+                    >
+                      {form.formState.isSubmitting ? "Sending..." : "Send Feedback"}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          {/* Footer */}
+          <div className="px-6 py-4 border-t border-gray-100">
+            <p className="text-xs text-slate-400 text-center">
+              Built by Digital Art Dealers
+            </p>
           </div>
         </div>
       </div>
