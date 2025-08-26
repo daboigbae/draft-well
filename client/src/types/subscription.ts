@@ -1,7 +1,3 @@
-// COMMENTED OUT: Paid feature - Subscription types and plans
-// This file will be uncommented when implementing paid features
-
-/*
 export type PlanType = 'free' | 'starter' | 'pro';
 
 export interface Plan {
@@ -90,47 +86,4 @@ export function canUseAiRating(plan: Plan, usedCount: number): boolean {
     return true;
   }
   return usedCount < plan.features.aiRatingsPerMonth;
-}
-*/
-
-// Minimal types needed for free users
-export type PlanType = 'free';
-
-export interface Plan {
-  id: PlanType;
-  name: string;
-  price: number;
-  features: {
-    aiRatingsPerMonth: number;
-    postReminders: boolean;
-    advancedAiFeedback: boolean;
-    csvExport: boolean;
-  };
-}
-
-export const PLANS: Plan[] = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    features: {
-      aiRatingsPerMonth: 0, // Disabled for free users
-      postReminders: false,
-      advancedAiFeedback: false,
-      csvExport: false,
-    },
-  },
-];
-
-export function getPlanById(planType: PlanType): Plan {
-  return PLANS[0]; // Always return free plan
-}
-
-export function getCurrentMonthKey(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-}
-
-export function canUseAiRating(plan: Plan, usedCount: number): boolean {
-  return false; // Always false for free users
 }
