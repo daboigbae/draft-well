@@ -277,88 +277,35 @@ export default function PostList() {
 
           {/* Header with Stats */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 sm:p-8 mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-indigo-600 bg-clip-text text-transparent mb-2" data-testid="text-filter-title">
-                  {getFilterTitle()}
-                </h1>
-                <p className="text-slate-600 text-lg" data-testid="text-post-count">
-                  {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""} found
-                </p>
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-indigo-600 bg-clip-text text-transparent mb-2" data-testid="text-filter-title">
+                    {getFilterTitle()}
+                  </h1>
+                  <p className="text-slate-600 text-lg" data-testid="text-post-count">
+                    {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""} found
+                  </p>
+                </div>
+                
+                {/* Quick Stats */}
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-indigo-600">{getPostCounts().draft}</div>
+                    <div className="text-xs text-slate-500 font-medium">Drafts</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{getPostCounts().published}</div>
+                    <div className="text-xs text-slate-500 font-medium">Published</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">{getPostCounts().scheduled}</div>
+                    <div className="text-xs text-slate-500 font-medium">Scheduled</div>
+                  </div>
+                </div>
               </div>
               
-              {/* Quick Stats */}
-              <div className="flex items-center gap-4 sm:gap-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-indigo-600">{getPostCounts().draft}</div>
-                  <div className="text-xs text-slate-500 font-medium">Drafts</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{getPostCounts().published}</div>
-                  <div className="text-xs text-slate-500 font-medium">Published</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{getPostCounts().scheduled}</div>
-                  <div className="text-xs text-slate-500 font-medium">Scheduled</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 mb-8">
-            {/* Filter Toggle Header */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Search className="h-5 w-5 text-slate-500" />
-                <span className="text-lg font-semibold text-slate-700">Search & Filters</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => updateFiltersExpanded(!filtersExpanded)}
-                className="text-slate-500 hover:text-slate-700"
-                data-testid="button-toggle-filters"
-              >
-                {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                <span className="ml-2">{filtersExpanded ? "Collapse" : "Expand"}</span>
-              </Button>
-            </div>
-            
-            {/* Search - Always Visible */}
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
-              <Input
-                type="text"
-                placeholder="Search by title, content, or tags..."
-                className="pl-12 pr-4 py-3 text-base border-gray-200 focus:border-indigo-300 focus:ring-indigo-200 rounded-xl"
-                value={searchQuery}
-                onChange={(e) => updateSearchQuery(e.target.value)}
-                data-testid="input-search"
-              />
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => updateSortOrder(sortOrder === "desc" ? "asc" : "desc")}
-                  className="text-slate-500 hover:text-slate-700"
-                  data-testid="button-sort"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                  <span className="hidden sm:inline ml-2">{sortOrder === "desc" ? "Newest" : "Oldest"}</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Collapsible Filter Content */}
-            {filtersExpanded && (
-              <div className="space-y-6">
-                {/* Post Status Filters */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Filter className="h-4 w-4 text-slate-500" />
-                <span className="text-sm font-medium text-slate-700">Filter by Status</span>
-              </div>
+              {/* Post Status Filters - Always Visible */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <Button
                   variant={currentFilter === "all" ? "default" : "outline"}
@@ -434,6 +381,56 @@ export default function PostList() {
                 </Button>
               </div>
             </div>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 mb-8">
+            {/* Filter Toggle Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Search className="h-5 w-5 text-slate-500" />
+                <span className="text-lg font-semibold text-slate-700">Search & Filters</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => updateFiltersExpanded(!filtersExpanded)}
+                className="text-slate-500 hover:text-slate-700"
+                data-testid="button-toggle-filters"
+              >
+                {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                <span className="ml-2">{filtersExpanded ? "Collapse" : "Expand"}</span>
+              </Button>
+            </div>
+            
+            {/* Search - Always Visible */}
+            <div className="relative mb-6">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+              <Input
+                type="text"
+                placeholder="Search by title, content, or tags..."
+                className="pl-12 pr-4 py-3 text-base border-gray-200 focus:border-indigo-300 focus:ring-indigo-200 rounded-xl"
+                value={searchQuery}
+                onChange={(e) => updateSearchQuery(e.target.value)}
+                data-testid="input-search"
+              />
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => updateSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+                  className="text-slate-500 hover:text-slate-700"
+                  data-testid="button-sort"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                  <span className="hidden sm:inline ml-2">{sortOrder === "desc" ? "Newest" : "Oldest"}</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Collapsible Filter Content */}
+            {filtersExpanded && (
+              <div className="space-y-6">
 
             {/* Tag Filters */}
             {allTags.length > 0 && (
