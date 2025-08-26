@@ -10,19 +10,6 @@ export default function ReleaseNotes() {
     <AppLayout>
       <div className="flex-1 p-8" data-testid="release-notes">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation('/app')}
-              className="flex items-center gap-2"
-              data-testid="button-back-to-posts"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Posts
-            </Button>
-          </div>
 
           {/* Content */}
           <div className="bg-white rounded-lg border border-gray-200 p-8">
