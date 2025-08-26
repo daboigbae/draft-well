@@ -179,6 +179,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </div>
           </div>
           
+          {/* Usage Indicator */}
+          <div className="mb-4">
+            <UsageIndicator />
+          </div>
           
           <Button
             onClick={handleNewPost}
