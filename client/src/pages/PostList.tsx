@@ -410,64 +410,43 @@ export default function PostList() {
 
           {/* Tag Filters */}
           {allTags.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 mb-8">
-              {/* Filter Toggle Header */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-slate-500" />
-                  <span className="text-lg font-semibold text-slate-700">Filter by Tag</span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => updateFiltersExpanded(!filtersExpanded)}
-                  className="text-slate-500 hover:text-slate-700"
-                  data-testid="button-toggle-filters"
-                >
-                  {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  <span className="ml-2">{filtersExpanded ? "Collapse" : "Expand"}</span>
-                </Button>
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="h-5 w-5 text-slate-500" />
+                <span className="text-lg font-semibold text-slate-700">Filter by Tag</span>
               </div>
               
-              {/* Collapsible Tag Filter Content */}
-              {filtersExpanded && (
-                <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={currentTagFilter === null ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => updateCurrentTagFilter(null)}
+                  className={`transition-all ${
+                    currentTagFilter === null 
+                      ? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white" 
+                      : "hover:border-purple-300 hover:bg-purple-50"
+                  }`}
+                  data-testid="button-tag-all"
+                >
+                  All Tags
+                </Button>
+                {allTags.map((tag) => (
                   <Button
-                    variant={currentTagFilter === null ? "default" : "outline"}
+                    key={tag}
+                    variant={currentTagFilter === tag ? "default" : "outline"}
                     size="sm"
-                    onClick={() => updateCurrentTagFilter(null)}
+                    onClick={() => updateCurrentTagFilter(tag)}
                     className={`transition-all ${
-                      currentTagFilter === null 
-                        ? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white" 
-                        : "hover:border-purple-300 hover:bg-purple-50"
+                      currentTagFilter === tag 
+                        ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white" 
+                        : "hover:border-violet-300 hover:bg-violet-50"
                     }`}
-                    data-testid="button-tag-all"
+                    data-testid={`button-tag-${tag}`}
                   >
-                    All Tags
+                    #{tag}
                   </Button>
-                  {allTags.slice(0, 12).map((tag) => (
-                    <Button
-                      key={tag}
-                      variant={currentTagFilter === tag ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => updateCurrentTagFilter(tag)}
-                      className={`transition-all ${
-                        currentTagFilter === tag 
-                          ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white" 
-                          : "hover:border-violet-300 hover:bg-violet-50"
-                      }`}
-                      data-testid={`button-tag-${tag}`}
-                    >
-                      #{tag}
-                    </Button>
-                  ))}
-                  {allTags.length > 12 && (
-                    <span className="text-xs text-slate-500 px-3 py-2 bg-slate-50 rounded-full">
-                      +{allTags.length - 12} more
-                    </span>
-                  )}
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           )}
 
