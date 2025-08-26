@@ -133,17 +133,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 </button>
               </div>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => {
-                setLocation('/app/settings');
-                setSidebarOpen(false);
-              }}
-              data-testid="button-user-account"
-            >
-              <User className="h-4 w-4" />
-            </Button>
           </div>
           
           <Button
@@ -201,7 +190,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               }}
               data-testid="button-account"
             >
-              <Settings className="mr-3 h-4 w-4" />
+              <User className="mr-3 h-4 w-4" />
               Account
             </Button>
           </div>
