@@ -15,8 +15,8 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile sidebar state
-  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true); // Desktop sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -97,21 +97,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-
-      {/* Desktop Sidebar Toggle Button */}
-      <div className={`hidden lg:block fixed top-4 z-50 transition-all duration-300 ease-in-out ${
-        desktopSidebarOpen ? 'left-72' : 'left-4'
-      }`}>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
-          className="bg-white shadow-md hover:shadow-lg border-gray-300"
-          data-testid="button-desktop-sidebar-toggle"
-        >
-          <Menu className="h-4 w-4" />
-        </Button>
-      </div>
 
       {/* Sidebar */}
       <div className={`
@@ -223,8 +208,23 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
       </div>
       
+      {/* Desktop Toggle Button */}
+      <div className={`hidden lg:block fixed top-4 left-4 z-50 transition-all duration-300 ${
+        desktopSidebarOpen ? 'translate-x-72' : 'translate-x-0'
+      }`}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
+          className="bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-white"
+          data-testid="button-desktop-sidebar-toggle"
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
+      </div>
+      
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col pt-16 lg:pt-0 transition-all duration-300 ease-in-out ${
+      <div className={`flex-1 flex flex-col pt-16 lg:pt-0 transition-all duration-300 ${
         desktopSidebarOpen ? 'lg:ml-0' : 'lg:ml-0'
       }`} data-testid="main-content">
         <div className="flex-1">
