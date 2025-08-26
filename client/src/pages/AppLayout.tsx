@@ -219,7 +219,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           className="bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-white"
           data-testid="button-desktop-sidebar-toggle"
         >
-          <Menu className="h-4 w-4" />
+          {desktopSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </Button>
       </div>
       
