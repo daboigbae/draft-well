@@ -16,7 +16,6 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -101,8 +100,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Sidebar */}
       <div className={`
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        ${desktopSidebarOpen ? 'lg:translate-x-0' : 'lg:-translate-x-full'}
-        fixed lg:static inset-y-0 left-0 z-50
+        lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50
         w-80 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out overflow-hidden
       `} data-testid="sidebar">
         {/* Header */}
@@ -208,25 +206,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
       </div>
       
-      {/* Desktop Toggle Button */}
-      <div className={`hidden lg:block fixed top-4 left-4 z-50 transition-all duration-300 ${
-        desktopSidebarOpen ? 'translate-x-72' : 'translate-x-0'
-      }`}>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
-          className="bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-white"
-          data-testid="button-desktop-sidebar-toggle"
-        >
-          <Menu className="h-4 w-4" />
-        </Button>
-      </div>
-      
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col pt-16 lg:pt-0 transition-all duration-300 ${
-        desktopSidebarOpen ? 'lg:ml-0' : 'lg:ml-0'
-      }`} data-testid="main-content">
+      <div className="flex-1 flex flex-col lg:ml-0 pt-16 lg:pt-0" data-testid="main-content">
         <div className="flex-1">
           {children}
         </div>
