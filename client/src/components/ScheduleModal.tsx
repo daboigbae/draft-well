@@ -25,10 +25,16 @@ export default function ScheduleModal({
     if (currentScheduledAt) {
       return currentScheduledAt.toISOString().slice(0, 16);
     }
-    // Default to next hour
-    const nextHour = new Date();
-    nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
-    return nextHour.toISOString().slice(0, 16);
+    // Default to 9:00 AM today, or 9:00 AM tomorrow if it's already past 9:00 AM
+    const defaultTime = new Date();
+    defaultTime.setHours(9, 0, 0, 0);
+    
+    // If 9:00 AM today has already passed, default to 9:00 AM tomorrow
+    if (defaultTime <= new Date()) {
+      defaultTime.setDate(defaultTime.getDate() + 1);
+    }
+    
+    return defaultTime.toISOString().slice(0, 16);
   });
 
   const handlePublishNow = () => {
