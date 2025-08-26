@@ -133,8 +133,13 @@ export default function PostList() {
 
     // Apply sort
     filtered.sort((a, b) => {
-      const timeA = a.updatedAt.getTime();
-      const timeB = b.updatedAt.getTime();
+      // For scheduled posts, use scheduledDate if available, otherwise use updatedAt
+      const timeA = (a.status === "scheduled" && a.scheduledDate) 
+        ? a.scheduledDate.getTime() 
+        : a.updatedAt.getTime();
+      const timeB = (b.status === "scheduled" && b.scheduledDate) 
+        ? b.scheduledDate.getTime() 
+        : b.updatedAt.getTime();
       return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
     });
 
