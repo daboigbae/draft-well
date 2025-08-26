@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { ArrowUpDown, AlertCircle, PenTool, Sparkles, Search, Filter, TrendingUp, Clock, Users, Plus } from "lucide-react";
+import { ArrowUpDown, AlertCircle, PenTool, Sparkles, Search, Filter, TrendingUp, Clock, Users, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
@@ -27,6 +27,7 @@ export default function PostList() {
   const [error, setError] = useState<string | null>(null);
   const [firstDraftCompleted, setFirstDraftCompleted] = useState<boolean>(true);
   const [tutorialCompleted, setTutorialCompleted] = useState<boolean>(true);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -245,7 +246,25 @@ export default function PostList() {
 
           {/* Search and Filters */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 mb-8">
-            {/* Search */}
+            {/* Filter Toggle Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Search className="h-5 w-5 text-slate-500" />
+                <span className="text-lg font-semibold text-slate-700">Search & Filters</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setFiltersExpanded(!filtersExpanded)}
+                className="text-slate-500 hover:text-slate-700"
+                data-testid="button-toggle-filters"
+              >
+                {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                <span className="ml-2">{filtersExpanded ? "Collapse" : "Expand"}</span>
+              </Button>
+            </div>
+            
+            {/* Search - Always Visible */}
             <div className="relative mb-6">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
               <Input
@@ -270,7 +289,10 @@ export default function PostList() {
               </div>
             </div>
 
-            {/* Post Status Filters */}
+            {/* Collapsible Filter Content */}
+            {filtersExpanded && (
+              <div className="space-y-6">
+                {/* Post Status Filters */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-3">
                 <Filter className="h-4 w-4 text-slate-500" />
@@ -395,6 +417,8 @@ export default function PostList() {
                     </span>
                   )}
                 </div>
+              </div>
+            )}
               </div>
             )}
           </div>
