@@ -1,74 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLocation } from "wouter";
-import { Linkedin, Mail, Lock, FileText, Sparkles, Users, Shield } from "lucide-react";
+import { Linkedin, Mail, Lock, FileText, Sparkles, Users, Shield, ArrowLeft } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { useToast } from "../hooks/use-toast";
+import { useAuth } from "../hooks/use-auth";
 import { signInWithEmail, signUpWithEmail, getAuthErrorMessage } from "../lib/auth";
 import Footer from "../components/Footer";
 
 const authSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().optional(),
-}).refine((data) => {
-  // Only require password confirmation for signup
-  return true;
-}, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
 });
 
 type AuthForm = z.infer<typeof authSchema>;
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { user, loading } = useAuth();
+
+  // If user is already authenticated, redirect to app
+  useEffect(() => {
+    if (!loading && user) {
+      setLocation('/app');
+    }
+  }, [user, loading, setLocation]);
 
   const form = useForm<AuthForm>({
     resolver: zodResolver(authSchema),
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: "",
     },
   });
 
   const onSubmit = async (data: AuthForm) => {
     setIsLoading(true);
     try {
-      if (isSignUp) {
-        // Validate password confirmation for signup
-        if (data.password !== data.confirmPassword) {
-          toast({
-            title: "Sign up failed",
-            description: "Passwords don't match",
-            variant: "destructive",
-          });
-          return;
-        }
-        await signUpWithEmail(data.email, data.password);
-        toast({
-          title: "Account created!",
-          description: "Welcome to Draftwell! You're now signed in.",
-        });
-      } else {
-        await signInWithEmail(data.email, data.password);
-        toast({
-          title: "Signed in",
-          description: "Welcome back to Draftwell!",
-        });
-      }
+      await signInWithEmail(data.email, data.password);
+      toast({
+        title: "Signed in",
+        description: "Welcome back to Draftwell!",
+      });
+      // Redirect to app after successful sign in
+      setLocation('/app');
     } catch (error: any) {
       toast({
-        title: isSignUp ? "Sign up failed" : "Authentication failed",
+        title: "Authentication failed",
         description: getAuthErrorMessage(error),
         variant: "destructive",
       });
@@ -79,185 +64,108 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
-        <div className="w-full max-w-4xl space-y-16 lg:space-y-20">
-        {/* Login Card */}
-        <Card className="w-full max-w-md mx-auto" data-testid="login-card">
-          <CardHeader className="text-center">
-            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Linkedin className="text-white h-6 w-6" />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 flex flex-col">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-sm font-bold">DW</span>
+              </div>
+              <h1 className="text-xl font-bold text-slate-800">Draftwell</h1>
             </div>
-            <CardTitle className="text-2xl font-bold text-slate-800">Draftwell</CardTitle>
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => setLocation('/signup')}
+                data-testid="button-sign-up"
+              >
+                Sign Up
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={() => setLocation('/')}
+                data-testid="button-back-home"
+              >
+                Back to Home
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Sign-in Form */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
+        <Card className="w-full max-w-md" data-testid="login-card">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-slate-800">Sign in to your account</CardTitle>
             <CardDescription>
-              {isSignUp ? "Create your account to start drafting better LinkedIn posts" : "Sign in to your account"}
+              Welcome back to Draftwell
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="space-y-6">
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    className="pl-10"
-                    {...form.register("email")}
-                    data-testid="input-email"
-                  />
-                </div>
-                {form.formState.errors.email && (
-                  <p className="text-sm text-red-600" data-testid="error-email">
-                    {form.formState.errors.email.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder={isSignUp ? "Create a password (6+ characters)" : "Enter your password"}
-                    className="pl-10"
-                    {...form.register("password")}
-                    data-testid="input-password"
-                  />
-                </div>
-                {form.formState.errors.password && (
-                  <p className="text-sm text-red-600" data-testid="error-password">
-                    {form.formState.errors.password.message}
-                  </p>
-                )}
-              </div>
-
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      placeholder="Confirm your password"
-                      className="pl-10"
-                      {...form.register("confirmPassword")}
-                      data-testid="input-confirm-password"
-                    />
-                  </div>
-                  {form.formState.errors.confirmPassword && (
-                    <p className="text-sm text-red-600" data-testid="error-confirm-password">
-                      {form.formState.errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
+          <CardContent className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Email"
+                {...form.register("email")}
+                data-testid="input-email"
+              />
+              {form.formState.errors.email && (
+                <p className="text-sm text-red-600" data-testid="error-email">
+                  {form.formState.errors.email.message}
+                </p>
               )}
+            </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-                data-testid="button-submit"
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Password"
+                {...form.register("password")}
+                data-testid="input-password"
+              />
+              {form.formState.errors.password && (
+                <p className="text-sm text-red-600" data-testid="error-password">
+                  {form.formState.errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              disabled={isLoading}
+              data-testid="button-submit"
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+
+          <div className="text-center">
+            <p className="text-sm text-slate-600">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => setLocation('/signup')}
+                className="font-medium text-purple-600 hover:text-purple-800 underline"
+                data-testid="link-signup"
               >
-                {isLoading ? "Please wait..." : (isSignUp ? "Create Account" : "Sign In")}
-              </Button>
-            </form>
-
-            <div className="text-center">
-              <p className="text-sm text-slate-600">
-                {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-                <button
-                  type="button"
-                  onClick={() => setIsSignUp(!isSignUp)}
-                  className="font-medium text-primary hover:text-primary/80 underline"
-                  data-testid="toggle-auth-mode"
-                >
-                  {isSignUp ? "Sign in" : "Sign up"}
-                </button>
-              </p>
-            </div>
-
-          </CardContent>
+                Sign up
+              </button>
+            </p>
+          </div>
+        </CardContent>
         </Card>
-
-        {/* About Linkedraft */}
-        <Card className="w-full max-w-3xl mx-auto bg-white/80 backdrop-blur-sm border-slate-200">
-          <CardContent className="p-8 lg:p-12">
-            <div className="text-center mb-12 lg:mb-16">
-              <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-6">
-                The Complete LinkedIn Post Management Platform
-              </h2>
-              <p className="text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                Draftwell helps content creators and professionals draft, organize, and perfect their LinkedIn posts 
-                with powerful features designed for social media excellence.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-12 lg:mb-16">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-blue-100 rounded-xl flex items-center justify-center mx-auto">
-                  <FileText className="h-8 w-8 lg:h-10 lg:w-10 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-slate-800 text-lg">Rich Editor</h3>
-                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Markdown-powered editor with live preview and LinkedIn-style formatting
-                </p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-green-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Sparkles className="h-8 w-8 lg:h-10 lg:w-10 text-green-600" />
-                </div>
-                <h3 className="font-semibold text-slate-800 text-lg">Smart Tags</h3>
-                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Auto-complete tags from previous posts and organize content by topic
-                </p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-purple-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Users className="h-8 w-8 lg:h-10 lg:w-10 text-purple-600" />
-                </div>
-                <h3 className="font-semibold text-slate-800 text-lg">AI Vetting</h3>
-                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Mark and track posts reviewed or enhanced by AI tools
-                </p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-orange-100 rounded-xl flex items-center justify-center mx-auto">
-                  <Shield className="h-8 w-8 lg:h-10 lg:w-10 text-orange-600" />
-                </div>
-                <h3 className="font-semibold text-slate-800 text-lg">Real-time Sync</h3>
-                <p className="text-sm lg:text-base text-slate-600 leading-relaxed">
-                  Your posts sync across all devices with automatic saving
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center space-y-6">
-              <div className="flex items-center justify-center gap-6">
-                <button
-                  onClick={() => setLocation('/app/release-notes')}
-                  className="text-sm lg:text-base text-slate-500 hover:text-slate-700 hover:underline cursor-pointer font-medium"
-                  data-testid="button-release-notes"
-                >
-                  v3.0.0 Release Notes
-                </button>
-                <span className="text-slate-300">•</span>
-                <span className="text-sm lg:text-base text-slate-500">Closed Beta</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        </div>
       </div>
-      <Footer />
+
+      {/* Footer */}
+      <footer className="text-center py-6 text-sm text-slate-500">
+        <p>© 2025 Draftwell. Built by Digital Art Dealers.</p>
+      </footer>
     </div>
   );
 }

@@ -4,7 +4,7 @@
 
 Draftwell is a full-stack LinkedIn post management application built with React, TypeScript, and Firebase. The application allows users to create, edit, organize, and schedule LinkedIn posts with AI-powered rating system, markdown editing, character counting, and real-time synchronization. The app provides a complete content creation workflow from draft to publication with advanced filtering, search capabilities, and intelligent content analysis.
 
-**Current Version:** v3.0.0 - Mobile-First Responsive Design & User Feedback
+**Current Version:** v3.1.0 - Enhanced UI/UX with Collapsible Menu & Filters
 
 ## User Preferences
 
@@ -34,6 +34,7 @@ Preferred communication style: Simple, everyday language.
 - **AI Rating System**: Get posts rated 1-10 with personalized improvement suggestions via Firebase cloud functions
 - **AI Rated Tracking**: Automatic flag management based on rating data with visual badges
 - **Character Validation**: 100-1000 character requirement for AI rating with user-friendly validation
+- **First Rating Onboarding**: Encouragement banner in editor for users who haven't rated posts yet
 - **Status Tracking**: Simple draft/published status system for tracking post lifecycle
 - **Filtering & Search**: Real-time filtering by status (draft/published) and text search
 - **Rating Display**: Post scores visible in both editor and post list views

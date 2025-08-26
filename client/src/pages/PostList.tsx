@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { ArrowUpDown, AlertCircle } from "lucide-react";
+import { ArrowUpDown, AlertCircle, PenTool, Sparkles, Search, Filter, TrendingUp, Clock, Users, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Badge } from "../components/ui/badge";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import PostCard from "../components/PostCard";
-import UsageIndicator from "../components/UsageIndicator";
 import AppLayout from "./AppLayout";
+import TutorialModal from "../components/TutorialModal";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
 import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags, createPost } from "../lib/posts";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -21,6 +25,9 @@ export default function PostList() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [firstDraftCompleted, setFirstDraftCompleted] = useState<boolean>(true);
+  const [tutorialCompleted, setTutorialCompleted] = useState<boolean>(true);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -43,6 +50,26 @@ export default function PostList() {
       unsubscribeTags();
     };
   }, [user]);
+
+  // Subscribe to user onboarded status
+  useEffect(() => {
+    if (!user) return;
+
+    const userDoc = doc(db, 'users', user.uid);
+    const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        setFirstDraftCompleted(userData.onboarded?.firstDraft ?? false); // Default to false to show onboarding
+        setTutorialCompleted(userData.onboarded?.tutorial ?? false); // Default to false to show onboarding
+      } else {
+        setFirstDraftCompleted(false);
+        setTutorialCompleted(false);
+      }
+    });
+
+    return unsubscribeUser;
+  }, [user]);
+
 
   // Filter and search posts
   useEffect(() => {
@@ -94,6 +121,13 @@ export default function PostList() {
         scheduledAt: null,
         aiRated: false,
       });
+
+      // Mark first draft as completed
+      const userDocRef = doc(db, 'users', user.uid);
+      await updateDoc(userDocRef, {
+        'onboarded.firstDraft': true
+      });
+
       setLocation(`/app/post/${newPostId}`);
     } catch (error) {
       toast({
@@ -149,27 +183,21 @@ export default function PostList() {
     all: posts.length,
     draft: posts.filter(p => p.status === "draft").length,
     published: posts.filter(p => p.status === "published").length,
+    scheduled: posts.filter(p => p.status === "scheduled").length,
   });
 
   const getFilterTitle = () => {
     switch (currentFilter) {
       case "draft": return "Draft Posts";
       case "published": return "Published Posts";
+      case "scheduled": return "Scheduled Posts";
       default: return "All Posts";
     }
   };
 
   if (error) {
     return (
-      <AppLayout
-        onFilterChange={setCurrentFilter}
-        onTagFilterChange={setCurrentTagFilter}
-        onSearchChange={setSearchQuery}
-        postCounts={getPostCounts()}
-        allTags={allTags}
-        currentFilter={currentFilter}
-        currentTagFilter={currentTagFilter}
-      >
+      <AppLayout>
         <div className="flex-1 p-8">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
@@ -181,52 +209,246 @@ export default function PostList() {
   }
 
   return (
-    <AppLayout
-      onFilterChange={setCurrentFilter}
-      onTagFilterChange={setCurrentTagFilter}
-      onSearchChange={setSearchQuery}
-      postCounts={getPostCounts()}
-      allTags={allTags}
-      currentFilter={currentFilter}
-      currentTagFilter={currentTagFilter}
-    >
-      <div className="flex-1 p-8" data-testid="post-list">
-        <div className="max-w-4xl mx-auto">
-          {/* Usage Indicator */}
-          <div className="mb-6">
-            <UsageIndicator />
+    <AppLayout>
+      <div className="flex-1 bg-gradient-to-br from-slate-50 to-blue-50/30 min-h-screen" data-testid="post-list">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+
+          {/* Header with Stats */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 sm:p-8 mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="flex-1">
+                <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-indigo-600 bg-clip-text text-transparent mb-2" data-testid="text-filter-title">
+                  {getFilterTitle()}
+                </h1>
+                <p className="text-slate-600 text-lg" data-testid="text-post-count">
+                  {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""} found
+                </p>
+              </div>
+              
+              {/* Quick Stats */}
+              <div className="flex items-center gap-4 sm:gap-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-indigo-600">{getPostCounts().draft}</div>
+                  <div className="text-xs text-slate-500 font-medium">Drafts</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{getPostCounts().published}</div>
+                  <div className="text-xs text-slate-500 font-medium">Published</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">{getPostCounts().scheduled}</div>
+                  <div className="text-xs text-slate-500 font-medium">Scheduled</div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-800" data-testid="text-filter-title">
-                {getFilterTitle()}
-              </h2>
-              <p className="text-slate-600 mt-1" data-testid="text-post-count">
-                {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""} found
-              </p>
+          {/* Search and Filters */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 mb-8">
+            {/* Filter Toggle Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Search className="h-5 w-5 text-slate-500" />
+                <span className="text-lg font-semibold text-slate-700">Search & Filters</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setFiltersExpanded(!filtersExpanded)}
+                className="text-slate-500 hover:text-slate-700"
+                data-testid="button-toggle-filters"
+              >
+                {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                <span className="ml-2">{filtersExpanded ? "Collapse" : "Expand"}</span>
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
-              className="flex items-center gap-2"
-              data-testid="button-sort"
-            >
-              <ArrowUpDown className="h-4 w-4" />
-              {sortOrder === "desc" ? "Newest First" : "Oldest First"}
-            </Button>
+            
+            {/* Search - Always Visible */}
+            <div className="relative mb-6">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+              <Input
+                type="text"
+                placeholder="Search by title, content, or tags..."
+                className="pl-12 pr-4 py-3 text-base border-gray-200 focus:border-indigo-300 focus:ring-indigo-200 rounded-xl"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                data-testid="input-search"
+              />
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+                  className="text-slate-500 hover:text-slate-700"
+                  data-testid="button-sort"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                  <span className="hidden sm:inline ml-2">{sortOrder === "desc" ? "Newest" : "Oldest"}</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Collapsible Filter Content */}
+            {filtersExpanded && (
+              <div className="space-y-6">
+                {/* Post Status Filters */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Filter className="h-4 w-4 text-slate-500" />
+                <span className="text-sm font-medium text-slate-700">Filter by Status</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <Button
+                  variant={currentFilter === "all" ? "default" : "outline"}
+                  onClick={() => setCurrentFilter("all")}
+                  className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
+                    currentFilter === "all" 
+                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg" 
+                      : "hover:border-indigo-300 hover:bg-indigo-50"
+                  }`}
+                  data-testid="button-filter-all"
+                >
+                  <TrendingUp className="h-5 w-5" />
+                  <div className="text-center">
+                    <div className="font-medium">All Posts</div>
+                    <div className={`text-xs ${currentFilter === "all" ? "text-indigo-100" : "text-slate-500"}`}>
+                      {getPostCounts().all} total
+                    </div>
+                  </div>
+                </Button>
+                <Button
+                  variant={currentFilter === "draft" ? "default" : "outline"}
+                  onClick={() => setCurrentFilter("draft")}
+                  className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
+                    currentFilter === "draft" 
+                      ? "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg" 
+                      : "hover:border-blue-300 hover:bg-blue-50"
+                  }`}
+                  data-testid="button-filter-draft"
+                >
+                  <PenTool className="h-5 w-5" />
+                  <div className="text-center">
+                    <div className="font-medium">Drafts</div>
+                    <div className={`text-xs ${currentFilter === "draft" ? "text-blue-100" : "text-slate-500"}`}>
+                      {getPostCounts().draft} drafts
+                    </div>
+                  </div>
+                </Button>
+                <Button
+                  variant={currentFilter === "scheduled" ? "default" : "outline"}
+                  onClick={() => setCurrentFilter("scheduled")}
+                  className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
+                    currentFilter === "scheduled" 
+                      ? "bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white shadow-lg" 
+                      : "hover:border-orange-300 hover:bg-orange-50"
+                  }`}
+                  data-testid="button-filter-scheduled"
+                >
+                  <Clock className="h-5 w-5" />
+                  <div className="text-center">
+                    <div className="font-medium">Scheduled</div>
+                    <div className={`text-xs ${currentFilter === "scheduled" ? "text-orange-100" : "text-slate-500"}`}>
+                      {getPostCounts().scheduled} pending
+                    </div>
+                  </div>
+                </Button>
+                <Button
+                  variant={currentFilter === "published" ? "default" : "outline"}
+                  onClick={() => setCurrentFilter("published")}
+                  className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
+                    currentFilter === "published" 
+                      ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg" 
+                      : "hover:border-green-300 hover:bg-green-50"
+                  }`}
+                  data-testid="button-filter-published"
+                >
+                  <Users className="h-5 w-5" />
+                  <div className="text-center">
+                    <div className="font-medium">Published</div>
+                    <div className={`text-xs ${currentFilter === "published" ? "text-green-100" : "text-slate-500"}`}>
+                      {getPostCounts().published} live
+                    </div>
+                  </div>
+                </Button>
+              </div>
+            </div>
+
+            {/* Tag Filters */}
+            {allTags.length > 0 && (
+              <div className="pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="h-4 w-4 text-slate-500" />
+                  <span className="text-sm font-medium text-slate-700">Filter by Tag</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant={currentTagFilter === null ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentTagFilter(null)}
+                    className={`transition-all ${
+                      currentTagFilter === null 
+                        ? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white" 
+                        : "hover:border-purple-300 hover:bg-purple-50"
+                    }`}
+                    data-testid="button-tag-all"
+                  >
+                    All Tags
+                  </Button>
+                  {allTags.slice(0, 12).map((tag) => (
+                    <Button
+                      key={tag}
+                      variant={currentTagFilter === tag ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentTagFilter(tag)}
+                      className={`transition-all ${
+                        currentTagFilter === tag 
+                          ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white" 
+                          : "hover:border-violet-300 hover:bg-violet-50"
+                      }`}
+                      data-testid={`button-tag-${tag}`}
+                    >
+                      #{tag}
+                    </Button>
+                  ))}
+                  {allTags.length > 12 && (
+                    <span className="text-xs text-slate-500 px-3 py-2 bg-slate-50 rounded-full">
+                      +{allTags.length - 12} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+              </div>
+            )}
           </div>
 
           {/* Posts */}
           {loading ? (
             <div className="space-y-6">
               {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="bg-white rounded-xl border border-gray-200 p-6">
+                <div key={index} className="bg-white rounded-2xl border border-gray-200/60 p-6 shadow-sm">
                   <div className="animate-pulse">
-                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex gap-2">
+                        <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-16"></div>
+                        <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-20"></div>
+                      </div>
+                      <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-12"></div>
+                    </div>
+                    <div className="h-7 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-3/4 mb-4"></div>
+                    <div className="space-y-2 mb-4">
+                      <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-full"></div>
+                      <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-2/3"></div>
+                    </div>
+                    <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                      <div className="flex gap-2">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                          <div key={i} className="h-8 w-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded"></div>
+                        ))}
+                      </div>
+                      <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-24"></div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -245,29 +467,134 @@ export default function PostList() {
             </div>
           ) : (
             <div className="text-center py-12" data-testid="empty-state">
-              <div className="text-slate-400 mb-4">
-                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-slate-800 mb-2">No posts found</h3>
-              <p className="text-slate-600 mb-6">
-                {searchQuery 
-                  ? "No posts match your search criteria. Try adjusting your search terms."
-                  : currentFilter === "all"
-                    ? "You haven't created any posts yet. Click 'New Post' to get started!"
-                    : `No ${currentFilter} posts found. Try switching to a different filter.`
-                }
-              </p>
-              {!searchQuery && currentFilter === "all" && (
-                <Button onClick={handleNewPost} data-testid="button-create-first-post">
-                  Create Your First Post
-                </Button>
+              {searchQuery ? (
+                <>
+                  <div className="text-slate-400 mb-4">
+                    <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-2">No posts found</h3>
+                  <p className="text-slate-600 mb-6">
+                    No posts match your search criteria. Try adjusting your search terms.
+                  </p>
+                </>
+              ) : currentFilter === "all" ? (
+                firstDraftCompleted ? (
+                  <div className="text-center">
+                    <div className="text-slate-400 mb-4">
+                      <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-slate-800 mb-2">Ready to write?</h3>
+                    <p className="text-slate-600 mb-6">
+                      You haven't created any posts yet. Start writing your next LinkedIn post.
+                    </p>
+                    <Button onClick={handleNewPost} data-testid="button-create-first-post">
+                      <PenTool className="w-4 h-4 mr-2" />
+                      New Post
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="max-w-2xl mx-auto">
+                    <h3 className="text-2xl font-bold text-slate-800 mb-2">Your next viral post starts here</h3>
+                    <p className="text-slate-600 mb-8">
+                      Imagine sharing insights that spark conversations, build your network, and establish your expertise. Here's what your post could look like:
+                    </p>
+                    
+                    {/* Example Post Preview */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8 text-left">
+                      <div className="flex items-center gap-3 mb-4">
+                        <img 
+                          src="https://media.licdn.com/dms/image/v2/D5603AQGeotNHHd8VhQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1723385389068?e=1758758400&v=beta&t=U7d-58A04Mhu8VyxHDNOIrA-j21HghJwsB0GR4oGUz0"
+                          alt="Gabe's profile"
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div>
+                          <div className="font-medium text-slate-800">Gabe</div>
+                          <div className="text-sm text-slate-500">Senior Developer & Top 1% Freelancer</div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-slate-800 leading-relaxed mb-4">
+                        <p className="mb-3">I declined a job this week because they wanted me to do some live coding during the interview.</p>
+                        <p className="mb-3">Look, I get it. Hiring devs is hella hard.</p>
+                        <p className="mb-3">But if your hiring process still involves making senior engineers do LeetCode under pressure.</p>
+                        <p className="mb-3"><strong>You're not hiring. You're hazing.</strong></p>
+                        <p className="mb-3">I've been writing code for almost a decade.</p>
+                        <p className="mb-3">I've shipped real apps, saved dying projects, and built a business off my results.</p>
+                        <p className="mb-3">I'm a top 1% freelancer on UpWork with almost 10,000 hours billed and over $700k earned.</p>
+                        <p className="mb-3">You can Google me. My resume is public.</p>
+                        <p className="mb-3">If that's not enough proof that I know what I'm doing.</p>
+                        <p className="mb-3"><strong>You're not the kind of client I want to work with.</strong></p>
+                        <p className="mb-3 italic">= = = gabe was here = =</p>
+                        <p className="mb-3">Sorry not sorry.</p>
+                        <p className="mb-3">What do y'all think? Are live coding interviews still legit in 2025 — or are they just lazy vetting?</p>
+                        <p className="mt-3 text-indigo-600">#freelancing #programming #innovation #artificialintelligence #ai</p>
+                      </div>
+                      
+                      <div className="flex items-center gap-6 text-sm text-slate-500 pt-3 border-t border-gray-100">
+                        <span>💬 284 comments</span>
+                        <span>🔄 156 shares</span>
+                        <span>❤️ 3.7K reactions</span>
+                      </div>
+                    </div>
+                    
+                    <div className="text-slate-600 mb-6">
+                      <strong>Your story matters.</strong> Share your unique perspective, lessons learned, and insights that only you can provide. 
+                      The LinkedIn community is waiting to hear from you.
+                    </div>
+                    
+                    <Button 
+                      onClick={handleNewPost} 
+                      size="lg"
+                      className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium px-8"
+                      data-testid="button-create-first-post"
+                    >
+                      <PenTool className="w-5 h-5 mr-2" />
+                      Start Writing Your Story
+                    </Button>
+                  </div>
+                )
+              ) : (
+                <>
+                  <div className="text-slate-400 mb-4">
+                    <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-2">No posts found</h3>
+                  <p className="text-slate-600 mb-6">
+                    No {currentFilter} posts found. Try switching to a different filter.
+                  </p>
+                </>
               )}
             </div>
           )}
         </div>
+        
+        {/* Floating Action Button */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            onClick={handleNewPost}
+            size="lg"
+            className="h-14 w-14 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-200 group"
+            data-testid="button-fab-new-post"
+          >
+            <Plus className="h-6 w-6 group-hover:scale-110 transition-transform" />
+          </Button>
+        </div>
       </div>
+
+      {/* Tutorial Modal */}
+      {user && (
+        <TutorialModal
+          userId={user.uid}
+          open={!tutorialCompleted}
+          onClose={() => setTutorialCompleted(true)}
+        />
+      )}
     </AppLayout>
   );
 }

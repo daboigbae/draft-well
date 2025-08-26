@@ -1,0 +1,130 @@
+. Hero Section (above the fold)
+
+Headline: Write LinkedIn posts that get noticed.
+
+Subheadline: Draftwell helps creators and professionals turn ideas into high-performing LinkedIn posts with AI feedback, reminders, and analytics.
+
+CTA Buttons:
+
+Primary: Start Free → signup
+
+Secondary (outlined): See How It Works → scroll to features
+
+Background: subtle gradient in Draftwell purple → light.
+
+2. Social Proof / Stats Row
+
+Add small cards showing your credibility:
+
+“860k+ LinkedIn impressions”
+
+“3.1k+ followers grown”
+
+“Built by top 1% Upwork freelancer”
+
+3. Feature Sections
+
+Use a 2-column grid (icon + text on left, mockup image on right). Three main features:
+
+Feature 1: AI Ratings & Suggestions
+
+Icon: ⭐
+
+Title: Know before you post.
+
+Copy: Get instant AI ratings (1–10) and actionable suggestions so every post has the best chance to perform.
+
+Feature 2: Reminders & Consistency
+
+Icon: ⏰
+
+Title: Never miss the right moment.
+
+Copy: Stay consistent with post reminders and performance check-ins at 1h, 12h, and 24h.
+
+Feature 3: Analytics & Insights
+
+Icon: 📊
+
+Title: See what works (and why).
+
+Copy: Track hashtags, keywords, and post performance over time so you always know how to improve.
+
+4. Pricing Section
+
+Three cards in a row: Free, Starter, Pro.
+
+Free (0)
+
+2 AI ratings/week
+
+Unlimited drafts
+
+Hashtag collections
+CTA: Start Free
+
+Starter ($9/mo)
+
+20 AI ratings/month
+
+Basic reminders
+
+Draft organization
+CTA: Upgrade to Starter
+
+Pro ($19/mo) (highlighted card with badge “Most Popular”)
+
+Unlimited AI ratings
+
+Advanced reminders (1h/12h/24h)
+
+Analytics dashboard
+
+Idea generator from your top posts
+CTA: Go Pro
+
+5. Testimonials / Proof Section
+
+Mock up 2–3 quotes from real posts (you can seed with your own LinkedIn screenshots for now).
+
+Example: “Draftwell gave me confidence my posts would land — my impressions doubled in a week.”
+
+6. Final CTA Section
+
+Headline: Stop guessing. Start posting with confidence.
+
+Subheadline: Join creators growing their LinkedIn with Draftwell today.
+
+Button: Start Free
+
+7. Footer
+
+Links: About · Privacy · Terms
+
+Small text: © 2025 Draftwell. Built by Digital Art Dealers. Not affiliated with LinkedIn Corporation.
+
+🎨 Design Notes
+
+Fonts: Inter or similar clean sans-serif.
+
+Colors:
+
+Primary purple: #6C63FF
+
+Gradient: bg-gradient-to-r from-purple-500 to-indigo-500
+
+Accent green for success/checkmarks.
+
+Buttons: shadcn/ui Button with variant="default" for primary, variant="outline" for secondary.
+
+Use Framer Motion for fade-in animations.
+
+Acceptance Criteria:
+
+Fully responsive (mobile → desktop).
+
+Clear CTA hierarchy (Free → Starter → Pro).
+
+SEO-friendly headings (H1 for hero, H2 for features).
+
+Uses Tailwind classes, clean and minimal.

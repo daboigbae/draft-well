@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { useAuth } from "../hooks/use-auth";
-import Login from "../pages/Login";
+import { useLocation } from "wouter";
 import { Skeleton } from "./ui/skeleton";
 
 interface AuthGuardProps {
@@ -9,6 +9,7 @@ interface AuthGuardProps {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const { user, loading } = useAuth();
+  const [, setLocation] = useLocation();
 
   if (loading) {
     return (
@@ -22,7 +23,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }
 
   if (!user) {
-    return <Login />;
+    setLocation('/');
+    return null;
   }
 
   return <>{children}</>;

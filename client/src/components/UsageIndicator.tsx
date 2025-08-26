@@ -84,9 +84,19 @@ export default function UsageIndicator() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-slate-500">
-        <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
-        Loading usage...
+      <div className="p-3" data-testid="usage-indicator-loading">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-gray-200 rounded animate-pulse" />
+            <div className="h-3 bg-gray-200 rounded w-20 animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded w-10 animate-pulse" />
+          </div>
+          <div className="h-3 bg-gray-200 rounded w-12 animate-pulse" />
+        </div>
+        
+        <div className="mb-2">
+          <div className="h-1 bg-gray-200 rounded-full w-full animate-pulse" />
+        </div>
       </div>
     );
   }
@@ -103,92 +113,78 @@ export default function UsageIndicator() {
   const isAtLimit = !usage.canUse;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm" data-testid="usage-indicator">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-indigo-600" />
-          <span className="font-medium text-slate-700">Rating Credits</span>
-          <Badge variant="outline" className="text-xs">
-            {usage.planName}
-          </Badge>
+    <div className="p-3 bg-slate-50 rounded-md" data-testid="usage-indicator">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <Zap className="w-3 h-3 text-slate-500" />
+          <span className="text-sm text-slate-600">Credits</span>
+          <span className="text-xs text-slate-400">({usage.planName})</span>
         </div>
         
         {!isUnlimited && (
-          <span className="text-sm text-slate-600" data-testid="usage-count">
+          <span className="text-xs text-slate-500" data-testid="usage-count">
             {usage.current} / {usage.limit}
           </span>
         )}
         
         {isUnlimited && (
-          <span className="text-sm text-slate-600" data-testid="usage-count">
+          <span className="text-xs text-slate-500" data-testid="usage-count">
             Unlimited
           </span>
         )}
       </div>
 
       {!isUnlimited && (
-        <div className="mb-3">
+        <div className="mb-2">
           <Progress 
             value={percentage} 
-            className="h-2"
+            className="h-1"
             data-testid="usage-progress"
           />
         </div>
       )}
 
       {isAtLimit && (
-        <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mb-3">
-          <p className="text-sm text-amber-800 mb-2">
-            You've used all your AI rating tokens.
-          </p>
-          <div className="flex gap-2">
-            {usage.planType === 'free' && (
-              <Button 
-                size="sm" 
-                onClick={() => handleUpgrade('starter')}
-                className="bg-indigo-600 hover:bg-indigo-700"
-                data-testid="button-upgrade-starter"
-              >
-                <TrendingUp className="w-3 h-3 mr-1" />
-                Upgrade to Starter
-              </Button>
-            )}
-            {(usage.planType === 'free' || usage.planType === 'starter') && (
-              <Button 
-                size="sm" 
-                variant={usage.planType === 'starter' ? 'default' : 'outline'}
-                onClick={() => handleUpgrade('pro')}
-                data-testid="button-upgrade-pro"
-              >
-                Go Pro
-              </Button>
-            )}
-          </div>
+        <div className="text-xs text-amber-700 mb-2">
+          No credits remaining.
+          {usage.planType === 'free' && (
+            <button 
+              onClick={() => handleUpgrade('starter')}
+              className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
+              data-testid="button-upgrade-starter"
+            >
+              Upgrade
+            </button>
+          )}
+          {usage.planType === 'starter' && (
+            <button 
+              onClick={() => handleUpgrade('pro')}
+              className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
+              data-testid="button-upgrade-pro"
+            >
+              Go Pro
+            </button>
+          )}
         </div>
       )}
 
-      {isNearLimit && !isAtLimit && (
-        <div className="bg-orange-50 border border-orange-200 rounded-md p-3 mb-3">
-          <p className="text-sm text-orange-800 mb-2">
-            You're close to your token limit. Consider upgrading for unlimited ratings.
-          </p>
-          <Button 
-            size="sm" 
-            variant="outline"
+      {isNearLimit && !isAtLimit && usage.planType === 'starter' && (
+        <div className="text-xs text-orange-700 mb-2">
+          Low on credits.
+          <button 
             onClick={() => handleUpgrade('pro')}
+            className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
             data-testid="button-upgrade-near-limit"
           >
-            <TrendingUp className="w-3 h-3 mr-1" />
-            Upgrade to Pro
-          </Button>
+            Go Pro
+          </button>
         </div>
       )}
 
       {usage.planName === 'Free' && !isAtLimit && (
-        <div className="text-xs text-slate-500">
-          Resets monthly. 
+        <div className="text-xs text-slate-400">
           <button 
-            className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
+            className="text-slate-500 hover:text-indigo-600 underline"
             onClick={() => handleUpgrade('starter')}
             data-testid="button-upgrade-free"
           >

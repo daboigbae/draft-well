@@ -25,12 +25,14 @@ import ScheduleModal from "../components/ScheduleModal";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post } from "../types/post";
-import { getPost, updatePost, publishPost } from "../lib/posts";
+import { getPost, updatePost, publishPost, schedulePost } from "../lib/posts";
 import { renderMarkdown, markdownToLinkedInText } from "../utils/markdown";
 import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getRating, RatingResponse, RatingData } from "../lib/rating";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function Editor() {
   const params = useParams();
@@ -54,6 +56,7 @@ export default function Editor() {
   const [loadingRating, setLoadingRating] = useState(false);
   const [showRatingConfirmDialog, setShowRatingConfirmDialog] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [firstRatingCompleted, setFirstRatingCompleted] = useState<boolean>(true);
   
   // Computed based on whether rating exists - backend handles aiRated flag
   const aiRated = !!rating;
@@ -119,6 +122,24 @@ export default function Editor() {
 
     loadPost();
   }, [user, postId]);
+
+  // Listen to user onboarding state for firstRating
+  useEffect(() => {
+    if (!user) return;
+
+    const userDoc = doc(db, 'users', user.uid);
+    const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        setFirstRatingCompleted(userData.onboarded?.firstRating ?? false); // Default to false to show onboarding
+      } else {
+        setFirstRatingCompleted(false);
+      }
+    });
+
+    return unsubscribeUser;
+  }, [user]);
+
 
   // Auto-save
   useEffect(() => {
@@ -249,7 +270,7 @@ export default function Editor() {
 
     try {
       await publishPost(user.uid, post.id);
-      setPost(prev => prev ? { ...prev, status: "published" } : null);
+      setPost(prev => prev ? { ...prev, status: "published", scheduledAt: null } : null);
       toast({
         title: "Post published",
         description: "Your post has been marked as published.",
@@ -258,6 +279,25 @@ export default function Editor() {
       toast({
         title: "Publish failed",
         description: "Failed to publish post.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSchedule = async (scheduledDate: Date) => {
+    if (!user || !post) return;
+
+    try {
+      await schedulePost(user.uid, post.id, scheduledDate);
+      setPost(prev => prev ? { ...prev, status: "scheduled", scheduledAt: scheduledDate } : null);
+      toast({
+        title: "Post scheduled",
+        description: `Your post has been scheduled for ${scheduledDate.toLocaleString()}.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Schedule failed",
+        description: "Failed to schedule post.",
         variant: "destructive",
       });
     }
@@ -306,6 +346,19 @@ export default function Editor() {
       if (ratingResult.success && ratingResult.data) {
         setRating(ratingResult.data);
         // aiRated is automatically computed from rating existence
+        
+        // Mark first rating as completed if this is their first rating
+        if (!firstRatingCompleted) {
+          try {
+            const userDocRef = doc(db, 'users', user!.uid);
+            await updateDoc(userDocRef, {
+              'onboarded.firstRating': true
+            });
+          } catch (error) {
+            console.error('Error updating firstRating status:', error);
+          }
+        }
+        
         toast({
           title: "Rating received",
           description: `Your post received a rating of ${ratingResult.data.rating}/10`,
@@ -452,7 +505,8 @@ export default function Editor() {
             data-testid="button-open-publish-modal"
           >
             <Calendar className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-            <span className="hidden sm:inline ml-2">Mark Published</span>
+            <span className="hidden sm:inline ml-2">Publish / Schedule</span>
+            <span className="sm:hidden">Schedule</span>
           </Button>
           
           <Button 
@@ -462,7 +516,8 @@ export default function Editor() {
             data-testid="button-publish"
           >
             <Share className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-            <span className="hidden sm:inline ml-2">Publish</span>
+            <span className="hidden sm:inline ml-2">Mark as Published</span>
+            <span className="sm:hidden">Publish</span>
           </Button>
           
           {/* Mobile Preview Toggle */}
@@ -534,6 +589,43 @@ export default function Editor() {
               onSelectCollection={handleInsertHashtags}
               showInsertButtons={true}
             />
+          </div>
+        )}
+
+        {/* First Rating Encouragement Banner */}
+        {!firstRatingCompleted && body.trim().length >= 100 && body.trim().length <= 1000 && (
+          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-4 mb-4" data-testid="first-rating-encouragement">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <Star className="h-6 w-6 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-purple-900 mb-1">
+                  Ready to discover your post's potential?
+                </h3>
+                <p className="text-purple-700 text-sm mb-3">
+                  Get your first AI-powered rating and unlock personalized suggestions to make your LinkedIn posts more engaging. Your content looks great – let's see how it scores!
+                </p>
+                <Button
+                  onClick={handleGetRating}
+                  disabled={loadingRating}
+                  className="bg-purple-600 hover:bg-purple-700 text-white text-sm"
+                  data-testid="button-first-rating-cta"
+                >
+                  {loadingRating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Getting your first rating...
+                    </>
+                  ) : (
+                    <>
+                      <Star className="h-4 w-4 mr-2" />
+                      Get Your First Rating
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -751,6 +843,8 @@ export default function Editor() {
         isOpen={showPublishModal}
         onClose={() => setShowPublishModal(false)}
         onPublish={handlePublishFromModal}
+        onSchedule={handleSchedule}
+        currentScheduledAt={post?.scheduledAt}
       />
 
       {/* Rating Confirmation Dialog */}

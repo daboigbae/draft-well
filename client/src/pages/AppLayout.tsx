@@ -1,52 +1,50 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Linkedin, Plus, Search, User, LogOut, Hash, Settings, Menu, X } from "lucide-react";
+import { Plus, User, Hash, Settings, Menu, X, FileText, MessageSquare } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
-import { Badge } from "../components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { logout } from "../lib/auth";
 import { createPost } from "../lib/posts";
+import { createFeedback } from "../lib/feedback";
 import { PostStatus } from "../types/post";
 import Footer from "../components/Footer";
+import UsageIndicator from "../components/UsageIndicator";
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  onFilterChange?: (filter: PostStatus | "all") => void;
-  onTagFilterChange?: (tag: string | null) => void;
-  onSearchChange?: (query: string) => void;
-  postCounts?: {
-    all: number;
-    draft: number;
-    published: number;
-  };
-  allTags?: string[];
-  currentFilter?: PostStatus | "all";
-  currentTagFilter?: string | null;
 }
 
-export default function AppLayout({ 
-  children, 
-  onFilterChange,
-  onTagFilterChange,
-  onSearchChange, 
-  postCounts = { all: 0, draft: 0, published: 0 },
-  allTags = [],
-  currentFilter = "all",
-  currentTagFilter = null
-}: AppLayoutProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+const feedbackSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  text: z.string().min(10, "Feedback must be at least 10 characters long").max(1000, "Feedback must not exceed 1000 characters"),
+});
+
+type FeedbackForm = z.infer<typeof feedbackSchema>;
+
+export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  const form = useForm<FeedbackForm>({
+    resolver: zodResolver(feedbackSchema),
+    defaultValues: {
+      email: user?.email || "",
+      text: "",
+    },
+  });
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    onSearchChange?.(query);
-  };
 
   const handleNewPost = async () => {
     if (!user) return;
@@ -86,14 +84,27 @@ export default function AppLayout({
     }
   };
 
-  const filterButtons = [
-    { key: "all" as const, label: "All Posts", count: postCounts.all },
-    { key: "draft" as const, label: "Drafts", count: postCounts.draft },
-    { key: "published" as const, label: "Published", count: postCounts.published },
-  ];
+  const onSubmitFeedback = async (data: FeedbackForm) => {
+    try {
+      await createFeedback(data);
+      toast({
+        title: "Feedback sent!",
+        description: "Thank you for your feedback. We'll review it and get back to you if needed.",
+      });
+      setFeedbackDialogOpen(false);
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Failed to send feedback",
+        description: "There was an error sending your feedback. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
 
   return (
-    <div className="min-h-screen bg-background flex" data-testid="app-layout">
+    <div className="min-h-screen bg-background" data-testid="app-layout">
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -102,7 +113,7 @@ export default function AppLayout({
             className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center"
             data-testid="button-logo-mobile"
           >
-            <Linkedin className="text-white h-4 w-4" />
+            <span className="text-white text-sm font-bold">DW</span>
           </button>
           <button 
             onClick={() => setLocation('/app')}
@@ -132,11 +143,12 @@ export default function AppLayout({
       {/* Sidebar */}
       <div className={`
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50
-        w-80 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out overflow-hidden
+        ${desktopSidebarOpen ? 'lg:translate-x-0' : 'lg:-translate-x-full'}
+        fixed inset-y-0 left-0 z-50
+        w-80 bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out overflow-hidden
       `} data-testid="sidebar">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <button 
@@ -144,7 +156,7 @@ export default function AppLayout({
                 className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors"
                 data-testid="button-logo"
               >
-                <Linkedin className="text-white h-4 w-4" />
+                <span className="text-white text-sm font-bold">DW</span>
               </button>
               <div>
                 <button 
@@ -159,31 +171,15 @@ export default function AppLayout({
                   className="text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer block"
                   data-testid="button-version"
                 >
-                  v3.0.0
+                  v3.1.0
                 </button>
               </div>
             </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" data-testid="button-user-menu">
-                  <User className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-56" align="end">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">{user?.email}</p>
-                  <Button 
-                    variant="ghost" 
-                    onClick={handleLogout}
-                    className="w-full justify-start"
-                    data-testid="button-logout"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
+          </div>
+          
+          {/* Usage Indicator */}
+          <div className="mb-4">
+            <UsageIndicator />
           </div>
           
           <Button
@@ -196,95 +192,22 @@ export default function AppLayout({
           </Button>
         </div>
         
-        {/* Search - only show if onSearchChange prop is provided */}
-        {onSearchChange && (
-          <div className="p-6 border-b border-gray-200">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search posts..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                data-testid="input-search"
-              />
-            </div>
-          </div>
-        )}
-        
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Filter Tabs - only show if onFilterChange prop is provided */}
-          {onFilterChange && (
-            <div className="px-6 py-4">
-              <nav className="space-y-1">
-                {filterButtons.map((filter) => (
-                  <Button
-                    key={filter.key}
-                    variant={currentFilter === filter.key ? "default" : "ghost"}
-                    className="w-full justify-between"
-                    onClick={() => {
-                      onFilterChange(filter.key);
-                      setLocation('/app');
-                      setSidebarOpen(false); // Close mobile sidebar after selection
-                    }}
-                    data-testid={`button-filter-${filter.key}`}
-                  >
-                    <span>{filter.label}</span>
-                    <Badge 
-                      variant={currentFilter === filter.key ? "secondary" : "outline"}
-                      className="ml-2"
-                    >
-                      {filter.count}
-                    </Badge>
-                  </Button>
-                ))}
-              </nav>
-            </div>
-          )}
-          
-          {/* Tag Filter */}
-          {onFilterChange && allTags.length > 0 && (
-            <div className="px-6 mt-6 pt-6 border-t border-gray-200">
-              <h3 className="text-sm font-medium text-slate-700 mb-3">Filter by Tag</h3>
-              <div className="space-y-1 max-h-32 overflow-y-auto">
-                <Button
-                  variant={currentTagFilter === null ? "default" : "ghost"}
-                  className="w-full justify-start text-xs"
-                  onClick={() => {
-                    onTagFilterChange?.(null);
-                    setSidebarOpen(false); // Close mobile sidebar after selection
-                  }}
-                  data-testid="button-tag-all"
-                >
-                  All Tags
-                </Button>
-                {allTags.slice(0, 10).map((tag) => (
-                  <Button
-                    key={tag}
-                    variant={currentTagFilter === tag ? "default" : "ghost"}
-                    className="w-full justify-start text-xs"
-                    onClick={() => {
-                      onTagFilterChange?.(tag);
-                      setSidebarOpen(false); // Close mobile sidebar after selection
-                    }}
-                    data-testid={`button-tag-${tag}`}
-                  >
-                    {tag}
-                  </Button>
-                ))}
-                {allTags.length > 10 && (
-                  <p className="text-xs text-slate-500 px-3 py-1">
-                    +{allTags.length - 10} more tags
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-
+        <div className="flex-1 overflow-y-auto flex flex-col">
           {/* Additional Navigation */}
-          <div className="px-6 mt-6 pt-6 border-t border-gray-200">
+          <div className="px-6 mt-6 flex-1">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                setLocation('/app');
+                setSidebarOpen(false); // Close mobile sidebar after navigation
+              }}
+              data-testid="button-all-posts"
+            >
+              <FileText className="mr-3 h-4 w-4" />
+              Posts
+            </Button>
             <Button
               variant="ghost"
               className="w-full justify-start"
@@ -295,7 +218,7 @@ export default function AppLayout({
               data-testid="button-hashtag-collections"
             >
               <Hash className="mr-3 h-4 w-4" />
-              Hashtag Collections
+              Hashtags
             </Button>
             <Button
               variant="ghost"
@@ -304,17 +227,124 @@ export default function AppLayout({
                 setLocation('/app/settings');
                 setSidebarOpen(false); // Close mobile sidebar after navigation
               }}
-              data-testid="button-settings"
+              data-testid="button-account"
             >
-              <Settings className="mr-3 h-4 w-4" />
-              Settings
+              <User className="mr-3 h-4 w-4" />
+              Account
             </Button>
+            <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  data-testid="button-send-feedback"
+                >
+                  <MessageSquare className="mr-3 h-4 w-4" />
+                  Send Feedback
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Send Feedback</DialogTitle>
+                  <DialogDescription>
+                    Help us improve Draftwell by sharing your thoughts, suggestions, or reporting issues.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <form onSubmit={form.handleSubmit(onSubmitFeedback)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="feedback-email">Email</Label>
+                    <Input
+                      id="feedback-email"
+                      type="email"
+                      placeholder="your.email@example.com"
+                      {...form.register("email")}
+                      data-testid="input-feedback-email"
+                    />
+                    {form.formState.errors.email && (
+                      <p className="text-sm text-red-600" data-testid="error-feedback-email">
+                        {form.formState.errors.email.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="feedback-text">Feedback</Label>
+                    <Textarea
+                      id="feedback-text"
+                      placeholder="Share your thoughts, suggestions, or report any issues..."
+                      rows={4}
+                      {...form.register("text")}
+                      data-testid="textarea-feedback-text"
+                    />
+                    <div className="flex justify-between items-center">
+                      {form.formState.errors.text && (
+                        <p className="text-sm text-red-600" data-testid="error-feedback-text">
+                          {form.formState.errors.text.message}
+                        </p>
+                      )}
+                      <span className="text-xs text-slate-500 ml-auto">
+                        {form.watch("text")?.length || 0}/1000
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setFeedbackDialogOpen(false)}
+                      data-testid="button-feedback-cancel"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={form.formState.isSubmitting}
+                      data-testid="button-feedback-submit"
+                    >
+                      {form.formState.isSubmitting ? "Sending..." : "Send Feedback"}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          {/* Footer */}
+          <div className="px-6 py-4 border-t border-gray-100">
+            <a 
+              href="https://digitalartdealers.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-slate-400 hover:text-slate-600 text-center block transition-colors cursor-pointer"
+              data-testid="link-digital-art-dealers"
+            >
+              Built by Digital Art Dealers
+            </a>
           </div>
         </div>
       </div>
       
+      {/* Desktop Toggle Button */}
+      <div className={`hidden lg:block fixed top-4 left-4 z-50 transition-all duration-300 ${
+        desktopSidebarOpen ? 'translate-x-72' : 'translate-x-0'
+      }`}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
+          className="bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-white"
+          data-testid="button-desktop-sidebar-toggle"
+        >
+          {desktopSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </Button>
+      </div>
+      
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0 pt-16 lg:pt-0" data-testid="main-content">
+      <div className={`min-h-screen flex flex-col pt-16 lg:pt-0 transition-all duration-300 ${
+        desktopSidebarOpen ? 'lg:ml-80' : 'lg:ml-0'
+      }`} data-testid="main-content">
         <div className="flex-1">
           {children}
         </div>
