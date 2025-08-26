@@ -15,7 +15,8 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile sidebar state
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true); // Desktop sidebar state
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -97,10 +98,26 @@ export default function AppLayout({ children }: AppLayoutProps) {
         />
       )}
 
+      {/* Desktop Sidebar Toggle Button */}
+      <div className={`hidden lg:block fixed top-4 z-50 transition-all duration-300 ease-in-out ${
+        desktopSidebarOpen ? 'left-72' : 'left-4'
+      }`}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
+          className="bg-white shadow-md hover:shadow-lg border-gray-300"
+          data-testid="button-desktop-sidebar-toggle"
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Sidebar */}
       <div className={`
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50
+        ${desktopSidebarOpen ? 'lg:translate-x-0' : 'lg:-translate-x-full'}
+        fixed lg:static inset-y-0 left-0 z-50
         w-80 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out overflow-hidden
       `} data-testid="sidebar">
         {/* Header */}
@@ -207,7 +224,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </div>
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0 pt-16 lg:pt-0" data-testid="main-content">
+      <div className={`flex-1 flex flex-col pt-16 lg:pt-0 transition-all duration-300 ease-in-out ${
+        desktopSidebarOpen ? 'lg:ml-0' : 'lg:ml-0'
+      }`} data-testid="main-content">
         <div className="flex-1">
           {children}
         </div>
