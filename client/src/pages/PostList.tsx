@@ -380,65 +380,57 @@ export default function PostList() {
                   </div>
                 </Button>
               </div>
+              
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+                <Input
+                  type="text"
+                  placeholder="Search by title, content, or tags..."
+                  className="pl-12 pr-4 py-3 text-base border-gray-200 focus:border-indigo-300 focus:ring-indigo-200 rounded-xl"
+                  value={searchQuery}
+                  onChange={(e) => updateSearchQuery(e.target.value)}
+                  data-testid="input-search"
+                />
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => updateSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+                    className="text-slate-500 hover:text-slate-700"
+                    data-testid="button-sort"
+                  >
+                    <ArrowUpDown className="h-4 w-4" />
+                    <span className="hidden sm:inline ml-2">{sortOrder === "desc" ? "Newest" : "Oldest"}</span>
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Search and Filters */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 mb-8">
-            {/* Filter Toggle Header */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Search className="h-5 w-5 text-slate-500" />
-                <span className="text-lg font-semibold text-slate-700">Search & Filters</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => updateFiltersExpanded(!filtersExpanded)}
-                className="text-slate-500 hover:text-slate-700"
-                data-testid="button-toggle-filters"
-              >
-                {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                <span className="ml-2">{filtersExpanded ? "Collapse" : "Expand"}</span>
-              </Button>
-            </div>
-            
-            {/* Search - Always Visible */}
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
-              <Input
-                type="text"
-                placeholder="Search by title, content, or tags..."
-                className="pl-12 pr-4 py-3 text-base border-gray-200 focus:border-indigo-300 focus:ring-indigo-200 rounded-xl"
-                value={searchQuery}
-                onChange={(e) => updateSearchQuery(e.target.value)}
-                data-testid="input-search"
-              />
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+          {/* Tag Filters */}
+          {allTags.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 mb-8">
+              {/* Filter Toggle Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-slate-500" />
+                  <span className="text-lg font-semibold text-slate-700">Filter by Tag</span>
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => updateSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+                  onClick={() => updateFiltersExpanded(!filtersExpanded)}
                   className="text-slate-500 hover:text-slate-700"
-                  data-testid="button-sort"
+                  data-testid="button-toggle-filters"
                 >
-                  <ArrowUpDown className="h-4 w-4" />
-                  <span className="hidden sm:inline ml-2">{sortOrder === "desc" ? "Newest" : "Oldest"}</span>
+                  {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  <span className="ml-2">{filtersExpanded ? "Collapse" : "Expand"}</span>
                 </Button>
               </div>
-            </div>
-
-            {/* Collapsible Filter Content */}
-            {filtersExpanded && (
-              <div className="space-y-6">
-
-            {/* Tag Filters */}
-            {allTags.length > 0 && (
-              <div className="pt-4 border-t border-gray-100">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="h-4 w-4 text-slate-500" />
-                  <span className="text-sm font-medium text-slate-700">Filter by Tag</span>
-                </div>
+              
+              {/* Collapsible Tag Filter Content */}
+              {filtersExpanded && (
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant={currentTagFilter === null ? "default" : "outline"}
@@ -475,11 +467,9 @@ export default function PostList() {
                     </span>
                   )}
                 </div>
-              </div>
-            )}
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Posts */}
           {loading ? (
@@ -640,7 +630,7 @@ export default function PostList() {
         {/* Tutorial Modal */}
         {user && (
           <TutorialModal
-            isOpen={!tutorialCompleted}
+            open={!tutorialCompleted}
             onComplete={() => setTutorialCompleted(true)}
           />
         )}
