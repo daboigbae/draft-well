@@ -150,13 +150,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <UsageIndicator />
         </div>
         
-        
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto">
-          
-
           {/* Additional Navigation */}
-          <div className="px-6 mt-6 pt-6">
+          <div className="px-6 mt-6">
             <Button
               variant="ghost"
               className="w-full justify-start"
@@ -167,7 +164,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               data-testid="button-all-posts"
             >
               <FileText className="mr-3 h-4 w-4" />
-              All Posts
+              Posts
             </Button>
             <Button
               variant="ghost"
@@ -179,7 +176,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               data-testid="button-hashtag-collections"
             >
               <Hash className="mr-3 h-4 w-4" />
-              Hashtag Collections
+              Hashtags
             </Button>
             <Button
               variant="ghost"
