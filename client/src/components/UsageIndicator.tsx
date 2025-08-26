@@ -147,51 +147,15 @@ export default function UsageIndicator() {
       {isAtLimit && (
         <div className="text-xs text-amber-700 mb-2">
           No credits remaining.
-          {usage.planType === 'free' && (
-            <button 
-              onClick={() => handleUpgrade('starter')}
-              className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
-              data-testid="button-upgrade-starter"
-            >
-              Upgrade
-            </button>
-          )}
-          {usage.planType === 'starter' && (
-            <button 
-              onClick={() => handleUpgrade('pro')}
-              className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
-              data-testid="button-upgrade-pro"
-            >
-              Go Pro
-            </button>
-          )}
         </div>
       )}
 
       {isNearLimit && !isAtLimit && usage.planType === 'starter' && (
         <div className="text-xs text-orange-700 mb-2">
           Low on credits.
-          <button 
-            onClick={() => handleUpgrade('pro')}
-            className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
-            data-testid="button-upgrade-near-limit"
-          >
-            Go Pro
-          </button>
         </div>
       )}
 
-      {usage.planName === 'Free' && !isAtLimit && (
-        <div className="text-xs text-slate-400">
-          <button 
-            className="text-slate-500 hover:text-indigo-600 underline"
-            onClick={() => handleUpgrade('starter')}
-            data-testid="button-upgrade-free"
-          >
-            Upgrade for more
-          </button>
-        </div>
-      )}
     </div>
   );
 }
