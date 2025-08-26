@@ -313,9 +313,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
           
           {/* Footer */}
           <div className="px-6 py-4 border-t border-gray-100">
-            <p className="text-xs text-slate-400 text-center">
+            <a 
+              href="https://digitalartdealers.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-slate-400 hover:text-slate-600 text-center block transition-colors cursor-pointer"
+              data-testid="link-digital-art-dealers"
+            >
               Built by Digital Art Dealers
-            </p>
+            </a>
           </div>
         </div>
       </div>
