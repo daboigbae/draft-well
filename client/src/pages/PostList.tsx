@@ -314,24 +314,6 @@ export default function PostList() {
                   </div>
                 </Button>
                 <Button
-                  variant={currentFilter === "published" ? "default" : "outline"}
-                  onClick={() => setCurrentFilter("published")}
-                  className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
-                    currentFilter === "published" 
-                      ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg" 
-                      : "hover:border-green-300 hover:bg-green-50"
-                  }`}
-                  data-testid="button-filter-published"
-                >
-                  <Users className="h-5 w-5" />
-                  <div className="text-center">
-                    <div className="font-medium">Published</div>
-                    <div className={`text-xs ${currentFilter === "published" ? "text-green-100" : "text-slate-500"}`}>
-                      {getPostCounts().published} live
-                    </div>
-                  </div>
-                </Button>
-                <Button
                   variant={currentFilter === "scheduled" ? "default" : "outline"}
                   onClick={() => setCurrentFilter("scheduled")}
                   className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
@@ -346,6 +328,24 @@ export default function PostList() {
                     <div className="font-medium">Scheduled</div>
                     <div className={`text-xs ${currentFilter === "scheduled" ? "text-orange-100" : "text-slate-500"}`}>
                       {getPostCounts().scheduled} pending
+                    </div>
+                  </div>
+                </Button>
+                <Button
+                  variant={currentFilter === "published" ? "default" : "outline"}
+                  onClick={() => setCurrentFilter("published")}
+                  className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
+                    currentFilter === "published" 
+                      ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg" 
+                      : "hover:border-green-300 hover:bg-green-50"
+                  }`}
+                  data-testid="button-filter-published"
+                >
+                  <Users className="h-5 w-5" />
+                  <div className="text-center">
+                    <div className="font-medium">Published</div>
+                    <div className={`text-xs ${currentFilter === "published" ? "text-green-100" : "text-slate-500"}`}>
+                      {getPostCounts().published} live
                     </div>
                   </div>
                 </Button>
