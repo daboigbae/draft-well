@@ -62,7 +62,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
 
   return (
-    <div className="min-h-screen bg-background flex" data-testid="app-layout">
+    <div className="min-h-screen bg-background" data-testid="app-layout">
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -101,7 +101,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Sidebar */}
       <div className={`
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        ${desktopSidebarOpen ? 'lg:translate-x-0 lg:relative lg:block' : 'lg:-translate-x-full lg:fixed lg:hidden'}
+        ${desktopSidebarOpen ? 'lg:translate-x-0' : 'lg:-translate-x-full'}
         fixed inset-y-0 left-0 z-50
         w-80 bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out overflow-hidden
       `} data-testid="sidebar">
@@ -213,7 +213,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </div>
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col pt-16 lg:pt-0" data-testid="main-content">
+      <div className={`min-h-screen flex flex-col pt-16 lg:pt-0 transition-all duration-300 ${
+        desktopSidebarOpen ? 'lg:ml-80' : 'lg:ml-0'
+      }`} data-testid="main-content">
         <div className="flex-1">
           {children}
         </div>
