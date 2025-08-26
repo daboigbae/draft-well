@@ -144,11 +144,6 @@ export default function UsageIndicator() {
         </div>
       )}
 
-      {isAtLimit && (
-        <div className="text-xs text-amber-700 mb-2">
-          No credits remaining.
-        </div>
-      )}
 
       {isNearLimit && !isAtLimit && usage.planType === 'starter' && (
         <div className="text-xs text-orange-700 mb-2">
