@@ -57,6 +57,7 @@ export default function Editor() {
   const [showRatingConfirmDialog, setShowRatingConfirmDialog] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [firstRatingCompleted, setFirstRatingCompleted] = useState<boolean>(true);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   // Computed based on whether rating exists - backend handles aiRated flag
   const aiRated = !!rating;
@@ -303,11 +304,12 @@ export default function Editor() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!user || !post) return;
+  const handleDelete = () => {
+    setShowDeleteDialog(true);
+  };
 
-    const confirmed = window.confirm('Are you sure you want to delete this post? This action cannot be undone.');
-    if (!confirmed) return;
+  const handleConfirmDelete = async () => {
+    if (!user || !post) return;
 
     try {
       await deletePost(user.uid, post.id);
@@ -323,6 +325,7 @@ export default function Editor() {
         variant: "destructive",
       });
     }
+    setShowDeleteDialog(false);
   };
 
   const handleGetRating = async () => {
@@ -895,6 +898,30 @@ export default function Editor() {
             <AlertDialogCancel data-testid="button-cancel-rating">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmRating} data-testid="button-confirm-rating">
               Yes, rate again
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent data-testid="delete-confirmation-dialog">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Post</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this post? This action cannot be undone and will permanently remove the post from your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+              data-testid="button-confirm-delete"
+            >
+              Delete Post
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
