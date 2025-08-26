@@ -41,9 +41,9 @@ export default function Landing() {
               <Button 
                 onClick={() => setLocation('/signup')}
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-                data-testid="button-start-free"
+                data-testid="button-create-account"
               >
-                Start Free
+                Create Account
               </Button>
             </div>
           </div>
@@ -64,9 +64,9 @@ export default function Landing() {
               size="lg" 
               onClick={() => setLocation('/signup')}
               className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-lg px-8 py-3"
-              data-testid="button-hero-start-free"
+              data-testid="button-hero-create-account"
             >
-              Start Free
+              Create Account
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
@@ -283,123 +283,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Simple, transparent pricing</h2>
-            <p className="text-xl text-slate-600">Start free, upgrade when you're ready to grow faster.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <Card className="relative">
-              <CardHeader>
-                <CardTitle className="text-2xl">Free</CardTitle>
-                <CardDescription>Perfect for getting started</CardDescription>
-                <div className="text-3xl font-bold">$0</div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">2 AI ratings/week</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Unlimited drafts</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Hashtag collections</span>
-                  </li>
-                </ul>
-                <Button 
-                  className="w-full" 
-                  variant="outline"
-                  onClick={() => setLocation('/signup')}
-                  data-testid="button-free-plan"
-                >
-                  Start Free
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Starter Plan */}
-            <Card className="relative border-purple-200 shadow-lg">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-purple-600 text-white">Most Popular</Badge>
-              </div>
-              <CardHeader>
-                <CardTitle className="text-2xl">Starter</CardTitle>
-                <CardDescription>For consistent creators</CardDescription>
-                <div className="text-3xl font-bold">$9<span className="text-lg text-slate-600">/mo</span></div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">20 AI ratings/month</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Basic reminders</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Draft organization</span>
-                  </li>
-                </ul>
-                <Button 
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  onClick={() => setLocation('/signup')}
-                  data-testid="button-starter-plan"
-                >
-                  Upgrade to Starter
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Pro Plan */}
-            <Card className="relative">
-              <CardHeader>
-                <CardTitle className="text-2xl">Pro</CardTitle>
-                <CardDescription>For power users</CardDescription>
-                <div className="text-3xl font-bold">$19<span className="text-lg text-slate-600">/mo</span></div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Unlimited AI ratings</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Advanced reminders (1h/12h/24h)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Analytics dashboard</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Idea generator from your top posts</span>
-                  </li>
-                </ul>
-                <Button 
-                  className="w-full" 
-                  variant="outline"
-                  onClick={() => setLocation('/signup')}
-                  data-testid="button-pro-plan"
-                >
-                  Go Pro
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
 
       {/* Final CTA Section */}
       <section className="py-20 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
@@ -416,7 +299,7 @@ export default function Landing() {
             className="bg-white text-purple-600 hover:bg-gray-100 text-lg px-8 py-3"
             data-testid="button-final-cta"
           >
-            Start Free
+            Create Account
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
