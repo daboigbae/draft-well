@@ -57,7 +57,7 @@ export default function Landing() {
             Write LinkedIn posts that get noticed.
           </h1>
           <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto" data-testid="hero-subheadline">
-            Draftwell helps creators and professionals turn ideas into high-performing LinkedIn posts with AI feedback, reminders, and analytics.
+            Draftwell helps creators and professionals write better LinkedIn posts with AI ratings, hashtag management, and smart organization.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Button 
@@ -88,8 +88,8 @@ export default function Landing() {
       <section id="features" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Everything you need to succeed on LinkedIn</h2>
-            <p className="text-xl text-slate-600">Stop guessing what will work. Start creating with confidence.</p>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Write better LinkedIn posts</h2>
+            <p className="text-xl text-slate-600">Get AI feedback, organize with hashtags, and manage your content.</p>
           </div>
 
           <div className="space-y-20">
@@ -155,39 +155,41 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Feature 2: Reminders */}
+            {/* Feature 2: Post Management */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="order-2 lg:order-1">
                 <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-slate-800">Posting Schedule</h4>
-                      <Clock className="h-5 w-5 text-blue-600" />
+                      <h4 className="font-semibold text-slate-800">Your Posts</h4>
+                      <Users className="h-5 w-5 text-blue-600" />
                     </div>
                     <div className="space-y-3">
-                      <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-green-800">Post in 2 hours</div>
-                          <div className="text-xs text-green-600">"Every founder thinks their first version..."</div>
-                        </div>
-                        <div className="text-xs text-green-600">9:00 AM</div>
-                      </div>
                       <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                         <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-blue-800">Check performance</div>
-                          <div className="text-xs text-blue-600">1h after posting</div>
+                          <div className="text-sm font-medium text-blue-800">Draft Post</div>
+                          <div className="text-xs text-blue-600">"Every founder thinks their first version..."</div>
                         </div>
-                        <div className="text-xs text-blue-600">10:00 AM</div>
+                        <div className="text-xs text-blue-600 bg-yellow-100 px-2 py-1 rounded flex items-center gap-1">
+                          <Star className="h-3 w-3" />8/10
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-green-800">Published Post</div>
+                          <div className="text-xs text-green-600">"Three lessons from my startup journey"</div>
+                        </div>
+                        <div className="text-xs text-green-600">#startup #founder</div>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
                         <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-purple-800">Follow-up check</div>
-                          <div className="text-xs text-purple-600">24h performance review</div>
+                          <div className="text-sm font-medium text-purple-800">Draft Post</div>
+                          <div className="text-xs text-purple-600">"How to validate your idea in 24 hours"</div>
                         </div>
-                        <div className="text-xs text-purple-600">Tomorrow</div>
+                        <div className="text-xs text-purple-600">#ai #product</div>
                       </div>
                     </div>
                   </div>
@@ -196,85 +198,80 @@ export default function Landing() {
               <div className="order-1 lg:order-2">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="bg-blue-100 p-3 rounded-lg">
-                    <Clock className="h-8 w-8 text-blue-600" />
+                    <Users className="h-8 w-8 text-blue-600" />
                   </div>
-                  <h3 className="text-3xl font-bold text-slate-900">Never miss the right moment.</h3>
+                  <h3 className="text-3xl font-bold text-slate-900">Organize your content.</h3>
                 </div>
                 <p className="text-lg text-slate-600 mb-6">
-                  Stay consistent with post reminders and performance check-ins at 1h, 12h, and 24h.
+                  Create, edit, and organize your LinkedIn posts with smart hashtag management and filtering.
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-slate-700">Post scheduled for 9:00 AM</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-slate-700">Check performance in 1 hour</span>
+                    <span className="text-sm text-slate-700">Write and edit posts</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-sm text-slate-700">Weekly analytics summary</span>
+                    <span className="text-sm text-slate-700">Manage hashtags</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm text-slate-700">Filter and search content</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Feature 3: Analytics */}
+            {/* Feature 3: Hashtags */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-green-100 p-3 rounded-lg">
-                    <BarChart3 className="h-8 w-8 text-green-600" />
+                  <div className="bg-purple-100 p-3 rounded-lg">
+                    <Zap className="h-8 w-8 text-purple-600" />
                   </div>
-                  <h3 className="text-3xl font-bold text-slate-900">See what works (and why).</h3>
+                  <h3 className="text-3xl font-bold text-slate-900">Smart hashtag management.</h3>
                 </div>
                 <p className="text-lg text-slate-600 mb-6">
-                  Track hashtags, keywords, and post performance over time so you always know how to improve.
+                  Add, organize, and reuse hashtags across your posts. Filter your content by tags to find exactly what you need.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <div className="text-2xl font-bold text-green-600">+127%</div>
-                    <div className="text-sm text-slate-600">Engagement boost</div>
+                    <div className="text-2xl font-bold text-purple-600">#ai</div>
+                    <div className="text-sm text-slate-600">Most used tag</div>
                   </div>
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <div className="text-2xl font-bold text-blue-600">#ai</div>
-                    <div className="text-sm text-slate-600">Top hashtag</div>
+                    <div className="text-2xl font-bold text-blue-600">12</div>
+                    <div className="text-sm text-slate-600">Total hashtags</div>
                   </div>
                 </div>
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-slate-800">Performance Analytics</h4>
-                    <BarChart3 className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">+127%</div>
-                      <div className="text-sm text-green-700">Engagement</div>
-                      <div className="text-xs text-green-600">vs last month</div>
-                    </div>
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">8.4</div>
-                      <div className="text-sm text-blue-700">Avg Rating</div>
-                      <div className="text-xs text-blue-600">last 10 posts</div>
-                    </div>
+                    <h4 className="font-semibold text-slate-800">Hashtag Manager</h4>
+                    <Zap className="h-5 w-5 text-purple-600" />
                   </div>
                   <div className="space-y-2">
-                    <div className="text-sm font-medium text-slate-700">Top Hashtags</div>
+                    <div className="text-sm font-medium text-slate-700">Your Hashtags</div>
                     <div className="flex flex-wrap gap-2">
                       <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">#ai</span>
                       <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">#startup</span>
                       <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">#founder</span>
+                      <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">#product</span>
+                      <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">#growth</span>
+                      <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs">#tech</span>
                     </div>
                   </div>
-                  <div className="h-20 bg-gradient-to-r from-green-200 via-blue-200 to-purple-200 rounded-lg flex items-end justify-around p-2">
-                    <div className="w-4 bg-green-500 rounded-t" style={{height: '60%'}}></div>
-                    <div className="w-4 bg-blue-500 rounded-t" style={{height: '80%'}}></div>
-                    <div className="w-4 bg-purple-500 rounded-t" style={{height: '40%'}}></div>
-                    <div className="w-4 bg-green-500 rounded-t" style={{height: '90%'}}></div>
-                    <div className="w-4 bg-blue-500 rounded-t" style={{height: '70%'}}></div>
+                  <div className="border-t pt-4">
+                    <div className="text-sm font-medium text-slate-700 mb-2">Add to Post</div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-8 bg-gray-100 rounded flex items-center px-3">
+                        <span className="text-sm text-gray-500">Select hashtags...</span>
+                      </div>
+                      <div className="bg-purple-600 text-white px-3 py-1 rounded text-sm">
+                        Add
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -291,7 +288,7 @@ export default function Landing() {
             Stop guessing. Start posting with confidence.
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join creators growing their LinkedIn with Draftwell today.
+            Start writing better LinkedIn posts with AI ratings and smart organization.
           </p>
           <Button 
             size="lg" 
