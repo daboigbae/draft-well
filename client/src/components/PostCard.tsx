@@ -138,7 +138,7 @@ export default function PostCard({ post, onEdit, onDuplicate, onDelete }: PostCa
             <div className="flex items-center gap-2 text-sm text-orange-700 bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-2 rounded-xl border border-orange-200">
               <Clock className="w-4 h-4" />
               <span data-testid={`text-scheduled-${post.id}`} className="font-medium">
-                Scheduled for {post.scheduledAt.toLocaleString()}
+                Scheduled for {post.scheduledAt.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' })}, {post.scheduledAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
               </span>
             </div>
           )}
