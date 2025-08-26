@@ -115,12 +115,10 @@ export default function UsageIndicator() {
   return (
     <div className="p-3 bg-slate-50 rounded-md" data-testid="usage-indicator">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Zap className="w-3 h-3 text-slate-500" />
           <span className="text-sm text-slate-600">Credits</span>
-          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-            {usage.planName}
-          </Badge>
+          <span className="text-xs text-slate-400">({usage.planName})</span>
         </div>
         
         {!isUnlimited && (
