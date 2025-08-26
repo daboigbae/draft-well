@@ -225,7 +225,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       
       {/* Main Content */}
       <div className={`flex-1 flex flex-col pt-16 lg:pt-0 transition-all duration-300 ${
-        desktopSidebarOpen ? 'lg:ml-0' : 'lg:ml-0'
+        desktopSidebarOpen ? 'lg:ml-80' : 'lg:ml-0'
       }`} data-testid="main-content">
         <div className="flex-1">
           {children}
