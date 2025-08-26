@@ -155,14 +155,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className="flex-1 overflow-y-auto">
           
 
-          {/* Post Navigation */}
+          {/* Additional Navigation */}
           <div className="px-6 mt-6 pt-6">
             <Button
               variant="ghost"
               className="w-full justify-start"
               onClick={() => {
                 setLocation('/app');
-                setSidebarOpen(false);
+                setSidebarOpen(false); // Close mobile sidebar after navigation
               }}
               data-testid="button-all-posts"
             >
@@ -173,48 +173,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
               variant="ghost"
               className="w-full justify-start"
               onClick={() => {
-                setLocation('/app/drafts');
-                setSidebarOpen(false);
-              }}
-              data-testid="button-drafts"
-            >
-              <FileText className="mr-3 h-4 w-4" />
-              Drafts
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
-                setLocation('/app/scheduled');
-                setSidebarOpen(false);
-              }}
-              data-testid="button-scheduled"
-            >
-              <FileText className="mr-3 h-4 w-4" />
-              Scheduled
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
-                setLocation('/app/published');
-                setSidebarOpen(false);
-              }}
-              data-testid="button-published"
-            >
-              <FileText className="mr-3 h-4 w-4" />
-              Published
-            </Button>
-          </div>
-          
-          {/* Additional Navigation */}
-          <div className="px-6 mt-6 pt-6 border-t border-gray-200">
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
                 setLocation('/app/hashtag-collections');
-                setSidebarOpen(false);
+                setSidebarOpen(false); // Close mobile sidebar after navigation
               }}
               data-testid="button-hashtag-collections"
             >
@@ -226,7 +186,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               className="w-full justify-start"
               onClick={() => {
                 setLocation('/app/settings');
-                setSidebarOpen(false);
+                setSidebarOpen(false); // Close mobile sidebar after navigation
               }}
               data-testid="button-account"
             >
