@@ -15,6 +15,7 @@ import { logout } from "../lib/auth";
 import { createPost } from "../lib/posts";
 import { createFeedback } from "../lib/feedback";
 import { PostStatus } from "../types/post";
+import Footer from "../components/Footer";
 import UsageIndicator from "../components/UsageIndicator";
 
 interface AppLayoutProps {
@@ -310,6 +311,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </Dialog>
           </div>
           
+          {/* Footer */}
+          <div className="px-6 py-4 border-t border-gray-100">
+            <a 
+              href="https://digitalartdealers.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-slate-400 hover:text-slate-600 text-center block transition-colors cursor-pointer"
+              data-testid="link-digital-art-dealers"
+            >
+              Built by Digital Art Dealers
+            </a>
+          </div>
         </div>
       </div>
       
@@ -335,6 +348,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className="flex-1">
           {children}
         </div>
+        <Footer />
       </div>
     </div>
   );
