@@ -135,6 +135,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </div>
           </div>
           
+          {/* Usage Indicator */}
+          <div className="mb-4">
+            <UsageIndicator />
+          </div>
+          
           <Button
             onClick={handleNewPost}
             className="w-full flex items-center justify-center gap-2"
@@ -143,11 +148,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <Plus className="h-4 w-4" />
             New Post
           </Button>
-        </div>
-
-        {/* Usage Indicator in Toolbar */}
-        <div className="px-6 py-4">
-          <UsageIndicator />
         </div>
         
         {/* Scrollable Content Area */}
