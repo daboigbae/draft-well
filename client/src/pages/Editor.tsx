@@ -75,16 +75,22 @@ export default function Editor() {
   const handleInsertHashtags = (hashtags: string[]) => {
     const hashtagText = hashtags.join(' ');
     const currentCursor = bodyRef.current?.selectionStart || body.length;
-    const newBody = body.slice(0, currentCursor) + ' ' + hashtagText + body.slice(currentCursor);
+    
+    // Only add space if cursor is not at beginning and previous character isn't already a space
+    const needsSpace = currentCursor > 0 && body[currentCursor - 1] !== ' ';
+    const spaceBefore = needsSpace ? ' ' : '';
+    
+    const newBody = body.slice(0, currentCursor) + spaceBefore + hashtagText + body.slice(currentCursor);
     setBody(newBody);
     
     // Focus back on the textarea and position cursor after inserted hashtags
+    const spaceLength = spaceBefore.length;
     setTimeout(() => {
       if (bodyRef.current) {
         bodyRef.current.focus();
         bodyRef.current.setSelectionRange(
-          currentCursor + hashtagText.length + 1,
-          currentCursor + hashtagText.length + 1
+          currentCursor + hashtagText.length + spaceLength,
+          currentCursor + hashtagText.length + spaceLength
         );
       }
     }, 0);
