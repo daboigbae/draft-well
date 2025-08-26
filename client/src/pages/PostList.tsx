@@ -15,19 +15,55 @@ import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, su
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
+// Helper functions for sticky filters
+const STORAGE_KEYS = {
+  currentFilter: 'draftwell_current_filter',
+  currentTagFilter: 'draftwell_current_tag_filter',
+  searchQuery: 'draftwell_search_query',
+  sortOrder: 'draftwell_sort_order',
+  filtersExpanded: 'draftwell_filters_expanded'
+};
+
+const loadFromStorage = (key: string, defaultValue: any): any => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
+const saveToStorage = (key: string, value: any): void => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Silent fail
+  }
+};
+
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
-  const [currentFilter, setCurrentFilter] = useState<PostStatus | "all">("all");
-  const [currentTagFilter, setCurrentTagFilter] = useState<string | null>(null);
+  const [currentFilter, setCurrentFilter] = useState<PostStatus | "all">(() => 
+    loadFromStorage(STORAGE_KEYS.currentFilter, "all")
+  );
+  const [currentTagFilter, setCurrentTagFilter] = useState<string | null>(() => 
+    loadFromStorage(STORAGE_KEYS.currentTagFilter, null)
+  );
   const [allTags, setAllTags] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [searchQuery, setSearchQuery] = useState(() => 
+    loadFromStorage(STORAGE_KEYS.searchQuery, "")
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(() => 
+    loadFromStorage(STORAGE_KEYS.sortOrder, "desc")
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [firstDraftCompleted, setFirstDraftCompleted] = useState<boolean>(true);
   const [tutorialCompleted, setTutorialCompleted] = useState<boolean>(true);
-  const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(() => 
+    loadFromStorage(STORAGE_KEYS.filtersExpanded, false)
+  );
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -195,6 +231,31 @@ export default function PostList() {
     }
   };
 
+  const updateCurrentFilter = (filter: PostStatus | "all") => {
+    setCurrentFilter(filter);
+    saveToStorage(STORAGE_KEYS.currentFilter, filter);
+  };
+
+  const updateCurrentTagFilter = (tagFilter: string | null) => {
+    setCurrentTagFilter(tagFilter);
+    saveToStorage(STORAGE_KEYS.currentTagFilter, tagFilter);
+  };
+
+  const updateSearchQuery = (query: string) => {
+    setSearchQuery(query);
+    saveToStorage(STORAGE_KEYS.searchQuery, query);
+  };
+
+  const updateSortOrder = (order: "asc" | "desc") => {
+    setSortOrder(order);
+    saveToStorage(STORAGE_KEYS.sortOrder, order);
+  };
+
+  const updateFiltersExpanded = (expanded: boolean) => {
+    setFiltersExpanded(expanded);
+    saveToStorage(STORAGE_KEYS.filtersExpanded, expanded);
+  };
+
   if (error) {
     return (
       <AppLayout>
@@ -255,7 +316,7 @@ export default function PostList() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setFiltersExpanded(!filtersExpanded)}
+                onClick={() => updateFiltersExpanded(!filtersExpanded)}
                 className="text-slate-500 hover:text-slate-700"
                 data-testid="button-toggle-filters"
               >
@@ -272,14 +333,14 @@ export default function PostList() {
                 placeholder="Search by title, content, or tags..."
                 className="pl-12 pr-4 py-3 text-base border-gray-200 focus:border-indigo-300 focus:ring-indigo-200 rounded-xl"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => updateSearchQuery(e.target.value)}
                 data-testid="input-search"
               />
               <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+                  onClick={() => updateSortOrder(sortOrder === "desc" ? "asc" : "desc")}
                   className="text-slate-500 hover:text-slate-700"
                   data-testid="button-sort"
                 >
@@ -301,7 +362,7 @@ export default function PostList() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <Button
                   variant={currentFilter === "all" ? "default" : "outline"}
-                  onClick={() => setCurrentFilter("all")}
+                  onClick={() => updateCurrentFilter("all")}
                   className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
                     currentFilter === "all" 
                       ? "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg" 
@@ -319,7 +380,7 @@ export default function PostList() {
                 </Button>
                 <Button
                   variant={currentFilter === "draft" ? "default" : "outline"}
-                  onClick={() => setCurrentFilter("draft")}
+                  onClick={() => updateCurrentFilter("draft")}
                   className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
                     currentFilter === "draft" 
                       ? "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg" 
@@ -337,7 +398,7 @@ export default function PostList() {
                 </Button>
                 <Button
                   variant={currentFilter === "scheduled" ? "default" : "outline"}
-                  onClick={() => setCurrentFilter("scheduled")}
+                  onClick={() => updateCurrentFilter("scheduled")}
                   className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
                     currentFilter === "scheduled" 
                       ? "bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white shadow-lg" 
@@ -355,7 +416,7 @@ export default function PostList() {
                 </Button>
                 <Button
                   variant={currentFilter === "published" ? "default" : "outline"}
-                  onClick={() => setCurrentFilter("published")}
+                  onClick={() => updateCurrentFilter("published")}
                   className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
                     currentFilter === "published" 
                       ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg" 
@@ -385,7 +446,7 @@ export default function PostList() {
                   <Button
                     variant={currentTagFilter === null ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setCurrentTagFilter(null)}
+                    onClick={() => updateCurrentTagFilter(null)}
                     className={`transition-all ${
                       currentTagFilter === null 
                         ? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white" 
@@ -400,7 +461,7 @@ export default function PostList() {
                       key={tag}
                       variant={currentTagFilter === tag ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setCurrentTagFilter(tag)}
+                      onClick={() => updateCurrentTagFilter(tag)}
                       className={`transition-all ${
                         currentTagFilter === tag 
                           ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white" 
@@ -523,78 +584,70 @@ export default function PostList() {
                         <p className="mb-3">But if your hiring process still involves making senior engineers do LeetCode under pressure.</p>
                         <p className="mb-3"><strong>You're not hiring. You're hazing.</strong></p>
                         <p className="mb-3">I've been writing code for almost a decade.</p>
-                        <p className="mb-3">I've shipped real apps, saved dying projects, and built a business off my results.</p>
-                        <p className="mb-3">I'm a top 1% freelancer on UpWork with almost 10,000 hours billed and over $700k earned.</p>
-                        <p className="mb-3">You can Google me. My resume is public.</p>
-                        <p className="mb-3">If that's not enough proof that I know what I'm doing.</p>
-                        <p className="mb-3"><strong>You're not the kind of client I want to work with.</strong></p>
-                        <p className="mb-3 italic">= = = gabe was here = =</p>
-                        <p className="mb-3">Sorry not sorry.</p>
-                        <p className="mb-3">What do y'all think? Are live coding interviews still legit in 2025 — or are they just lazy vetting?</p>
-                        <p className="mt-3 text-indigo-600">#freelancing #programming #innovation #artificialintelligence #ai</p>
+                        <p className="mb-3">I've shipped millions of lines of code.</p>
+                        <p className="mb-3">I've led teams. I've mentored engineers.</p>
+                        <p className="mb-3">Yet you want to see me stumble through a "reverse a linked list" problem on a whiteboard?</p>
+                        <p className="mb-3">Here's what you should evaluate instead:</p>
+                        <ul className="list-disc list-inside mb-3 space-y-1">
+                          <li>Can they explain complex technical concepts clearly?</li>
+                          <li>Do they ask the right questions about requirements?</li>
+                          <li>Can they reason about trade-offs and system design?</li>
+                          <li>How do they handle ambiguous problems?</li>
+                        </ul>
+                        <p className="mb-3">These skills matter infinitely more than whether someone can balance a binary tree in 20 minutes while you watch.</p>
+                        <p className="mb-3">Trust me - the engineer who can explain why they chose React over Vue for your specific use case is worth 10x more than someone who memorized sorting algorithms.</p>
+                        <p className="text-slate-600 italic">What's your take? Are technical interviews broken?</p>
                       </div>
                       
-                      <div className="flex items-center gap-6 text-sm text-slate-500 pt-3 border-t border-gray-100">
-                        <span>💬 284 comments</span>
-                        <span>🔄 156 shares</span>
-                        <span>❤️ 3.7K reactions</span>
+                      <div className="text-slate-600 text-sm">
+                        <div className="flex items-center gap-4 mb-3">
+                          <span>👍 125 • 💬 42 • 🔄 18</span>
+                        </div>
+                        <div className="text-xs text-slate-400">2 hours ago</div>
                       </div>
                     </div>
                     
-                    <div className="text-slate-600 mb-6">
-                      <strong>Your story matters.</strong> Share your unique perspective, lessons learned, and insights that only you can provide. 
-                      The LinkedIn community is waiting to hear from you.
+                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-8 border border-indigo-100">
+                      <h4 className="font-medium text-slate-800 mb-2">🚀 Ready to share your expertise?</h4>
+                      <p className="text-slate-600 text-sm mb-4">
+                        Your unique perspective could be the next post that goes viral. Share your experiences, insights, and knowledge with your professional network.
+                      </p>
+                      <Button onClick={handleNewPost} className="w-full sm:w-auto" data-testid="button-new-post-cta">
+                        <PenTool className="w-4 h-4 mr-2" />
+                        Start Writing
+                      </Button>
                     </div>
-                    
-                    <Button 
-                      onClick={handleNewPost} 
-                      size="lg"
-                      className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium px-8"
-                      data-testid="button-create-first-post"
-                    >
-                      <PenTool className="w-5 h-5 mr-2" />
-                      Start Writing Your Story
-                    </Button>
                   </div>
                 )
               ) : (
-                <>
+                <div className="text-center">
                   <div className="text-slate-400 mb-4">
                     <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-slate-800 mb-2">No posts found</h3>
+                  <h3 className="text-lg font-medium text-slate-800 mb-2">No {currentFilter} posts yet</h3>
                   <p className="text-slate-600 mb-6">
-                    No {currentFilter} posts found. Try switching to a different filter.
+                    You haven't created any {currentFilter} posts yet. Start writing and organize your content.
                   </p>
-                </>
+                  <Button onClick={handleNewPost} data-testid="button-create-first-post">
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Post
+                  </Button>
+                </div>
               )}
             </div>
           )}
         </div>
-        
-        {/* Floating Action Button */}
-        <div className="fixed bottom-6 right-6 z-50">
-          <Button
-            onClick={handleNewPost}
-            size="lg"
-            className="h-14 w-14 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-200 group"
-            data-testid="button-fab-new-post"
-          >
-            <Plus className="h-6 w-6 group-hover:scale-110 transition-transform" />
-          </Button>
-        </div>
-      </div>
 
-      {/* Tutorial Modal */}
-      {user && (
-        <TutorialModal
-          userId={user.uid}
-          open={!tutorialCompleted}
-          onClose={() => setTutorialCompleted(true)}
-        />
-      )}
+        {/* Tutorial Modal */}
+        {user && (
+          <TutorialModal
+            isOpen={!tutorialCompleted}
+            onComplete={() => setTutorialCompleted(true)}
+          />
+        )}
+      </div>
     </AppLayout>
   );
 }
