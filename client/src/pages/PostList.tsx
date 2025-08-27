@@ -135,8 +135,8 @@ export default function PostList() {
     filtered.sort((a, b) => {
       // If both posts are scheduled, always sort by scheduled date (chronological order)
       if (a.status === "scheduled" && b.status === "scheduled") {
-        const timeA = a.scheduledDate ? a.scheduledDate.getTime() : a.updatedAt.getTime();
-        const timeB = b.scheduledDate ? b.scheduledDate.getTime() : b.updatedAt.getTime();
+        const timeA = a.scheduledAt ? a.scheduledAt.getTime() : a.updatedAt.getTime();
+        const timeB = b.scheduledAt ? b.scheduledAt.getTime() : b.updatedAt.getTime();
         return timeA - timeB; // Always ascending (chronological) for scheduled posts
       }
       
