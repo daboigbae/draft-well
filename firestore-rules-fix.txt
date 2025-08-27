@@ -1,0 +1,9 @@
+Change line 25 in your Firestore rules from:
+
+request.resource.data.status in ['draft','published']
+
+To:
+
+request.resource.data.status in ['draft','published','scheduled']
+
+This will allow creating posts directly with scheduled status.
