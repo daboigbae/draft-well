@@ -606,6 +606,36 @@ export default function Editor() {
           </Button>
         </div>
         
+        {/* Post Status Information */}
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <Badge 
+            className={`px-3 py-1 text-xs font-semibold rounded-full ${
+              post.status === "draft" ? "bg-blue-100 text-blue-700" :
+              post.status === "published" ? "bg-green-100 text-green-700" :
+              post.status === "scheduled" ? "bg-orange-100 text-orange-700" : ""
+            }`} 
+            data-testid="badge-post-status"
+          >
+            {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
+          </Badge>
+          
+          {post.status === "scheduled" && post.scheduledAt && (
+            <div className="flex items-center gap-2 text-sm text-orange-700 bg-gradient-to-r from-orange-50 to-amber-50 px-3 py-1 rounded-full border border-orange-200" data-testid="scheduled-info">
+              <Clock className="w-4 h-4" />
+              <span className="font-medium">
+                {post.scheduledAt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {post.scheduledAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+              </span>
+            </div>
+          )}
+          
+          {aiRated && rating && (
+            <Badge className="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700" data-testid="badge-ai-rated">
+              <Star className="w-3 h-3 mr-1" />
+              AI Rated: {rating.rating}/10
+            </Badge>
+          )}
+        </div>
+        
         {/* Title Input */}
         <div className="mb-4">
           <Input
