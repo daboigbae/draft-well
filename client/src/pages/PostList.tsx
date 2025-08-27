@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import PostCard from "../components/PostCard";
 import AppLayout from "./AppLayout";
 import TutorialModal from "../components/TutorialModal";
+import ScheduledPostsView from '../components/ScheduledPostsView';
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
@@ -489,17 +490,26 @@ export default function PostList() {
               ))}
             </div>
           ) : filteredPosts.length > 0 ? (
-            <div className="space-y-6">
-              {filteredPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  onEdit={handleEditPost}
-                  onDuplicate={handleDuplicatePost}
-                  onDelete={handleDeletePost}
-                />
-              ))}
-            </div>
+            currentFilter === "scheduled" ? (
+              <ScheduledPostsView 
+                posts={filteredPosts} 
+                onEdit={handleEditPost}
+                onDuplicate={handleDuplicatePost}
+                onDelete={handleDeletePost}
+              />
+            ) : (
+              <div className="space-y-6">
+                {filteredPosts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onEdit={handleEditPost}
+                    onDuplicate={handleDuplicatePost}
+                    onDelete={handleDeletePost}
+                  />
+                ))}
+              </div>
+            )
           ) : (
             <div className="text-center py-12" data-testid="empty-state">
               {searchQuery ? (
