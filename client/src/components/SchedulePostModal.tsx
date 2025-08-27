@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, FileText, Calendar } from 'lucide-react';
 import { Button } from './ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Post } from '../types/post';
 import { format } from 'date-fns';
 
@@ -32,12 +32,12 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
             <Calendar className="w-5 h-5" />
             Schedule for {format(targetDate, 'EEEE, MMM d')}
           </DialogTitle>
+          <DialogDescription>
+            Choose how you'd like to schedule a post for this day
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
-          <p className="text-sm text-slate-600">
-            Choose how you'd like to schedule a post for this day:
-          </p>
           
           {/* Create New Post Option */}
           <Button
