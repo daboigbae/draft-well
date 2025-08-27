@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star, Trash2, CalendarX } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -25,7 +25,7 @@ import ScheduleModal from "../components/ScheduleModal";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post } from "../types/post";
-import { getPost, updatePost, publishPost, schedulePost, deletePost } from "../lib/posts";
+import { getPost, updatePost, publishPost, schedulePost, unschedulePost, deletePost } from "../lib/posts";
 import { renderMarkdown, markdownToLinkedInText } from "../utils/markdown";
 import { copyToClipboard } from "@/utils/clipboard";
 import { exportPostAsText } from "@/utils/export";
@@ -305,6 +305,25 @@ export default function Editor() {
     }
   };
 
+  const handleUnschedule = async () => {
+    if (!user || !post) return;
+
+    try {
+      await unschedulePost(user.uid, post.id);
+      setPost(prev => prev ? { ...prev, status: "draft", scheduledAt: null } : null);
+      toast({
+        title: "Post unscheduled",
+        description: "Your post has been converted back to a draft.",
+      });
+    } catch (error) {
+      toast({
+        title: "Unschedule failed",
+        description: "Failed to unschedule post.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleDelete = () => {
     setShowDeleteDialog(true);
   };
@@ -534,6 +553,20 @@ export default function Editor() {
             <span className="hidden sm:inline ml-2">Publish / Schedule</span>
             <span className="sm:hidden">Schedule</span>
           </Button>
+          
+          {post?.status === "scheduled" && (
+            <Button
+              variant="outline"
+              onClick={handleUnschedule}
+              size="sm"
+              className="text-xs sm:text-sm text-orange-600 border-orange-300 hover:bg-orange-50"
+              data-testid="button-unschedule"
+            >
+              <CalendarX className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+              <span className="hidden sm:inline ml-2">Unschedule</span>
+              <span className="sm:hidden">Unschedule</span>
+            </Button>
+          )}
           
           <Button 
             onClick={handlePublish} 

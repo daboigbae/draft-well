@@ -161,6 +161,13 @@ export const publishPost = async (userId: string, postId: string): Promise<void>
   });
 };
 
+export const unschedulePost = async (userId: string, postId: string): Promise<void> => {
+  await updatePost(userId, postId, {
+    status: "draft",
+    scheduledAt: null,
+  });
+};
+
 // Get all unique tags from user's posts for auto-complete
 export const getUserTags = async (userId: string): Promise<string[]> => {
   const postsRef = getPostsCollection(userId);
