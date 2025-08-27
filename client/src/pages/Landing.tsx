@@ -103,7 +103,7 @@ export default function Landing() {
                   <h3 className="text-3xl font-bold text-slate-900">Know before you post.</h3>
                 </div>
                 <p className="text-lg text-slate-600 mb-6">
-                  Get instant AI ratings (1–10) and actionable feedback so every post has the best chance to perform.
+                  Get instant AI ratings (1–10) and actionable suggestions so every post has the best chance to perform.
                 </p>
                 <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
@@ -111,7 +111,7 @@ export default function Landing() {
                     <span className="font-semibold text-slate-900">AI Rating: 8/10</span>
                   </div>
                   <p className="text-sm text-slate-600 mb-3">
-                    Great hook and valuable insights! Your opening captures attention well and the content provides genuine value to your audience. To make this post even more compelling, consider adding a specific statistic or concrete example to strengthen your opening statement. This will help establish credibility and give readers a clear reason to keep reading. The overall structure flows nicely and your conclusion ties everything together effectively.
+                    Great hook and valuable insights! Consider adding a specific statistic to strengthen your opening.
                   </p>
                   <div className="flex items-center gap-2 text-xs text-green-600">
                     <Check className="h-4 w-4" />
