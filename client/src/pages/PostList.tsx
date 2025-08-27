@@ -234,8 +234,6 @@ export default function PostList() {
     if (!user || !selectedScheduleDate) return;
 
     try {
-      console.log('Creating scheduled post for date:', selectedScheduleDate);
-      
       // Create new post with scheduled status and date
       const newPostId = await createPost(user.uid, {
         title: "",
@@ -246,8 +244,6 @@ export default function PostList() {
         aiRated: false,
       });
       
-      console.log('Post created successfully with ID:', newPostId);
-      
       toast({
         title: "New post created",
         description: `Post scheduled for ${selectedScheduleDate.toLocaleDateString()}`,
@@ -256,10 +252,9 @@ export default function PostList() {
       // Navigate to editor for the new post
       setLocation(`/app/post/${newPostId}`);
     } catch (error) {
-      console.error('Error creating scheduled post:', error);
       toast({
         title: "Creation failed",
-        description: `Failed to create the scheduled post: ${error.message}`,
+        description: "Failed to create the scheduled post.",
         variant: "destructive",
       });
     }

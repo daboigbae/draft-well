@@ -19,10 +19,8 @@ export interface CreatePostData {
   body: string;
   tags: string[];
   status: PostStatus;
-  scheduledAt?: any; // Firestore Timestamp or null
-  aiRated?: boolean;
-  rating?: number;
-  feedback?: string;
+  scheduledAt: any; // Firestore Timestamp or null
+  aiRated: boolean;
 }
 
 export interface UpdatePostData {
