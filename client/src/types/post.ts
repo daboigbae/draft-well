@@ -9,7 +9,7 @@ export interface Post {
   scheduledAt: Date | null;
   aiRated: boolean;
   rating?: number;
-  suggestions?: string[];
+  feedback?: string;
   createdAt: Date;
   updatedAt: Date;
 }

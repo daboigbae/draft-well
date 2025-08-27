@@ -105,11 +105,11 @@ export default function Editor() {
           setTags(postData.tags);
           // aiRated is computed from rating existence
           
-          // Load existing rating and suggestions if available
-          if (postData.rating && postData.suggestions) {
+          // Load existing rating and feedback if available
+          if (postData.rating && postData.feedback) {
             setRating({
               rating: postData.rating,
-              suggestions: postData.suggestions
+              feedback: postData.feedback
             });
           }
         } else {
@@ -857,18 +857,13 @@ export default function Editor() {
             </div>
             
             {/* Rating Suggestions */}
-            {rating && rating.suggestions && rating.suggestions.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm mt-6" data-testid="rating-suggestions-panel">
+            {rating && rating.feedback && (
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm mt-6" data-testid="rating-feedback-panel">
                 <div className="p-4">
-                  <h4 className="font-medium text-slate-700 mb-4">Suggestions for Improvement</h4>
-                  <ul className="space-y-3" data-testid="rating-suggestions">
-                    {rating.suggestions.map((suggestion, index) => (
-                      <li key={index} className="text-sm text-slate-600 flex items-start gap-3">
-                        <span className="text-slate-400 mt-1 font-bold">{index + 1}.</span>
-                        <span className="leading-relaxed">{suggestion}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <h4 className="font-medium text-slate-700 mb-4">Feedback</h4>
+                  <div className="text-sm text-slate-600 leading-relaxed" data-testid="rating-feedback">
+                    {rating.feedback}
+                  </div>
                 </div>
               </div>
             )}
