@@ -9,11 +9,12 @@ import PostCard from "../components/PostCard";
 import AppLayout from "./AppLayout";
 import TutorialModal from "../components/TutorialModal";
 import ScheduledPostsView from '../components/ScheduledPostsView';
+import SchedulePostModal from '../components/SchedulePostModal';
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
-import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags, createPost } from "../lib/posts";
-import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags, createPost, schedulePost } from "../lib/posts";
+import { doc, getDoc, onSnapshot, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Helper functions for sticky filters
@@ -65,6 +66,8 @@ export default function PostList() {
   const [filtersExpanded, setFiltersExpanded] = useState(() => 
     loadFromStorage(STORAGE_KEYS.filtersExpanded, false)
   );
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [selectedScheduleDate, setSelectedScheduleDate] = useState<Date | null>(null);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -217,6 +220,60 @@ export default function PostList() {
       toast({
         title: "Delete failed",
         description: "Failed to delete the post.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleScheduleForDay = (date: Date) => {
+    setSelectedScheduleDate(date);
+    setScheduleModalOpen(true);
+  };
+
+  const handleCreateNewScheduledPost = async () => {
+    if (!user || !selectedScheduleDate) return;
+
+    try {
+      // Create new post with scheduled status and date
+      const newPostId = await createPost(user.uid, {
+        title: "",
+        body: "",
+        tags: [],
+        status: "scheduled",
+        scheduledAt: Timestamp.fromDate(selectedScheduleDate),
+        aiRated: false,
+      });
+      
+      toast({
+        title: "New post created",
+        description: `Post scheduled for ${selectedScheduleDate.toLocaleDateString()}`,
+      });
+      
+      // Navigate to editor for the new post
+      setLocation(`/app/post/${newPostId}`);
+    } catch (error) {
+      toast({
+        title: "Creation failed",
+        description: "Failed to create the scheduled post.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleScheduleExistingDraft = async (postId: string) => {
+    if (!user || !selectedScheduleDate) return;
+
+    try {
+      await schedulePost(user.uid, postId, selectedScheduleDate);
+      
+      toast({
+        title: "Post scheduled",
+        description: `Post scheduled for ${selectedScheduleDate.toLocaleDateString()}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Scheduling failed",
+        description: "Failed to schedule the post.",
         variant: "destructive",
       });
     }
@@ -472,9 +529,11 @@ export default function PostList() {
             currentFilter === "scheduled" ? (
               <ScheduledPostsView 
                 posts={filteredPosts} 
+                allPosts={posts}
                 onEdit={handleEditPost}
                 onDuplicate={handleDuplicatePost}
                 onDelete={handleDeletePost}
+                onScheduleForDay={handleScheduleForDay}
               />
             ) : (
               <div className="space-y-6">
@@ -610,6 +669,15 @@ export default function PostList() {
             onComplete={() => setTutorialCompleted(true)}
           />
         )}
+
+        <SchedulePostModal
+          isOpen={scheduleModalOpen}
+          onClose={() => setScheduleModalOpen(false)}
+          targetDate={selectedScheduleDate}
+          draftPosts={posts.filter(post => post.status === "draft")}
+          onSelectDraft={handleScheduleExistingDraft}
+          onCreateNew={handleCreateNewScheduledPost}
+        />
       </div>
     </AppLayout>
   );

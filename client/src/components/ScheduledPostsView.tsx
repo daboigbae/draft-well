@@ -7,9 +7,11 @@ import { formatDistanceToNow, isToday, isTomorrow, isThisWeek, startOfDay, isAft
 
 interface ScheduledPostsViewProps {
   posts: Post[];
+  allPosts: Post[];
   onEdit: (postId: string) => void;
   onDuplicate: (postId: string) => void;
   onDelete: (postId: string) => void;
+  onScheduleForDay: (date: Date) => void;
 }
 
 interface DaySchedule {
@@ -24,9 +26,11 @@ interface DaySchedule {
 
 const ScheduledPostsView: React.FC<ScheduledPostsViewProps> = ({ 
   posts, 
+  allPosts,
   onEdit, 
   onDuplicate, 
-  onDelete 
+  onDelete,
+  onScheduleForDay 
 }) => {
   const getNext7Days = (): DaySchedule[] => {
     const today = startOfDay(new Date());
@@ -170,6 +174,7 @@ const ScheduledPostsView: React.FC<ScheduledPostsViewProps> = ({
                     variant="outline" 
                     size="sm"
                     className="text-xs border-gray-300 hover:border-gray-400"
+                    onClick={() => onScheduleForDay(day.date)}
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Schedule Post
