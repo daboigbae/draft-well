@@ -45,8 +45,8 @@ const saveToStorage = (key: string, value: any): void => {
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
-  const [currentFilter, setCurrentFilter] = useState<PostStatus | "all">(() => 
-    loadFromStorage(STORAGE_KEYS.currentFilter, "all")
+  const [currentFilter, setCurrentFilter] = useState<PostStatus>(() => 
+    loadFromStorage(STORAGE_KEYS.currentFilter, "draft")
   );
   const [currentTagFilter, setCurrentTagFilter] = useState<string | null>(() => 
     loadFromStorage(STORAGE_KEYS.currentTagFilter, null)
@@ -113,9 +113,7 @@ export default function PostList() {
     let filtered = [...posts];
 
     // Apply status filter
-    if (currentFilter !== "all") {
-      filtered = filtered.filter(post => post.status === currentFilter);
-    }
+    filtered = filtered.filter(post => post.status === currentFilter);
 
     // Apply tag filter
     if (currentTagFilter) {
@@ -225,7 +223,6 @@ export default function PostList() {
   };
 
   const getPostCounts = () => ({
-    all: posts.length,
     draft: posts.filter(p => p.status === "draft").length,
     published: posts.filter(p => p.status === "published").length,
     scheduled: posts.filter(p => p.status === "scheduled").length,
@@ -236,11 +233,11 @@ export default function PostList() {
       case "draft": return "Draft Posts";
       case "published": return "Published Posts";
       case "scheduled": return "Scheduled Posts";
-      default: return "All Posts";
+      default: return "Draft Posts";
     }
   };
 
-  const updateCurrentFilter = (filter: PostStatus | "all") => {
+  const updateCurrentFilter = (filter: PostStatus) => {
     setCurrentFilter(filter);
     saveToStorage(STORAGE_KEYS.currentFilter, filter);
   };
@@ -315,25 +312,7 @@ export default function PostList() {
               </div>
               
               {/* Post Status Filters - Always Visible */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Button
-                  variant={currentFilter === "all" ? "default" : "outline"}
-                  onClick={() => updateCurrentFilter("all")}
-                  className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
-                    currentFilter === "all" 
-                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg" 
-                      : "hover:border-indigo-300 hover:bg-indigo-50"
-                  }`}
-                  data-testid="button-filter-all"
-                >
-                  <TrendingUp className="h-5 w-5" />
-                  <div className="text-center">
-                    <div className="font-medium">All Posts</div>
-                    <div className={`text-xs ${currentFilter === "all" ? "text-indigo-100" : "text-slate-500"}`}>
-                      {getPostCounts().all} total
-                    </div>
-                  </div>
-                </Button>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Button
                   variant={currentFilter === "draft" ? "default" : "outline"}
                   onClick={() => updateCurrentFilter("draft")}
@@ -524,7 +503,7 @@ export default function PostList() {
                     No posts match your search criteria. Try adjusting your search terms.
                   </p>
                 </>
-              ) : currentFilter === "all" ? (
+              ) : currentFilter === "draft" ? (
                 firstDraftCompleted ? (
                   <div className="text-center">
                     <div className="text-slate-400 mb-4">
