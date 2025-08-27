@@ -32,7 +32,7 @@ const ScheduledPostsView: React.FC<ScheduledPostsViewProps> = ({
     const today = startOfDay(new Date());
     const days: DaySchedule[] = [];
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 1; i <= 7; i++) {
       const date = addDays(today, i);
       const dayPosts = posts.filter(post => 
         post.scheduledAt && isSameDay(post.scheduledAt, date)
@@ -42,7 +42,7 @@ const ScheduledPostsView: React.FC<ScheduledPostsViewProps> = ({
         date,
         dayName: format(date, 'EEEE'),
         dateString: format(date, 'MMM d'),
-        isToday: i === 0,
+        isToday: false,
         isTomorrow: i === 1,
         posts: dayPosts.sort((a, b) => {
           if (!a.scheduledAt || !b.scheduledAt) return 0;
@@ -57,9 +57,9 @@ const ScheduledPostsView: React.FC<ScheduledPostsViewProps> = ({
 
   const next7Days = getNext7Days();
 
-  // Also show overdue posts at the top
+  // Show overdue posts (including today) at the top
   const overduePosts = posts.filter(post => 
-    post.scheduledAt && isBefore(post.scheduledAt, startOfDay(new Date()))
+    post.scheduledAt && isBefore(post.scheduledAt, addDays(startOfDay(new Date()), 1))
   );
 
   return (
@@ -140,13 +140,11 @@ const ScheduledPostsView: React.FC<ScheduledPostsViewProps> = ({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className={`px-3 py-1 rounded-lg font-semibold ${
-                    day.isToday 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : day.isTomorrow 
+                    day.isTomorrow 
                       ? 'bg-green-100 text-green-700'
                       : 'bg-slate-100 text-slate-700'
                   }`}>
-                    {day.isToday ? 'Today' : day.isTomorrow ? 'Tomorrow' : day.dayName}
+                    {day.isTomorrow ? 'Tomorrow' : day.dayName}
                   </div>
                   <span className="text-slate-600 font-medium">{day.dateString}</span>
                   {day.posts.length > 0 && (
@@ -163,9 +161,7 @@ const ScheduledPostsView: React.FC<ScheduledPostsViewProps> = ({
                   <CalendarDays className="w-8 h-8 mx-auto text-gray-400 mb-3" />
                   <h4 className="font-medium text-slate-700 mb-2">No posts scheduled</h4>
                   <p className="text-sm text-slate-500 mb-4">
-                    {day.isToday 
-                      ? "You could publish something today to stay active with your audience."
-                      : day.isTomorrow
+                    {day.isTomorrow
                       ? "Tomorrow is a great day to share insights with your network."
                       : `Consider scheduling a post for ${day.dayName} to maintain consistent engagement.`
                     }
