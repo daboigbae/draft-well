@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star, Trash2, CalendarX } from "lucide-react";
+import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star, Trash2, CalendarX, Clock } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
