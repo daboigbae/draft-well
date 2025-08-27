@@ -234,15 +234,18 @@ export default function PostList() {
     if (!user || !selectedScheduleDate) return;
 
     try {
-      // Create new post with scheduled status and date
+      // First create as draft, then schedule it
       const newPostId = await createPost(user.uid, {
         title: "",
         body: "",
         tags: [],
-        status: "scheduled",
-        scheduledAt: Timestamp.fromDate(selectedScheduleDate),
+        status: "draft",
+        scheduledAt: null,
         aiRated: false,
       });
+      
+      // Then schedule the newly created post
+      await schedulePost(user.uid, newPostId, selectedScheduleDate);
       
       toast({
         title: "New post created",
@@ -252,6 +255,7 @@ export default function PostList() {
       // Navigate to editor for the new post
       setLocation(`/app/post/${newPostId}`);
     } catch (error) {
+      console.error("Error creating scheduled post:", error);
       toast({
         title: "Creation failed",
         description: "Failed to create the scheduled post.",
