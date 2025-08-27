@@ -7,6 +7,7 @@ import { Textarea } from "../components/ui/textarea";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { Checkbox } from "../components/ui/checkbox";
 import { Label } from "../components/ui/label";
+import { Badge } from "../components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
