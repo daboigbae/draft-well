@@ -607,14 +607,20 @@ export default function Editor() {
       <div className="flex">
         {/* Editor Panel */}
         <div className="flex-1">
-          {/* Title - No visible title input, just content */}
+          {/* Title Input */}
           <div className="p-6 border-b border-gray-100">
-            <div className="text-lg text-slate-600 mb-2">
-              The best developers in 2025 aren't the ones who can code the fastest—they're the ones who can debug AI's bullshit the fa
-            </div>
-            <div className="flex items-center gap-6 text-sm text-slate-500">
-              <span>120/120 characters</span>
-              <span>44 words</span>
+            <Input
+              type="text"
+              placeholder="Post title..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="text-lg font-medium border-none p-0 focus-visible:ring-0 shadow-none bg-transparent placeholder-slate-400"
+              maxLength={120}
+              data-testid="input-title"
+            />
+            <div className="flex items-center gap-6 text-sm text-slate-500 mt-2">
+              <span>{title.length}/120 characters</span>
+              <span>{title.trim() ? title.trim().split(/\s+/).length : 0} words</span>
               <span>1 min read</span>
             </div>
           </div>
