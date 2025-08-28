@@ -32,6 +32,96 @@ import { renderMarkdown, markdownToLinkedInText } from "../utils/markdown";
 import { copyToClipboard } from "../utils/clipboard";
 import { exportPostAsText } from "../utils/export";
 
+// LinkedIn Post Preview Component
+interface LinkedInPostPreviewProps {
+  content: string;
+  userName: string;
+  userInitial: string;
+}
+
+function LinkedInPostPreview({ content, userName, userInitial }: LinkedInPostPreviewProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // LinkedIn typically truncates at around 300 characters
+  const shouldTruncate = content.length > 300;
+  const truncatedContent = shouldTruncate && !isExpanded 
+    ? content.substring(0, 300) + "..."
+    : content;
+
+  // Preserve formatting by converting newlines to JSX
+  const formatContent = (text: string) => {
+    return text.split('\n').map((line, index) => (
+      <span key={index}>
+        {line}
+        {index < text.split('\n').length - 1 && <br />}
+      </span>
+    ));
+  };
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+      <div className="flex items-start gap-3 mb-3">
+        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+          <span className="text-gray-500 text-sm font-medium">
+            {userInitial}
+          </span>
+        </div>
+        <div>
+          <div className="font-semibold text-gray-900">
+            {userName}
+          </div>
+          <div className="text-sm text-gray-500">
+            Your Title • 1st
+          </div>
+          <div className="text-xs text-gray-400 flex items-center gap-1">
+            2m • 🌐
+          </div>
+        </div>
+      </div>
+
+      <div className="text-gray-900 leading-relaxed mb-4">
+        {content ? formatContent(truncatedContent) : "Your post content will appear here..."}
+        {shouldTruncate && !isExpanded && (
+          <button
+            onClick={() => setIsExpanded(true)}
+            className="text-gray-600 hover:text-gray-800 font-medium ml-1"
+          >
+            ...more
+          </button>
+        )}
+        {shouldTruncate && isExpanded && (
+          <button
+            onClick={() => setIsExpanded(false)}
+            className="text-gray-600 hover:text-gray-800 font-medium ml-1 block mt-2"
+          >
+            Show less
+          </button>
+        )}
+      </div>
+
+      <div className="text-sm text-gray-500 mb-3">
+        👍 You and 24 others
+        <span className="float-right">8 comments • 3 reposts</span>
+      </div>
+
+      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+        <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded">
+          👍 Like
+        </button>
+        <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded">
+          💬 Comment
+        </button>
+        <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded">
+          🔄 Repost
+        </button>
+        <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded">
+          ➤ Send
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Editor() {
   const params = useParams();
   const postId = params.id;
@@ -560,54 +650,15 @@ export default function Editor() {
             </h3>
 
             {/* LinkedIn Post Preview */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                  <span className="text-gray-500 text-sm font-medium">
-                    {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                  </span>
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900">
-                    {user?.displayName || 'Your Name'}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Your Title • 1st
-                  </div>
-                  <div className="text-xs text-gray-400 flex items-center gap-1">
-                    2m • 🌐
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-gray-900 leading-relaxed mb-4">
-                {linkedInText || "Your post content will appear here..."}
-              </div>
-
-              <div className="text-sm text-gray-500 mb-3">
-                👍 You and 24 others
-                <span className="float-right">8 comments • 3 reposts</span>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded">
-                  👍 Like
-                </button>
-                <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded">
-                  💬 Comment
-                </button>
-                <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded">
-                  🔄 Repost
-                </button>
-                <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded">
-                  ➤ Send
-                </button>
-              </div>
-            </div>
+            <LinkedInPostPreview 
+              content={linkedInText}
+              userName={user?.displayName || 'Your Name'}
+              userInitial={user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'U'}
+            />
 
             {/* AI Rating Display */}
             {rating && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-gray-200 p-4 mt-6">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
                   Post Rating
                   <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded">
