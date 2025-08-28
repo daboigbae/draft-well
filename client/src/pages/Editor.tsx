@@ -28,6 +28,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import EditorToolbar from "../components/EditorToolbar";
 import TagInput from "../components/TagInput";
 import CharacterCounter from "../components/CharacterCounter";
+import HashtagDropdown from "../components/HashtagDropdown";
 import ScheduleModal from "../components/ScheduleModal";
 import { renderMarkdown, markdownToLinkedInText } from "../utils/markdown";
 import { copyToClipboard } from "../utils/clipboard";
@@ -443,6 +444,10 @@ export default function Editor() {
               <Minimize2 className="w-4 h-4 mr-2" />
               Exit Focus Mode
             </Button>
+            
+            {/* Hashtag Dropdown in Fullscreen */}
+            <HashtagDropdown onInsertHashtags={handleInsertMarkdown} />
+            
             {saving && <span className="text-sm text-slate-500">Saving...</span>}
             {lastSaved && !saving && (
               <span className="text-sm text-slate-500">
