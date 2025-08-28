@@ -487,7 +487,7 @@ export default function Editor() {
 
   // Fullscreen wrapper component
   const EditorContent = () => (
-    <div className="min-h-screen bg-background flex flex-col" data-testid="editor">
+    <div className={`min-h-screen bg-background flex flex-col ${isFullscreen ? 'fixed inset-0 z-[9999]' : ''}`} data-testid="editor">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 p-4 sm:p-6">
         {/* First row: Back button and save status */}
@@ -630,10 +630,7 @@ export default function Editor() {
           {/* Fullscreen Toggle */}
           <Button
             variant="outline"
-            onClick={() => {
-              console.log("Focus mode clicked, current state:", isFullscreen);
-              setIsFullscreen(!isFullscreen);
-            }}
+            onClick={() => setIsFullscreen(!isFullscreen)}
             size="sm"
             className="text-xs sm:text-sm"
             data-testid="button-fullscreen"
@@ -1031,19 +1028,6 @@ export default function Editor() {
     </div>
   );
 
-  // Return fullscreen mode or normal wrapped mode
-  console.log("Rendering Editor, isFullscreen:", isFullscreen);
-  
-  if (isFullscreen) {
-    console.log("Rendering fullscreen mode");
-    return createPortal(
-      <div className="fixed inset-0 z-[9999] bg-background">
-        <EditorContent />
-      </div>,
-      document.body
-    );
-  }
-
-  console.log("Rendering normal mode");
+  // Return the editor content with conditional fullscreen styling
   return <EditorContent />;
 }
