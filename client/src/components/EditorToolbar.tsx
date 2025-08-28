@@ -18,7 +18,7 @@ export default function EditorToolbar({ onInsertMarkdown }: EditorToolbarProps) 
   ];
 
   return (
-    <div className="bg-gray-50 border-b border-gray-200 p-4" data-testid="editor-toolbar">
+    <div className="sticky top-0 z-10 bg-gray-50 border-b border-gray-200 p-4" data-testid="editor-toolbar">
       <div className="flex items-center gap-2">
         {formatButtons.map((button, index) => (
           <div key={button.label} className="flex items-center">
