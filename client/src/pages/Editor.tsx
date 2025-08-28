@@ -354,7 +354,7 @@ export default function Editor() {
       setPost(prev => prev ? {
         ...prev,
         status,
-        scheduledAt,
+        scheduledAt: scheduledAt || null,
       } : null);
       
       toast({
@@ -736,8 +736,7 @@ export default function Editor() {
             handleStatusChange('published');
             setShowScheduleModal(false);
           }}
-          currentStatus={post.status}
-          scheduledDate={post.scheduledAt}
+          currentScheduledAt={post.scheduledAt}
         />
       )}
     </div>

@@ -669,8 +669,9 @@ export default function PostList() {
         {/* Tutorial Modal */}
         {user && (
           <TutorialModal
+            userId={user.uid}
             open={!tutorialCompleted}
-            onComplete={() => setTutorialCompleted(true)}
+            onClose={() => setTutorialCompleted(true)}
           />
         )}
 
