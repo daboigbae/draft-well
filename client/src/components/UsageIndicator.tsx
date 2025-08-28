@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
-import { Zap, TrendingUp } from 'lucide-react';
+import { Zap, TrendingUp, Flame } from 'lucide-react';
 import { useAuth } from '../hooks/use-auth';
-import { getUserSubscription, getCurrentUsage, canUserUseAiRating, subscribeToUserSubscription } from '../lib/subscription';
+import { getUserSubscription, getCurrentUsage, canUserUseAiRating, subscribeToUserSubscription, getUserPostingStreak } from '../lib/subscription';
 import { createCheckoutSession } from '../lib/stripe';
 import { getPlanById } from '../types/subscription';
 import { useToast } from '../hooks/use-toast';
@@ -13,6 +13,7 @@ export default function UsageIndicator() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [postingStreak, setPostingStreak] = useState(0);
   const [usage, setUsage] = useState({
     current: 0,
     limit: 0 as number | 'unlimited',
@@ -26,6 +27,11 @@ export default function UsageIndicator() {
       setLoading(false);
       return;
     }
+
+    // Fetch posting streak
+    getUserPostingStreak(user.uid).then(streak => {
+      setPostingStreak(streak);
+    });
 
     // Set up real-time subscription listener
     const unsubscribe = subscribeToUserSubscription(user.uid, async (subscription) => {
@@ -72,7 +78,7 @@ export default function UsageIndicator() {
     if (!user?.uid) return;
     
     try {
-      await createCheckoutSession(planType, user.uid);
+      await createCheckoutSession();
     } catch (error: any) {
       toast({
         title: 'Upgrade failed',
@@ -144,54 +150,29 @@ export default function UsageIndicator() {
         </div>
       )}
 
-      {isAtLimit && (
-        <div className="text-xs text-amber-700 mb-2">
-          No credits remaining.
-          {usage.planType === 'free' && (
-            <button 
-              onClick={() => handleUpgrade('starter')}
-              className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
-              data-testid="button-upgrade-starter"
-            >
-              Upgrade
-            </button>
-          )}
-          {usage.planType === 'starter' && (
-            <button 
-              onClick={() => handleUpgrade('pro')}
-              className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
-              data-testid="button-upgrade-pro"
-            >
-              Go Pro
-            </button>
-          )}
-        </div>
-      )}
 
       {isNearLimit && !isAtLimit && usage.planType === 'starter' && (
         <div className="text-xs text-orange-700 mb-2">
           Low on credits.
-          <button 
-            onClick={() => handleUpgrade('pro')}
-            className="text-indigo-600 hover:text-indigo-700 ml-1 underline"
-            data-testid="button-upgrade-near-limit"
-          >
-            Go Pro
-          </button>
         </div>
       )}
 
-      {usage.planName === 'Free' && !isAtLimit && (
-        <div className="text-xs text-slate-400">
-          <button 
-            className="text-slate-500 hover:text-indigo-600 underline"
-            onClick={() => handleUpgrade('starter')}
-            data-testid="button-upgrade-free"
-          >
-            Upgrade for more
-          </button>
+      {/* Posting Streak Display */}
+      <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-200">
+        <div className="flex items-center gap-1.5">
+          <Flame className="w-3 h-3 text-orange-500" />
+          <span className="text-sm text-slate-600">Streak</span>
         </div>
-      )}
+        <div className="flex items-center gap-1">
+          <span className="text-sm font-semibold text-orange-600" data-testid="posting-streak-count">
+            {postingStreak}
+          </span>
+          <span className="text-xs text-slate-500">
+            {postingStreak === 1 ? 'day' : 'days'}
+          </span>
+        </div>
+      </div>
+
     </div>
   );
 }

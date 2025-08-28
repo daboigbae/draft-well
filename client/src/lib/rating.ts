@@ -4,7 +4,7 @@ import { canUserUseAiRating, getUserSubscription } from './subscription';
 
 export interface RatingData {
   rating: number;
-  suggestions: string[];
+  feedback: string;
 }
 
 export interface RatingResponse {

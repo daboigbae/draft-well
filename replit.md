@@ -4,7 +4,7 @@
 
 Draftwell is a full-stack LinkedIn post management application built with React, TypeScript, and Firebase. The application allows users to create, edit, organize, and schedule LinkedIn posts with AI-powered rating system, markdown editing, character counting, and real-time synchronization. The app provides a complete content creation workflow from draft to publication with advanced filtering, search capabilities, and intelligent content analysis.
 
-**Current Version:** v3.1.0 - Enhanced UI/UX with Collapsible Menu & Filters
+**Current Version:** v3.2.0 - Bug Fixes & Type Safety Improvements
 
 ## User Preferences
 
@@ -94,3 +94,20 @@ Preferred communication style: Simple, everyday language.
 - **PostCSS & Autoprefixer**: CSS processing and vendor prefixing
 
 The application follows a modern JAMstack architecture with Firebase as the primary backend service, providing real-time capabilities and seamless authentication. The frontend is built with performance and user experience in mind, utilizing optimistic updates and efficient state management patterns.
+
+## Recent Changes (v3.2.0)
+
+**Date:** August 28, 2025
+
+### Bug Fixes & Improvements
+- ✓ Fixed TypeScript type safety issues in Editor component with scheduledAt property handling
+- ✓ Resolved ScheduleModal prop interface mismatch (currentStatus → currentScheduledAt)
+- ✓ Fixed TutorialModal prop interface (onComplete → onClose, added required userId)
+- ✓ Improved type consistency across Post scheduling functionality
+- ✓ Enhanced code stability and reduced potential runtime errors
+
+### Technical Improvements
+- Corrected Post type compatibility for scheduledAt field (Date | null vs undefined)
+- Standardized modal component prop interfaces for better maintainability
+- Eliminated all TypeScript compilation warnings and errors
+- Improved development experience with cleaner type checking

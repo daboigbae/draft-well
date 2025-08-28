@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return request.auth.uid == uid; }
+    
+    // Helper function to check if user owns the Stripe customer ID
+    function ownsStripeCustomer(stripeCustomerId) {
+      return isSignedIn() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.stripeCustomerId == stripeCustomerId;
+    }
+
+    match /users/{uid} {
+      allow read, write: if isSignedIn() && isOwner(uid);
+    }
+
+    match /users/{uid}/posts/{postId} {
+      allow create: if isSignedIn() && isOwner(uid) &&
+        request.resource.data.keys().hasAll(['title','body','status','createdAt','updatedAt','aiRated']) &&
+        request.resource.data.title is string &&
+        request.resource.data.body is string &&
+        request.resource.data.status in ['draft','published'] &&
+        request.resource.data.aiRated is bool;
+
+      allow read, update, delete: if isSignedIn() && isOwner(uid);
+    }
+
+    match /users/{uid}/hashtagCollections/{collectionId} {
+      allow read, write: if isSignedIn() && isOwner(uid);
+    }
+
+    // Updated: subscriptions now use stripeCustomerId as document ID
+    match /subscriptions/{stripeCustomerId} {
+      allow read, write: if ownsStripeCustomer(stripeCustomerId);
+    }
+    
+    match /usage/{usageId} {
+      allow read, write: if isSignedIn() && 
+        usageId.matches('^' + request.auth.uid + '_.*');
+    }
+    
+    // Allow any authenticated user to submit feedback
+    match /feedback/{feedbackId} {
+      allow create: if isSignedIn() &&
+        request.resource.data.keys().hasAll(['email', 'text', 'createdAt']) &&
+        request.resource.data.email is string &&
+        request.resource.data.text is string;
+      
+      // Only allow reading feedback for admin purposes (optional)
+      allow read: if false; // Change to true if you need to read feedback from the client
+    }
+  }
+}

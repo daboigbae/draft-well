@@ -1,5 +1,6 @@
 import { Button } from "./ui/button";
 import { Bold, Italic, Heading, List, ListOrdered, Link, Code } from "lucide-react";
+import HashtagDropdown from "./HashtagDropdown";
 
 interface EditorToolbarProps {
   onInsertMarkdown: (markdown: string) => void;
@@ -35,6 +36,11 @@ export default function EditorToolbar({ onInsertMarkdown }: EditorToolbarProps) 
             )}
           </div>
         ))}
+        
+        <div className="w-px h-6 bg-gray-300 mx-1" />
+        
+        {/* Hashtag Collections Dropdown */}
+        <HashtagDropdown onInsertHashtags={onInsertMarkdown} />
       </div>
     </div>
   );

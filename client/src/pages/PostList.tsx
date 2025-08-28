@@ -8,11 +8,13 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import PostCard from "../components/PostCard";
 import AppLayout from "./AppLayout";
 import TutorialModal from "../components/TutorialModal";
+import ScheduledPostsView from '../components/ScheduledPostsView';
+import SchedulePostModal from '../components/SchedulePostModal';
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
-import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags, createPost } from "../lib/posts";
-import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags, createPost, schedulePost } from "../lib/posts";
+import { doc, getDoc, onSnapshot, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Helper functions for sticky filters
@@ -44,8 +46,8 @@ const saveToStorage = (key: string, value: any): void => {
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
-  const [currentFilter, setCurrentFilter] = useState<PostStatus | "all">(() => 
-    loadFromStorage(STORAGE_KEYS.currentFilter, "all")
+  const [currentFilter, setCurrentFilter] = useState<PostStatus>(() => 
+    loadFromStorage(STORAGE_KEYS.currentFilter, "scheduled")
   );
   const [currentTagFilter, setCurrentTagFilter] = useState<string | null>(() => 
     loadFromStorage(STORAGE_KEYS.currentTagFilter, null)
@@ -64,6 +66,8 @@ export default function PostList() {
   const [filtersExpanded, setFiltersExpanded] = useState(() => 
     loadFromStorage(STORAGE_KEYS.filtersExpanded, false)
   );
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [selectedScheduleDate, setSelectedScheduleDate] = useState<Date | null>(null);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -112,9 +116,7 @@ export default function PostList() {
     let filtered = [...posts];
 
     // Apply status filter
-    if (currentFilter !== "all") {
-      filtered = filtered.filter(post => post.status === currentFilter);
-    }
+    filtered = filtered.filter(post => post.status === currentFilter);
 
     // Apply tag filter
     if (currentTagFilter) {
@@ -133,6 +135,14 @@ export default function PostList() {
 
     // Apply sort
     filtered.sort((a, b) => {
+      // If both posts are scheduled, always sort by scheduled date (chronological order)
+      if (a.status === "scheduled" && b.status === "scheduled") {
+        const timeA = a.scheduledAt ? a.scheduledAt.getTime() : a.updatedAt.getTime();
+        const timeB = b.scheduledAt ? b.scheduledAt.getTime() : b.updatedAt.getTime();
+        return timeA - timeB; // Always ascending (chronological) for scheduled posts
+      }
+      
+      // For non-scheduled posts, use normal sorting
       const timeA = a.updatedAt.getTime();
       const timeB = b.updatedAt.getTime();
       return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
@@ -215,8 +225,65 @@ export default function PostList() {
     }
   };
 
+  const handleScheduleForDay = (date: Date) => {
+    setSelectedScheduleDate(date);
+    setScheduleModalOpen(true);
+  };
+
+  const handleCreateNewScheduledPost = async () => {
+    if (!user || !selectedScheduleDate) return;
+
+    try {
+      // First create as draft, then schedule it
+      const newPostId = await createPost(user.uid, {
+        title: "",
+        body: "",
+        tags: [],
+        status: "draft",
+        scheduledAt: null,
+        aiRated: false,
+      });
+      
+      // Then schedule the newly created post
+      await schedulePost(user.uid, newPostId, selectedScheduleDate);
+      
+      toast({
+        title: "New post created",
+        description: `Post scheduled for ${selectedScheduleDate.toLocaleDateString()}`,
+      });
+      
+      // Navigate to editor for the new post
+      setLocation(`/app/post/${newPostId}`);
+    } catch (error) {
+      console.error("Error creating scheduled post:", error);
+      toast({
+        title: "Creation failed",
+        description: "Failed to create the scheduled post.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleScheduleExistingDraft = async (postId: string) => {
+    if (!user || !selectedScheduleDate) return;
+
+    try {
+      await schedulePost(user.uid, postId, selectedScheduleDate);
+      
+      toast({
+        title: "Post scheduled",
+        description: `Post scheduled for ${selectedScheduleDate.toLocaleDateString()}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Scheduling failed",
+        description: "Failed to schedule the post.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getPostCounts = () => ({
-    all: posts.length,
     draft: posts.filter(p => p.status === "draft").length,
     published: posts.filter(p => p.status === "published").length,
     scheduled: posts.filter(p => p.status === "scheduled").length,
@@ -227,11 +294,11 @@ export default function PostList() {
       case "draft": return "Draft Posts";
       case "published": return "Published Posts";
       case "scheduled": return "Scheduled Posts";
-      default: return "All Posts";
+      default: return "Draft Posts";
     }
   };
 
-  const updateCurrentFilter = (filter: PostStatus | "all") => {
+  const updateCurrentFilter = (filter: PostStatus) => {
     setCurrentFilter(filter);
     saveToStorage(STORAGE_KEYS.currentFilter, filter);
   };
@@ -277,107 +344,36 @@ export default function PostList() {
 
           {/* Header with Stats */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 sm:p-8 mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-indigo-600 bg-clip-text text-transparent mb-2" data-testid="text-filter-title">
-                  {getFilterTitle()}
-                </h1>
-                <p className="text-slate-600 text-lg" data-testid="text-post-count">
-                  {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""} found
-                </p>
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-indigo-600 bg-clip-text text-transparent mb-2" data-testid="text-filter-title">
+                    {getFilterTitle()}
+                  </h1>
+                  <p className="text-slate-600 text-lg" data-testid="text-post-count">
+                    {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""} found
+                  </p>
+                </div>
+                
+                {/* Quick Stats */}
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-indigo-600">{getPostCounts().draft}</div>
+                    <div className="text-xs text-slate-500 font-medium">Drafts</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{getPostCounts().published}</div>
+                    <div className="text-xs text-slate-500 font-medium">Published</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">{getPostCounts().scheduled}</div>
+                    <div className="text-xs text-slate-500 font-medium">Scheduled</div>
+                  </div>
+                </div>
               </div>
               
-              {/* Quick Stats */}
-              <div className="flex items-center gap-4 sm:gap-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-indigo-600">{getPostCounts().draft}</div>
-                  <div className="text-xs text-slate-500 font-medium">Drafts</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{getPostCounts().published}</div>
-                  <div className="text-xs text-slate-500 font-medium">Published</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{getPostCounts().scheduled}</div>
-                  <div className="text-xs text-slate-500 font-medium">Scheduled</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 mb-8">
-            {/* Filter Toggle Header */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Search className="h-5 w-5 text-slate-500" />
-                <span className="text-lg font-semibold text-slate-700">Search & Filters</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => updateFiltersExpanded(!filtersExpanded)}
-                className="text-slate-500 hover:text-slate-700"
-                data-testid="button-toggle-filters"
-              >
-                {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                <span className="ml-2">{filtersExpanded ? "Collapse" : "Expand"}</span>
-              </Button>
-            </div>
-            
-            {/* Search - Always Visible */}
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
-              <Input
-                type="text"
-                placeholder="Search by title, content, or tags..."
-                className="pl-12 pr-4 py-3 text-base border-gray-200 focus:border-indigo-300 focus:ring-indigo-200 rounded-xl"
-                value={searchQuery}
-                onChange={(e) => updateSearchQuery(e.target.value)}
-                data-testid="input-search"
-              />
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => updateSortOrder(sortOrder === "desc" ? "asc" : "desc")}
-                  className="text-slate-500 hover:text-slate-700"
-                  data-testid="button-sort"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                  <span className="hidden sm:inline ml-2">{sortOrder === "desc" ? "Newest" : "Oldest"}</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Collapsible Filter Content */}
-            {filtersExpanded && (
-              <div className="space-y-6">
-                {/* Post Status Filters */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Filter className="h-4 w-4 text-slate-500" />
-                <span className="text-sm font-medium text-slate-700">Filter by Status</span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Button
-                  variant={currentFilter === "all" ? "default" : "outline"}
-                  onClick={() => updateCurrentFilter("all")}
-                  className={`flex flex-col items-center gap-2 h-auto py-4 px-3 transition-all ${
-                    currentFilter === "all" 
-                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg" 
-                      : "hover:border-indigo-300 hover:bg-indigo-50"
-                  }`}
-                  data-testid="button-filter-all"
-                >
-                  <TrendingUp className="h-5 w-5" />
-                  <div className="text-center">
-                    <div className="font-medium">All Posts</div>
-                    <div className={`text-xs ${currentFilter === "all" ? "text-indigo-100" : "text-slate-500"}`}>
-                      {getPostCounts().all} total
-                    </div>
-                  </div>
-                </Button>
+              {/* Post Status Filters - Always Visible */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Button
                   variant={currentFilter === "draft" ? "default" : "outline"}
                   onClick={() => updateCurrentFilter("draft")}
@@ -433,56 +429,75 @@ export default function PostList() {
                   </div>
                 </Button>
               </div>
-            </div>
-
-            {/* Tag Filters */}
-            {allTags.length > 0 && (
-              <div className="pt-4 border-t border-gray-100">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="h-4 w-4 text-slate-500" />
-                  <span className="text-sm font-medium text-slate-700">Filter by Tag</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
+              
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+                <Input
+                  type="text"
+                  placeholder="Search by title, content, or tags..."
+                  className="pl-12 pr-4 py-3 text-base border-gray-200 focus:border-indigo-300 focus:ring-indigo-200 rounded-xl"
+                  value={searchQuery}
+                  onChange={(e) => updateSearchQuery(e.target.value)}
+                  data-testid="input-search"
+                />
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
                   <Button
-                    variant={currentTagFilter === null ? "default" : "outline"}
+                    variant="ghost"
                     size="sm"
-                    onClick={() => updateCurrentTagFilter(null)}
-                    className={`transition-all ${
-                      currentTagFilter === null 
-                        ? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white" 
-                        : "hover:border-purple-300 hover:bg-purple-50"
-                    }`}
-                    data-testid="button-tag-all"
+                    onClick={() => updateSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+                    className="text-slate-500 hover:text-slate-700"
+                    data-testid="button-sort"
                   >
-                    All Tags
+                    <ArrowUpDown className="h-4 w-4" />
+                    <span className="hidden sm:inline ml-2">{sortOrder === "desc" ? "Newest" : "Oldest"}</span>
                   </Button>
-                  {allTags.slice(0, 12).map((tag) => (
-                    <Button
-                      key={tag}
-                      variant={currentTagFilter === tag ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => updateCurrentTagFilter(tag)}
-                      className={`transition-all ${
-                        currentTagFilter === tag 
-                          ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white" 
-                          : "hover:border-violet-300 hover:bg-violet-50"
-                      }`}
-                      data-testid={`button-tag-${tag}`}
-                    >
-                      #{tag}
-                    </Button>
-                  ))}
-                  {allTags.length > 12 && (
-                    <span className="text-xs text-slate-500 px-3 py-2 bg-slate-50 rounded-full">
-                      +{allTags.length - 12} more
-                    </span>
-                  )}
                 </div>
               </div>
-            )}
-              </div>
-            )}
+            </div>
           </div>
+
+          {/* Tag Filters */}
+          {allTags.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="h-5 w-5 text-slate-500" />
+                <span className="text-lg font-semibold text-slate-700">Filter by Tag</span>
+              </div>
+              
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={currentTagFilter === null ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => updateCurrentTagFilter(null)}
+                  className={`transition-all ${
+                    currentTagFilter === null 
+                      ? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white" 
+                      : "hover:border-purple-300 hover:bg-purple-50"
+                  }`}
+                  data-testid="button-tag-all"
+                >
+                  All Tags
+                </Button>
+                {allTags.map((tag) => (
+                  <Button
+                    key={tag}
+                    variant={currentTagFilter === tag ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => updateCurrentTagFilter(tag)}
+                    className={`transition-all ${
+                      currentTagFilter === tag 
+                        ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white" 
+                        : "hover:border-violet-300 hover:bg-violet-50"
+                    }`}
+                    data-testid={`button-tag-${tag}`}
+                  >
+                    #{tag}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Posts */}
           {loading ? (
@@ -515,17 +530,28 @@ export default function PostList() {
               ))}
             </div>
           ) : filteredPosts.length > 0 ? (
-            <div className="space-y-6">
-              {filteredPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  onEdit={handleEditPost}
-                  onDuplicate={handleDuplicatePost}
-                  onDelete={handleDeletePost}
-                />
-              ))}
-            </div>
+            currentFilter === "scheduled" ? (
+              <ScheduledPostsView 
+                posts={filteredPosts} 
+                allPosts={posts}
+                onEdit={handleEditPost}
+                onDuplicate={handleDuplicatePost}
+                onDelete={handleDeletePost}
+                onScheduleForDay={handleScheduleForDay}
+              />
+            ) : (
+              <div className="space-y-6">
+                {filteredPosts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onEdit={handleEditPost}
+                    onDuplicate={handleDuplicatePost}
+                    onDelete={handleDeletePost}
+                  />
+                ))}
+              </div>
+            )
           ) : (
             <div className="text-center py-12" data-testid="empty-state">
               {searchQuery ? (
@@ -540,7 +566,7 @@ export default function PostList() {
                     No posts match your search criteria. Try adjusting your search terms.
                   </p>
                 </>
-              ) : currentFilter === "all" ? (
+              ) : currentFilter === "draft" ? (
                 firstDraftCompleted ? (
                   <div className="text-center">
                     <div className="text-slate-400 mb-4">
@@ -643,10 +669,20 @@ export default function PostList() {
         {/* Tutorial Modal */}
         {user && (
           <TutorialModal
-            isOpen={!tutorialCompleted}
-            onComplete={() => setTutorialCompleted(true)}
+            userId={user.uid}
+            open={!tutorialCompleted}
+            onClose={() => setTutorialCompleted(true)}
           />
         )}
+
+        <SchedulePostModal
+          isOpen={scheduleModalOpen}
+          onClose={() => setScheduleModalOpen(false)}
+          targetDate={selectedScheduleDate}
+          draftPosts={posts.filter(post => post.status === "draft")}
+          onSelectDraft={handleScheduleExistingDraft}
+          onCreateNew={handleCreateNewScheduledPost}
+        />
       </div>
     </AppLayout>
   );

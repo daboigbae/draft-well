@@ -22,13 +22,46 @@ export default function ReleaseNotes() {
               </p>
             </div>
 
+            {/* Version 3.2.0 */}
+            <div className="mb-8" data-testid="version-3-2-0">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-2xl font-semibold text-slate-800">Version 3.2.0</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  Latest
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">Released: August 28, 2025</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🐛 Bug Fixes & Type Safety</h3>
+                  <p className="text-slate-600 mb-4">
+                    Critical bug fixes and TypeScript improvements for better stability and developer experience.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Fixed TypeScript Compilation Errors:</strong> Resolved all remaining TypeScript diagnostic issues across the codebase</li>
+                    <li><strong>Schedule Modal Interface:</strong> Fixed prop interface mismatch in ScheduleModal component</li>
+                    <li><strong>Tutorial Modal Interface:</strong> Fixed prop interface mismatch in TutorialModal component</li>
+                    <li><strong>Enhanced Type Consistency:</strong> Improved type safety across scheduling functionality</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🔧 Technical Improvements</h3>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li>Eliminated all TypeScript compilation warnings and errors</li>
+                    <li>Improved development workflow with cleaner type checking</li>
+                    <li>Enhanced editor component reliability for scheduling operations</li>
+                    <li>Standardized modal component prop interfaces for better maintainability</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Version 3.1.0 */}
             <div className="mb-8" data-testid="version-3-1-0">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl font-semibold text-slate-800">Version 3.1.0</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  Latest
-                </span>
               </div>
               <p className="text-sm text-slate-500 mb-6">Released: August 26, 2025</p>
               
