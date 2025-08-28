@@ -47,7 +47,7 @@ export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [currentFilter, setCurrentFilter] = useState<PostStatus>(() => 
-    loadFromStorage(STORAGE_KEYS.currentFilter, "draft")
+    loadFromStorage(STORAGE_KEYS.currentFilter, "scheduled")
   );
   const [currentTagFilter, setCurrentTagFilter] = useState<string | null>(() => 
     loadFromStorage(STORAGE_KEYS.currentTagFilter, null)
