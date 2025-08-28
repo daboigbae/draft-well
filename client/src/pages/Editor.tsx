@@ -158,7 +158,7 @@ export default function Editor() {
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [rating, setRating] = useState<{ score: number; feedback: string } | null>(null);
+  const [rating, setRating] = useState<{ rating: number; feedback: string } | null>(null);
   const [loadingRating, setLoadingRating] = useState(false);
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
@@ -183,7 +183,7 @@ export default function Editor() {
           
           // Load rating if exists
           if (postData.rating) {
-            setRating({ score: postData.rating, feedback: postData.feedback || "" });
+            setRating({ rating: postData.rating, feedback: postData.feedback || "" });
           }
         } else {
           setError("Post not found");
@@ -265,14 +265,14 @@ export default function Editor() {
 
   const handleCopyPost = async () => {
     const linkedInText = markdownToLinkedInText(body);
-    const success = await copyToClipboard(linkedInText);
     
-    if (success) {
+    try {
+      await copyToClipboard(linkedInText);
       toast({
         title: "Copied to clipboard",
         description: "Post content has been copied to your clipboard.",
       });
-    } else {
+    } catch (error) {
       toast({
         title: "Copy failed",
         description: "Failed to copy post to clipboard.",
@@ -283,7 +283,7 @@ export default function Editor() {
 
   const handleExport = () => {
     if (!post) return;
-    exportPostAsText(post, markdownToLinkedInText(body));
+    exportPostAsText(post);
     toast({
       title: "Post exported",
       description: "Post has been downloaded as a text file.",
@@ -306,20 +306,30 @@ export default function Editor() {
 
     setLoadingRating(true);
     try {
-      const result = await getRating(user.uid, linkedInText);
-      setRating(result);
+      const result = await getRating(linkedInText, post.id, user.uid);
       
-      // Update post with rating
-      await updatePost(user.uid, post.id, {
-        aiRated: true,
-        rating: result.score,
-        feedback: result.feedback,
-      });
+      if (!result.success) {
+        toast({
+          title: "Rating failed",
+          description: result.message || result.error || "Failed to get AI rating.",
+          variant: "destructive",
+        });
+        return;
+      }
       
-      toast({
-        title: "Rating received",
-        description: `Your post scored ${result.score}/10!`,
-      });
+      if (result.data) {
+        setRating(result.data);
+        
+        // Update post with rating
+        await updatePost(user.uid, post.id, {
+          aiRated: true,
+        });
+        
+        toast({
+          title: "Rating received",
+          description: `Your post scored ${result.data.rating}/10!`,
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Rating failed",
@@ -689,7 +699,7 @@ export default function Editor() {
                   <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded">
                     <Star className="w-3 h-3 text-amber-500 fill-current" />
                     <span className="text-sm font-medium text-amber-700">
-                      {rating.score}/10
+                      {rating.rating}/10
                     </span>
                   </div>
                 </h4>
