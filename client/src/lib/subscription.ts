@@ -57,6 +57,22 @@ export async function getUserSubscription(userId: string): Promise<UserSubscript
   }
 }
 
+// Get user's posting streak
+export async function getUserPostingStreak(userId: string): Promise<number> {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (!userDoc.exists()) {
+      return 0;
+    }
+
+    const data = userDoc.data();
+    return data?.postingStreak || 0;
+  } catch (error) {
+    console.error('Error getting user posting streak:', error);
+    return 0;
+  }
+}
+
 
 
 // Usage tracking
