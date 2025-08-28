@@ -81,11 +81,7 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                       <div className="font-medium text-slate-900 mb-1 truncate">
                         {post.title || 'Untitled Post'}
                       </div>
-                      <p className="text-sm text-slate-600 mb-2 overflow-hidden" style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical'
-                      }}>
+                      <p className="text-sm text-slate-600 mb-2 line-clamp-2">
                         {post.body.substring(0, 150)}
                         {post.body.length > 150 && '...'}
                       </p>
