@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star, Trash2, CalendarX, Clock } from "lucide-react";
+import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star, Trash2, CalendarX, Clock, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -59,6 +59,7 @@ export default function Editor() {
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [firstRatingCompleted, setFirstRatingCompleted] = useState<boolean>(true);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   
   // Computed based on whether rating exists - backend handles aiRated flag
   const aiRated = !!rating;
@@ -465,7 +466,8 @@ export default function Editor() {
   
   const renderedMarkdown = renderMarkdown(previewText);
 
-  return (
+  // Fullscreen wrapper component
+  const EditorContent = () => (
     <div className="min-h-screen bg-background flex flex-col" data-testid="editor">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 p-4 sm:p-6">
@@ -604,6 +606,24 @@ export default function Editor() {
               {showMobilePreview ? '👁️' : '👁️'}
             </div>
             <span className="ml-2">{showMobilePreview ? 'Hide Preview' : 'Show Preview'}</span>
+          </Button>
+
+          {/* Fullscreen Toggle */}
+          <Button
+            variant="outline"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            size="sm"
+            className="text-xs sm:text-sm"
+            data-testid="button-fullscreen"
+          >
+            {isFullscreen ? (
+              <Minimize2 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            ) : (
+              <Maximize2 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            )}
+            <span className="hidden sm:inline ml-2">
+              {isFullscreen ? "Exit Focus" : "Focus Mode"}
+            </span>
           </Button>
         </div>
         
@@ -988,4 +1008,15 @@ export default function Editor() {
       </AlertDialog>
     </div>
   );
+
+  // Return fullscreen mode or normal wrapped mode
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background">
+        <EditorContent />
+      </div>
+    );
+  }
+
+  return <EditorContent />;
 }
