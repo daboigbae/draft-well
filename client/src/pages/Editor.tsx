@@ -17,7 +17,8 @@ import {
   Maximize2, 
   Minimize2,
   Bot,
-  Clock
+  Clock,
+  Loader2
 } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
@@ -534,10 +535,14 @@ export default function Editor() {
             size="sm"
             onClick={handleGetRating}
             disabled={!canGetRating || loadingRating}
-            className="flex items-center gap-2"
+            className={`flex items-center gap-2 ${loadingRating ? 'bg-blue-50 border-blue-200' : ''}`}
             data-testid="button-rating"
           >
-            <Star className="w-4 h-4" />
+            {loadingRating ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Star className="w-4 h-4" />
+            )}
             {loadingRating ? "Getting Rating..." : "Get Rating"}
           </Button>
 
