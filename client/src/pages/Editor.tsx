@@ -42,10 +42,28 @@ interface LinkedInPostPreviewProps {
 function LinkedInPostPreview({ content, userName, userInitial }: LinkedInPostPreviewProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // LinkedIn typically truncates at around 300 characters
-  const shouldTruncate = content.length > 300;
+  // LinkedIn typically truncates at around 140 characters
+  const truncateLength = 140;
+  const shouldTruncate = content.length > truncateLength;
+  
+  // Find a good break point near the truncate length (avoid breaking mid-word)
+  const findTruncatePoint = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text.length;
+    
+    // Look for the last space before maxLength
+    let truncatePoint = maxLength;
+    for (let i = maxLength; i > maxLength - 30 && i > 0; i--) {
+      if (text[i] === ' ' || text[i] === '\n') {
+        truncatePoint = i;
+        break;
+      }
+    }
+    return truncatePoint;
+  };
+  
+  const truncatePoint = findTruncatePoint(content, truncateLength);
   const truncatedContent = shouldTruncate && !isExpanded 
-    ? content.substring(0, 300) + "..."
+    ? content.substring(0, truncatePoint)
     : content;
 
   // Preserve formatting by converting newlines to JSX
