@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useLocation, useParams } from "wouter";
 import { ArrowLeft, Copy, Download, Share, Calendar, Save, Bot, Hash, Star, Trash2, CalendarX, Clock, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -73,6 +74,24 @@ export default function Editor() {
   useEffect(() => {
     setPreviewExpanded(false);
   }, [body]);
+
+  // Handle fullscreen keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // F11 or Ctrl/Cmd + Shift + F to toggle fullscreen
+      if (event.key === 'F11' || (event.key === 'F' && (event.ctrlKey || event.metaKey) && event.shiftKey)) {
+        event.preventDefault();
+        setIsFullscreen(!isFullscreen);
+      }
+      // Escape to exit fullscreen
+      if (event.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
 
   const handleInsertHashtags = (hashtags: string[]) => {
     const hashtagText = hashtags.join(' ');
@@ -1011,10 +1030,11 @@ export default function Editor() {
 
   // Return fullscreen mode or normal wrapped mode
   if (isFullscreen) {
-    return (
-      <div className="fixed inset-0 z-50 bg-background">
+    return createPortal(
+      <div className="fixed inset-0 z-[9999] bg-background">
         <EditorContent />
-      </div>
+      </div>,
+      document.body
     );
   }
 
