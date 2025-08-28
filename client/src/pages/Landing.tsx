@@ -5,9 +5,11 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { resetFiltersToDefault } from "../lib/filter-utils";
+import { useAuth } from "../hooks/use-auth";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
+  const { user, loading } = useAuth();
 
   // Reset filters when landing page loads
   useEffect(() => {
@@ -31,20 +33,34 @@ export default function Landing() {
               <h1 className="text-xl font-bold text-slate-800">Draftwell</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
-                onClick={() => setLocation('/signin')}
-                data-testid="button-sign-in"
-              >
-                Sign In
-              </Button>
-              <Button 
-                onClick={() => setLocation('/signup')}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-                data-testid="button-create-account"
-              >
-                Create Account
-              </Button>
+              {loading ? (
+                <div className="w-8 h-8 animate-spin rounded-full border-2 border-purple-600 border-t-transparent"></div>
+              ) : user ? (
+                <Button 
+                  onClick={() => setLocation('/app')}
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                  data-testid="button-go-to-account"
+                >
+                  Go to Account
+                </Button>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => setLocation('/signin')}
+                    data-testid="button-sign-in"
+                  >
+                    Sign In
+                  </Button>
+                  <Button 
+                    onClick={() => setLocation('/signup')}
+                    className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                    data-testid="button-create-account"
+                  >
+                    Create Account
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -60,15 +76,27 @@ export default function Landing() {
             Draftwell helps creators and professionals write better LinkedIn posts with AI ratings, hashtag management, and smart organization.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Button 
-              size="lg" 
-              onClick={() => setLocation('/signup')}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-lg px-8 py-3"
-              data-testid="button-hero-create-account"
-            >
-              Create Account
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            {user ? (
+              <Button 
+                size="lg" 
+                onClick={() => setLocation('/app')}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-lg px-8 py-3"
+                data-testid="button-hero-go-to-account"
+              >
+                Go to Account
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            ) : (
+              <Button 
+                size="lg" 
+                onClick={() => setLocation('/signup')}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-lg px-8 py-3"
+                data-testid="button-hero-create-account"
+              >
+                Create Account
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            )}
             <Button 
               size="lg" 
               variant="outline" 
