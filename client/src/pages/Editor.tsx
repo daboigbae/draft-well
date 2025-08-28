@@ -630,7 +630,10 @@ export default function Editor() {
           {/* Fullscreen Toggle */}
           <Button
             variant="outline"
-            onClick={() => setIsFullscreen(!isFullscreen)}
+            onClick={() => {
+              console.log("Focus mode clicked, current state:", isFullscreen);
+              setIsFullscreen(!isFullscreen);
+            }}
             size="sm"
             className="text-xs sm:text-sm"
             data-testid="button-fullscreen"
@@ -1029,7 +1032,10 @@ export default function Editor() {
   );
 
   // Return fullscreen mode or normal wrapped mode
+  console.log("Rendering Editor, isFullscreen:", isFullscreen);
+  
   if (isFullscreen) {
+    console.log("Rendering fullscreen mode");
     return createPortal(
       <div className="fixed inset-0 z-[9999] bg-background">
         <EditorContent />
@@ -1038,5 +1044,6 @@ export default function Editor() {
     );
   }
 
+  console.log("Rendering normal mode");
   return <EditorContent />;
 }
