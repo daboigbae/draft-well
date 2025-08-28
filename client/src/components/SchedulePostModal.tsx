@@ -26,7 +26,7 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto overflow-x-hidden w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
@@ -77,11 +77,11 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                     className="w-full justify-start h-auto p-3 text-left"
                     data-testid={`button-select-draft-${post.id}`}
                   >
-                    <div className="flex-1 min-w-0 overflow-hidden">
+                    <div className="flex-1 min-w-0">
                       <div className="font-medium text-slate-900 mb-1 truncate">
                         {post.title || 'Untitled Post'}
                       </div>
-                      <p className="text-sm text-slate-600 mb-2 line-clamp-2">
+                      <p className="text-sm text-slate-600 mb-2 line-clamp-2 break-words">
                         {post.body.substring(0, 150)}
                         {post.body.length > 150 && '...'}
                       </p>
