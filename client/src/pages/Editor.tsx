@@ -622,7 +622,7 @@ export default function Editor() {
       {/* Main Content */}
       <div className="flex">
         {/* Editor Panel */}
-        <div className="flex-1">
+        <div className="flex-1 relative">
           {/* Title Input */}
           <div className="p-6 border-b border-gray-100">
             <Input
@@ -650,11 +650,13 @@ export default function Editor() {
             />
           </div>
 
-          {/* Editor Toolbar */}
-          <EditorToolbar onInsertMarkdown={handleInsertMarkdown} />
+          {/* Editor Toolbar - Now sticky */}
+          <div className="sticky top-0 z-20 bg-white">
+            <EditorToolbar onInsertMarkdown={handleInsertMarkdown} />
+          </div>
 
           {/* Content Editor */}
-          <div className="flex-1 p-6">
+          <div className="p-6">
             <Textarea
               ref={bodyRef}
               placeholder="Write your LinkedIn post..."
