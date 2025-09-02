@@ -20,20 +20,20 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
   const features = [
     {
       icon: Star,
-      title: "Organize & Get Your Posts Rated",
-      description: "Create, organize, and get AI-powered ratings for your LinkedIn posts. Discover what makes content engaging and improve your writing with personalized feedback.",
+      title: "Write Your First Post",
+      description: "Create and edit LinkedIn posts with our intuitive editor. Use markdown formatting, organize your content with tags, and draft your professional thoughts with ease.",
       color: "from-blue-500 to-cyan-500"
     },
     {
       icon: Bell,
-      title: "Smart Notifications",
-      description: "Get intelligent reminders and insights to improve your LinkedIn posting experience. Never miss the perfect time to share your content with your network.",
+      title: "Get It Rated",
+      description: "Get AI-powered feedback on your posts to improve engagement. Receive personalized suggestions and ratings to make your content more compelling and effective.",
       color: "from-purple-500 to-pink-500"
     },
     {
       icon: Hash,
-      title: "Hashtag Performance Analytics",
-      description: "Organize your hashtag collections and measure their performance. Track which tags drive the most engagement and optimize your content strategy.",
+      title: "Manage Your Hashtags",
+      description: "Organize your hashtag collections and track their performance. Build reusable hashtag sets and optimize your content strategy for maximum reach.",
       color: "from-green-500 to-emerald-500"
     }
   ];
