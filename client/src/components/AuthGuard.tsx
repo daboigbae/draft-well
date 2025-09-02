@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useAuth } from "../hooks/use-auth";
 import { useLocation } from "wouter";
 import { Skeleton } from "./ui/skeleton";
@@ -10,6 +10,12 @@ interface AuthGuardProps {
 export default function AuthGuard({ children }: AuthGuardProps) {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      setLocation('/');
+    }
+  }, [user, loading, setLocation]);
 
   if (loading) {
     return (
@@ -23,7 +29,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }
 
   if (!user) {
-    setLocation('/');
     return null;
   }
 
