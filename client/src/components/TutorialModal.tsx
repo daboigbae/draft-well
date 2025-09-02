@@ -20,8 +20,8 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
   const features = [
     {
       icon: Star,
-      title: "Write Your First Post",
-      description: "Create and edit LinkedIn posts with our intuitive editor. Use markdown formatting, organize your content with tags, and draft your professional thoughts with ease.",
+      title: "Create, Edit & Manage Your Posts",
+      description: "Build a library of LinkedIn content with our powerful editor. Create drafts, edit with markdown formatting, organize with tags, and manage your posts from draft to published.",
       color: "from-blue-500 to-cyan-500"
     },
     {
