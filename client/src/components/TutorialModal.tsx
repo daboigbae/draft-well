@@ -113,26 +113,17 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
   const IconComponent = currentFeature.icon;
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        // When the dialog's built-in close is triggered, run our skip logic
+        handleSkip().catch(() => onClose());
+      }
+    }}>
       <DialogContent className="sm:max-w-lg" data-testid="tutorial-modal">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold">
-              Welcome to Draftwell
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                // Always close the modal, even if there's an error
-                handleSkip().catch(() => onClose());
-              }}
-              className="text-slate-500 hover:text-slate-700"
-              data-testid="button-skip-tutorial"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-xl font-semibold">
+            Welcome to Draftwell
+          </DialogTitle>
         </DialogHeader>
 
         <div className="py-6">
