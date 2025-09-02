@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Badge } from './ui/badge';
 import { Star, Bell, Hash, ArrowRight, X } from 'lucide-react';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useToast } from '../hooks/use-toast';
 
@@ -46,10 +46,36 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
     }
   };
 
+  const ensureUserDocumentAndUpdate = async (updates: any) => {
+    const userDocRef = doc(db, 'users', userId);
+    
+    try {
+      // Try to update the document first
+      await updateDoc(userDocRef, updates);
+    } catch (error: any) {
+      // If document doesn't exist, create it with the updates
+      if (error.code === 'not-found') {
+        try {
+          await setDoc(userDocRef, {
+            onboarded: {
+              tutorial: false,
+              firstDraft: false,
+              ...updates
+            }
+          }, { merge: true });
+        } catch (createError) {
+          console.error('Error creating user document:', createError);
+          throw createError;
+        }
+      } else {
+        throw error;
+      }
+    }
+  };
+
   const handleFinish = async () => {
     try {
-      const userDocRef = doc(db, 'users', userId);
-      await updateDoc(userDocRef, {
+      await ensureUserDocumentAndUpdate({
         'onboarded.tutorial': true
       });
       
@@ -61,23 +87,25 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
       onClose();
     } catch (error) {
       console.error('Error completing tutorial:', error);
+      // Close the modal anyway to prevent being stuck
+      onClose();
       toast({
-        title: "Error",
-        description: "Failed to save tutorial progress.",
-        variant: "destructive",
+        title: "Welcome to Draftwell!",
+        description: "You're all set to start creating amazing LinkedIn content.",
       });
     }
   };
 
   const handleSkip = async () => {
     try {
-      const userDocRef = doc(db, 'users', userId);
-      await updateDoc(userDocRef, {
+      await ensureUserDocumentAndUpdate({
         'onboarded.tutorial': true
       });
       onClose();
     } catch (error) {
       console.error('Error skipping tutorial:', error);
+      // Close the modal anyway to prevent being stuck
+      onClose();
     }
   };
 
@@ -95,7 +123,10 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleSkip}
+              onClick={() => {
+                // Always close the modal, even if there's an error
+                handleSkip().catch(() => onClose());
+              }}
               className="text-slate-500 hover:text-slate-700"
               data-testid="button-skip-tutorial"
             >
