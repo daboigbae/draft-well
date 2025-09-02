@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Badge } from './ui/badge';
-import { Star, Bell, Hash, ArrowRight, X } from 'lucide-react';
+import { Star, Brain, Hash, ArrowRight, X } from 'lucide-react';
 import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useToast } from '../hooks/use-toast';
@@ -25,7 +25,7 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
       color: "from-blue-500 to-cyan-500"
     },
     {
-      icon: Bell,
+      icon: Brain,
       title: "Get It Rated",
       description: "Get AI-powered feedback on your posts to improve engagement. Receive personalized suggestions and ratings to make your content more compelling and effective.",
       color: "from-purple-500 to-pink-500"
