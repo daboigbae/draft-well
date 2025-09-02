@@ -46,9 +46,7 @@ const saveToStorage = (key: string, value: any): void => {
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
-  const [currentFilter, setCurrentFilter] = useState<PostStatus>(() => 
-    loadFromStorage(STORAGE_KEYS.currentFilter, "scheduled")
-  );
+  const [currentFilter, setCurrentFilter] = useState<PostStatus>("draft"); // Will be updated based on firstDraft status
   const [currentTagFilter, setCurrentTagFilter] = useState<string | null>(() => 
     loadFromStorage(STORAGE_KEYS.currentTagFilter, null)
   );
