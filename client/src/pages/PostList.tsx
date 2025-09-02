@@ -97,23 +97,11 @@ export default function PostList() {
     const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
-        const firstDraftStatus = userData.onboarded?.firstDraft ?? false;
-        setFirstDraftCompleted(firstDraftStatus); // Default to false to show onboarding
+        setFirstDraftCompleted(userData.onboarded?.firstDraft ?? false); // Default to false to show onboarding
         setTutorialCompleted(userData.onboarded?.tutorial ?? false); // Default to false to show onboarding
-        
-        // Set default filter based on first draft status
-        if (!firstDraftStatus) {
-          // If first draft not completed, default to drafts
-          setCurrentFilter("draft");
-        } else {
-          // If first draft completed, use saved preference or default to scheduled
-          const savedFilter = loadFromStorage(STORAGE_KEYS.currentFilter, "scheduled");
-          setCurrentFilter(savedFilter);
-        }
       } else {
         setFirstDraftCompleted(false);
         setTutorialCompleted(false);
-        setCurrentFilter("draft"); // Default to drafts for new users
       }
     });
 
@@ -567,35 +555,6 @@ export default function PostList() {
               />
             ) : (
               <div className="space-y-6">
-                {/* First Draft Banner */}
-                {currentFilter === "draft" && !firstDraftCompleted && (
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-6">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-blue-900 mb-2">Welcome to your drafts!</h3>
-                        <p className="text-blue-700 mb-4">
-                          This is where you'll create and manage your LinkedIn content. Start writing your first post to unlock AI-powered ratings and feedback.
-                        </p>
-                        <Button 
-                          onClick={handleNewPost} 
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                          data-testid="button-create-first-draft"
-                        >
-                          <PenTool className="w-4 h-4 mr-2" />
-                          Create Your First Post
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
                 {filteredPosts.map((post) => (
                   <PostCard
                     key={post.id}
