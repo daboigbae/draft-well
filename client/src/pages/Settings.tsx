@@ -13,7 +13,6 @@ import { createCheckoutSession, createCustomerPortalSession } from '../lib/strip
 import { PLANS, type UserSubscription, type UsageRecord, getPlanById } from '../types/subscription';
 import { useToast } from '../hooks/use-toast';
 import { logout, reauthenticateUser, deleteUserAccount, getAuthErrorMessage } from '../lib/auth';
-import { deleteAllUserData } from '../lib/posts';
 import AppLayout from './AppLayout';
 
 export default function Settings() {
@@ -202,9 +201,6 @@ export default function Settings() {
     try {
       // First, try to reauthenticate the user
       await reauthenticateUser(deletePassword);
-      
-      // Delete all user data from Firestore
-      await deleteAllUserData(user.uid);
       
       // Delete the Firebase Auth account
       await deleteUserAccount();
