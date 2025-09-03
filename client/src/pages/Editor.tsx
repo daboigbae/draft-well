@@ -18,8 +18,11 @@ import {
   Minimize2,
   Bot,
   Clock,
-  Loader2
+  Loader2,
+  Sparkles
 } from "lucide-react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
@@ -162,6 +165,7 @@ export default function Editor() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [rating, setRating] = useState<{ rating: number; feedback: string } | null>(null);
   const [loadingRating, setLoadingRating] = useState(false);
+  const [firstDraftCompleted, setFirstDraftCompleted] = useState(true); // Default to true to hide banner initially
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const debouncedTitle = useDebounce(title, 800);
@@ -213,6 +217,23 @@ export default function Editor() {
       savePost();
     }
   }, [debouncedTitle, debouncedBody, debouncedTags]);
+
+  // Subscribe to user onboarded status
+  useEffect(() => {
+    if (!user) return;
+
+    const userDoc = doc(db, 'users', user.uid);
+    const unsubscribeUser = onSnapshot(userDoc, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        setFirstDraftCompleted(userData.onboarded?.firstDraft ?? false); // Default to false to show banner
+      } else {
+        setFirstDraftCompleted(false);
+      }
+    });
+
+    return unsubscribeUser;
+  }, [user]);
 
   const savePost = async () => {
     if (!user || !post || saving) return;
@@ -623,6 +644,19 @@ export default function Editor() {
           )}
         </div>
       </div>
+
+      {/* Encouragement Banner for First-Time Users */}
+      {!firstDraftCompleted && (
+        <div className="mx-6 my-4" data-testid="banner-encouragement">
+          <Alert className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+            <Sparkles className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-800">
+              <strong>Welcome to your first post!</strong> Try getting an AI rating to see how your content performs. 
+              Write at least 100 characters and click "Get Rating" to receive personalized feedback and improve your LinkedIn posts.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex">

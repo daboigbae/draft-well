@@ -14,7 +14,7 @@ import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
 import { Post, PostStatus } from "../types/post";
 import { subscribeToUserPosts, deletePost as deletePostFromDb, duplicatePost, subscribeToUserTags, createPost, schedulePost } from "../lib/posts";
-import { doc, getDoc, onSnapshot, updateDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Helper functions for sticky filters
@@ -46,9 +46,7 @@ const saveToStorage = (key: string, value: any): void => {
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
-  const [currentFilter, setCurrentFilter] = useState<PostStatus>(() => 
-    loadFromStorage(STORAGE_KEYS.currentFilter, "scheduled")
-  );
+  const [currentFilter, setCurrentFilter] = useState<PostStatus>("draft"); // Will be updated based on firstDraft status
   const [currentTagFilter, setCurrentTagFilter] = useState<string | null>(() => 
     loadFromStorage(STORAGE_KEYS.currentTagFilter, null)
   );
@@ -170,9 +168,25 @@ export default function PostList() {
 
       // Mark first draft as completed
       const userDocRef = doc(db, 'users', user.uid);
-      await updateDoc(userDocRef, {
-        'onboarded.firstDraft': true
-      });
+      try {
+        await updateDoc(userDocRef, {
+          'onboarded.firstDraft': true
+        });
+      } catch (error: any) {
+        // If document doesn't exist, create it
+        if (error.code === 'not-found') {
+          try {
+            await setDoc(userDocRef, {
+              onboarded: {
+                tutorial: false,
+                firstDraft: true
+              }
+            }, { merge: true });
+          } catch (createError) {
+            console.error('Error creating user document:', createError);
+          }
+        }
+      }
 
       setLocation(`/app/post/${newPostId}`);
     } catch (error) {

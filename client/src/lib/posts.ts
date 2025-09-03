@@ -36,8 +36,15 @@ export const createPost = async (userId: string, data: CreatePostData): Promise<
 
 export const updatePost = async (userId: string, postId: string, data: UpdatePostData): Promise<void> => {
   const postRef = getPostDoc(userId, postId);
+  
+  // Convert Date objects to Firebase Timestamps
+  const updateData = { ...data };
+  if (updateData.scheduledAt instanceof Date) {
+    updateData.scheduledAt = Timestamp.fromDate(updateData.scheduledAt);
+  }
+  
   await updateDoc(postRef, {
-    ...data,
+    ...updateData,
     updatedAt: serverTimestamp(),
   });
 };

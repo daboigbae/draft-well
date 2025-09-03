@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Badge } from './ui/badge';
-import { Star, Bell, Hash, ArrowRight, X } from 'lucide-react';
-import { doc, updateDoc } from 'firebase/firestore';
+import { Star, Brain, Hash, ArrowRight, X } from 'lucide-react';
+import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useToast } from '../hooks/use-toast';
 
@@ -20,20 +20,20 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
   const features = [
     {
       icon: Star,
-      title: "Organize & Get Your Posts Rated",
-      description: "Create, organize, and get AI-powered ratings for your LinkedIn posts. Discover what makes content engaging and improve your writing with personalized feedback.",
+      title: "Create, Edit & Manage Your Posts",
+      description: "Build a library of LinkedIn content with our powerful editor. Create drafts, edit with markdown formatting, organize with tags, and manage your posts from draft to published.",
       color: "from-blue-500 to-cyan-500"
     },
     {
-      icon: Bell,
-      title: "Smart Notifications",
-      description: "Get intelligent reminders and insights to improve your LinkedIn posting experience. Never miss the perfect time to share your content with your network.",
+      icon: Brain,
+      title: "Get It Rated",
+      description: "Get AI-powered feedback on your posts to improve engagement. Receive personalized suggestions and ratings to make your content more compelling and effective.",
       color: "from-purple-500 to-pink-500"
     },
     {
       icon: Hash,
-      title: "Hashtag Performance Analytics",
-      description: "Organize your hashtag collections and measure their performance. Track which tags drive the most engagement and optimize your content strategy.",
+      title: "Manage Your Hashtags",
+      description: "Organize your hashtag collections and track their performance. Build reusable hashtag sets and optimize your content strategy for maximum reach.",
       color: "from-green-500 to-emerald-500"
     }
   ];
@@ -46,10 +46,36 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
     }
   };
 
+  const ensureUserDocumentAndUpdate = async (updates: any) => {
+    const userDocRef = doc(db, 'users', userId);
+    
+    try {
+      // Try to update the document first
+      await updateDoc(userDocRef, updates);
+    } catch (error: any) {
+      // If document doesn't exist, create it with the updates
+      if (error.code === 'not-found') {
+        try {
+          await setDoc(userDocRef, {
+            onboarded: {
+              tutorial: false,
+              firstDraft: false,
+              ...updates
+            }
+          }, { merge: true });
+        } catch (createError) {
+          console.error('Error creating user document:', createError);
+          throw createError;
+        }
+      } else {
+        throw error;
+      }
+    }
+  };
+
   const handleFinish = async () => {
     try {
-      const userDocRef = doc(db, 'users', userId);
-      await updateDoc(userDocRef, {
+      await ensureUserDocumentAndUpdate({
         'onboarded.tutorial': true
       });
       
@@ -61,23 +87,25 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
       onClose();
     } catch (error) {
       console.error('Error completing tutorial:', error);
+      // Close the modal anyway to prevent being stuck
+      onClose();
       toast({
-        title: "Error",
-        description: "Failed to save tutorial progress.",
-        variant: "destructive",
+        title: "Welcome to Draftwell!",
+        description: "You're all set to start creating amazing LinkedIn content.",
       });
     }
   };
 
   const handleSkip = async () => {
     try {
-      const userDocRef = doc(db, 'users', userId);
-      await updateDoc(userDocRef, {
+      await ensureUserDocumentAndUpdate({
         'onboarded.tutorial': true
       });
       onClose();
     } catch (error) {
       console.error('Error skipping tutorial:', error);
+      // Close the modal anyway to prevent being stuck
+      onClose();
     }
   };
 
@@ -85,23 +113,17 @@ export default function TutorialModal({ userId, open, onClose }: TutorialModalPr
   const IconComponent = currentFeature.icon;
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        // When the dialog's built-in close is triggered, run our skip logic
+        handleSkip().catch(() => onClose());
+      }
+    }}>
       <DialogContent className="sm:max-w-lg" data-testid="tutorial-modal">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold">
-              Welcome to Draftwell
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSkip}
-              className="text-slate-500 hover:text-slate-700"
-              data-testid="button-skip-tutorial"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-xl font-semibold">
+            Welcome to Draftwell
+          </DialogTitle>
         </DialogHeader>
 
         <div className="py-6">
