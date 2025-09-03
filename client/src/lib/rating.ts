@@ -27,8 +27,8 @@ export const getRating = async (draft: string, postId: string, userId: string): 
   if (!quotaCheck.canUse) {
     return {
       success: false,
-      error: quotaCheck.reason || 'Usage limit exceeded',
-      message: `You've used ${quotaCheck.current} of ${quotaCheck.limit} AI ratings this month.`
+      error: 'No credits left',
+      message: 'You have no credits left. Wait until tomorrow to get more AI ratings.'
     };
   }
   
