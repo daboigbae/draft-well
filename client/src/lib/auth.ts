@@ -68,6 +68,8 @@ export const getAuthErrorMessage = (error: AuthError): string => {
       return 'No account found with this email address.';
     case 'auth/wrong-password':
       return 'Incorrect password.';
+    case 'auth/invalid-credential':
+      return 'Invalid email or password. Please check your credentials and try again.';
     case 'auth/email-already-in-use':
       return 'An account with this email already exists.';
     case 'auth/weak-password':
@@ -78,6 +80,10 @@ export const getAuthErrorMessage = (error: AuthError): string => {
       return 'Network error. Please check your connection.';
     case 'auth/requires-recent-login':
       return 'For security reasons, you need to sign in again before deleting your account.';
+    case 'auth/invalid-login-credentials':
+      return 'Invalid login credentials. Please check your email and password.';
+    case 'auth/too-many-requests':
+      return 'Too many failed attempts. Please try again later.';
     default:
       return error.message || 'An unexpected error occurred.';
   }
