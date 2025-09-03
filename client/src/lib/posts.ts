@@ -54,6 +54,19 @@ export const deletePost = async (userId: string, postId: string): Promise<void> 
   await deleteDoc(postRef);
 };
 
+export const deleteAllUserData = async (userId: string): Promise<void> => {
+  // Delete all user posts
+  const postsRef = getPostsCollection(userId);
+  const postsSnapshot = await getDocs(postsRef);
+  
+  const deletePromises = postsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+  await Promise.all(deletePromises);
+  
+  // Delete user document
+  const userRef = doc(db, 'users', userId);
+  await deleteDoc(userRef);
+};
+
 export const getPost = async (userId: string, postId: string): Promise<Post | null> => {
   const postRef = getPostDoc(userId, postId);
   const docSnap = await getDoc(postRef);

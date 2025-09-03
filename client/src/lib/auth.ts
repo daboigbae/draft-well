@@ -4,6 +4,9 @@ import {
   signInWithRedirect,
   getRedirectResult,
   signOut,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
   GoogleAuthProvider,
   User,
   AuthError
@@ -40,6 +43,25 @@ export const logout = async (): Promise<void> => {
   await signOut(auth);
 };
 
+export const reauthenticateUser = async (password: string): Promise<void> => {
+  const user = auth.currentUser;
+  if (!user || !user.email) {
+    throw new Error('No user is currently signed in');
+  }
+
+  const credential = EmailAuthProvider.credential(user.email, password);
+  await reauthenticateWithCredential(user, credential);
+};
+
+export const deleteUserAccount = async (): Promise<void> => {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('No user is currently signed in');
+  }
+
+  await deleteUser(user);
+};
+
 export const getAuthErrorMessage = (error: AuthError): string => {
   switch (error.code) {
     case 'auth/user-not-found':
@@ -54,6 +76,8 @@ export const getAuthErrorMessage = (error: AuthError): string => {
       return 'Please enter a valid email address.';
     case 'auth/network-request-failed':
       return 'Network error. Please check your connection.';
+    case 'auth/requires-recent-login':
+      return 'For security reasons, you need to sign in again before deleting your account.';
     default:
       return error.message || 'An unexpected error occurred.';
   }

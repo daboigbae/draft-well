@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Crown, CreditCard, Check, Zap, Calendar, FileSpreadsheet, MessageSquare, LogOut } from 'lucide-react';
+import { Crown, CreditCard, Check, Zap, Calendar, FileSpreadsheet, MessageSquare, LogOut, Trash2, AlertTriangle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../components/ui/alert-dialog';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
 import { useAuth } from '../hooks/use-auth';
 import { getUserSubscription, getCurrentUsage } from '../lib/subscription';
 import { createCheckoutSession, createCustomerPortalSession } from '../lib/stripe';
 import { PLANS, type UserSubscription, type UsageRecord, getPlanById } from '../types/subscription';
 import { useToast } from '../hooks/use-toast';
-import { logout } from '../lib/auth';
+import { logout, reauthenticateUser, deleteUserAccount, getAuthErrorMessage } from '../lib/auth';
+import { deleteAllUserData } from '../lib/posts';
 import AppLayout from './AppLayout';
 
 export default function Settings() {
@@ -20,6 +24,9 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [verifyingSubscription, setVerifyingSubscription] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (user?.uid) {
@@ -187,6 +194,43 @@ export default function Settings() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!user?.uid) return;
+
+    setDeleting(true);
+    
+    try {
+      // First, try to reauthenticate the user
+      await reauthenticateUser(deletePassword);
+      
+      // Delete all user data from Firestore
+      await deleteAllUserData(user.uid);
+      
+      // Delete the Firebase Auth account
+      await deleteUserAccount();
+      
+      // Logout (this should happen automatically after account deletion)
+      await logout();
+      
+      toast({
+        title: "Account deleted",
+        description: "Your account and all data have been permanently deleted.",
+      });
+      
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Account deletion failed",
+        description: getAuthErrorMessage(error),
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+      setDeleteDialogOpen(false);
+      setDeletePassword('');
+    }
+  };
+
   if (loading) {
     return (
       <AppLayout>
@@ -340,29 +384,91 @@ export default function Settings() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button 
-                variant="outline" 
-                onClick={async () => {
-                  try {
-                    await logout();
-                    toast({
-                      title: "Signed out",
-                      description: "You have been signed out successfully.",
-                    });
-                  } catch (error) {
-                    toast({
-                      title: "Sign out failed",
-                      description: "There was an error signing out.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                className="flex items-center gap-2"
-                data-testid="button-logout"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign out
-              </Button>
+              <div className="space-y-4">
+                <Button 
+                  variant="outline" 
+                  onClick={async () => {
+                    try {
+                      await logout();
+                      toast({
+                        title: "Signed out",
+                        description: "You have been signed out successfully.",
+                      });
+                    } catch (error) {
+                      toast({
+                        title: "Sign out failed",
+                        description: "There was an error signing out.",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  className="flex items-center gap-2"
+                  data-testid="button-logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign out
+                </Button>
+
+                <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                      data-testid="button-delete-account"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete Account
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-red-600" />
+                        Delete Account Permanently
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="space-y-3">
+                        <p>This action cannot be undone. This will permanently delete your account and remove all of your data from our servers.</p>
+                        <p><strong>This includes:</strong></p>
+                        <ul className="list-disc list-inside space-y-1 text-sm">
+                          <li>All your LinkedIn posts and drafts</li>
+                          <li>Your AI ratings and feedback</li>
+                          <li>Your hashtag collections</li>
+                          <li>Your account settings and preferences</li>
+                        </ul>
+                        <div className="space-y-2">
+                          <Label htmlFor="confirm-password">Enter your password to confirm:</Label>
+                          <Input
+                            id="confirm-password"
+                            type="password"
+                            value={deletePassword}
+                            onChange={(e) => setDeletePassword(e.target.value)}
+                            placeholder="Your account password"
+                            data-testid="input-delete-password"
+                          />
+                        </div>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDeleteAccount}
+                        disabled={!deletePassword || deleting}
+                        className="bg-red-600 hover:bg-red-700"
+                        data-testid="button-confirm-delete"
+                      >
+                        {deleting ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                            Deleting...
+                          </>
+                        ) : (
+                          'Delete Account'
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </CardContent>
           </Card>
         </div>
