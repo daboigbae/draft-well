@@ -16,6 +16,17 @@ export default function Landing() {
     resetFiltersToDefault();
   }, []);
 
+  // Redirect logged-in users to /app after 300ms
+  useEffect(() => {
+    if (!loading && user) {
+      const timer = setTimeout(() => {
+        setLocation('/app');
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, loading, setLocation]);
+
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
