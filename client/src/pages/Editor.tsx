@@ -19,9 +19,10 @@ import {
   Bot,
   Clock,
   Loader2,
-  Sparkles
+  Sparkles,
+  Brain
 } from "lucide-react";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../hooks/use-auth";
 import { useToast } from "../hooks/use-toast";
@@ -166,6 +167,7 @@ export default function Editor() {
   const [rating, setRating] = useState<{ rating: number; feedback: string } | null>(null);
   const [loadingRating, setLoadingRating] = useState(false);
   const [firstDraftCompleted, setFirstDraftCompleted] = useState(true); // Default to true to hide banner initially
+  const [firstRatingCompleted, setFirstRatingCompleted] = useState(false);
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const debouncedTitle = useDebounce(title, 800);
@@ -227,8 +229,10 @@ export default function Editor() {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
         setFirstDraftCompleted(userData.onboarded?.firstDraft ?? false); // Default to false to show banner
+        setFirstRatingCompleted(userData.onboarded?.firstRating ?? false); // Default to false to show rating banner
       } else {
         setFirstDraftCompleted(false);
+        setFirstRatingCompleted(false);
       }
     });
 
@@ -347,6 +351,31 @@ export default function Editor() {
         await updatePost(user.uid, post.id, {
           aiRated: true,
         });
+        
+        // Mark first rating as completed if this is their first one
+        if (!firstRatingCompleted) {
+          const userDocRef = doc(db, 'users', user.uid);
+          try {
+            await updateDoc(userDocRef, {
+              'onboarded.firstRating': true
+            });
+          } catch (error: any) {
+            // If document doesn't exist, create it
+            if (error.code === 'not-found') {
+              try {
+                await setDoc(userDocRef, {
+                  onboarded: {
+                    tutorial: false,
+                    firstDraft: false,
+                    firstRating: true
+                  }
+                }, { merge: true });
+              } catch (createError) {
+                console.error('Error creating user document:', createError);
+              }
+            }
+          }
+        }
         
         toast({
           title: "Rating received",
@@ -652,6 +681,19 @@ export default function Editor() {
             <Sparkles className="h-4 w-4 text-blue-600" />
             <AlertDescription className="text-blue-800">
               <strong>Welcome to your first post!</strong> Try getting an AI rating to see how your content performs. 
+              Write at least 100 characters and click "Get Rating" to receive personalized feedback and improve your LinkedIn posts.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+      
+      {/* First Rating Encouragement Banner */}
+      {firstDraftCompleted && !firstRatingCompleted && (
+        <div className="mx-6 my-4" data-testid="banner-first-rating">
+          <Alert className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+            <Brain className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
+              <strong>Ready to get your first AI rating?</strong> See how your content performs with our AI analysis. 
               Write at least 100 characters and click "Get Rating" to receive personalized feedback and improve your LinkedIn posts.
             </AlertDescription>
           </Alert>
