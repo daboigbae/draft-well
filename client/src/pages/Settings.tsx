@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Crown, CreditCard, Check, Zap, Calendar, FileSpreadsheet, MessageSquare, LogOut, Trash2, AlertTriangle } from 'lucide-react';
+import { Crown, CreditCard, Check, Zap, Calendar, FileSpreadsheet, MessageSquare, LogOut } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../components/ui/alert-dialog';
 import { useAuth } from '../hooks/use-auth';
 import { getUserSubscription, getCurrentUsage } from '../lib/subscription';
 import { createCheckoutSession, createCustomerPortalSession } from '../lib/stripe';
 import { PLANS, type UserSubscription, type UsageRecord, getPlanById } from '../types/subscription';
 import { useToast } from '../hooks/use-toast';
-import { logout, deleteUser } from '../lib/auth';
+import { logout } from '../lib/auth';
 import AppLayout from './AppLayout';
 
 export default function Settings() {
@@ -21,7 +20,6 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [verifyingSubscription, setVerifyingSubscription] = useState(false);
-  const [deletingAccount, setDeletingAccount] = useState(false);
 
   useEffect(() => {
     if (user?.uid) {
@@ -189,29 +187,6 @@ export default function Settings() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (!user) return;
-    
-    setDeletingAccount(true);
-    
-    try {
-      await deleteUser();
-      toast({
-        title: "Account deleted",
-        description: "Your account and all data have been permanently deleted.",
-      });
-    } catch (error: any) {
-      console.error('Error deleting account:', error);
-      toast({
-        title: "Delete failed",
-        description: error.message || "There was an error deleting your account. Please try again or contact support.",
-        variant: "destructive",
-      });
-    } finally {
-      setDeletingAccount(false);
-    }
-  };
-
   if (loading) {
     return (
       <AppLayout>
@@ -357,7 +332,7 @@ export default function Settings() {
           )}
 
           {/* Account Actions */}
-          <Card className="mb-8">
+          <Card>
             <CardHeader>
               <CardTitle>Account Actions</CardTitle>
               <CardDescription>
@@ -388,68 +363,6 @@ export default function Settings() {
                 <LogOut className="h-4 w-4" />
                 Sign out
               </Button>
-            </CardContent>
-          </Card>
-
-          {/* Danger Zone */}
-          <Card className="border-red-200">
-            <CardHeader>
-              <CardTitle className="text-red-600 flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" />
-                Danger Zone
-              </CardTitle>
-              <CardDescription>
-                Permanently delete your account and all associated data. This action cannot be undone.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button 
-                    variant="destructive" 
-                    disabled={deletingAccount}
-                    className="flex items-center gap-2"
-                    data-testid="button-delete-account"
-                  >
-                    {deletingAccount ? (
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Trash2 className="h-4 w-4" />
-                    )}
-                    {deletingAccount ? "Deleting..." : "Delete Account"}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="flex items-center gap-2 text-red-600">
-                      <AlertTriangle className="h-5 w-5" />
-                      Delete Account
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="space-y-2">
-                      <p>Are you absolutely sure you want to delete your account?</p>
-                      <p className="font-medium">This will permanently delete:</p>
-                      <ul className="list-disc list-inside space-y-1 text-sm">
-                        <li>Your account and profile</li>
-                        <li>All your posts and drafts</li>
-                        <li>All your hashtag collections</li>
-                        <li>Your subscription and billing information</li>
-                        <li>All AI ratings and feedback</li>
-                      </ul>
-                      <p className="text-red-600 font-medium">This action cannot be undone.</p>
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction 
-                      onClick={handleDeleteAccount}
-                      className="bg-red-600 hover:bg-red-700"
-                      data-testid="button-confirm-delete"
-                    >
-                      Yes, Delete My Account
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
             </CardContent>
           </Card>
         </div>
