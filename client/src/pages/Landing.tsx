@@ -10,20 +10,28 @@ import { useAuth } from "../hooks/use-auth";
 export default function Landing() {
   const [, setLocation] = useLocation();
   const { user, loading } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Reset filters when landing page loads
   useEffect(() => {
     resetFiltersToDefault();
   }, []);
 
-  // Redirect logged-in users to /app after 300ms
+  // Redirect logged-in users to /app with smooth transition
   useEffect(() => {
     if (!loading && user) {
-      const timer = setTimeout(() => {
-        setLocation('/app');
-      }, 300);
+      const fadeTimer = setTimeout(() => {
+        setIsRedirecting(true);
+      }, 200);
       
-      return () => clearTimeout(timer);
+      const redirectTimer = setTimeout(() => {
+        setLocation('/app');
+      }, 800);
+      
+      return () => {
+        clearTimeout(fadeTimer);
+        clearTimeout(redirectTimer);
+      };
     }
   }, [user, loading, setLocation]);
 
@@ -32,7 +40,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen bg-white transition-opacity duration-500 ${isRedirecting ? 'opacity-0' : 'opacity-100'}`}>
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
