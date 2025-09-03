@@ -4,7 +4,7 @@
 
 Draftwell is a full-stack LinkedIn post management application built with React, TypeScript, and Firebase. The application allows users to create, edit, organize, and schedule LinkedIn posts with AI-powered rating system, markdown editing, character counting, and real-time synchronization. The app provides a complete content creation workflow from draft to publication with advanced filtering, search capabilities, and intelligent content analysis.
 
-**Current Version:** v3.2.0 - Bug Fixes & Type Safety Improvements
+**Current Version:** v3.2.1 - Account Management & Onboarding Enhancements
 
 ## User Preferences
 
@@ -95,19 +95,26 @@ Preferred communication style: Simple, everyday language.
 
 The application follows a modern JAMstack architecture with Firebase as the primary backend service, providing real-time capabilities and seamless authentication. The frontend is built with performance and user experience in mind, utilizing optimistic updates and efficient state management patterns.
 
-## Recent Changes (v3.2.0)
+## Recent Changes (v3.2.1)
 
-**Date:** August 28, 2025
+**Date:** September 3, 2025
 
-### Bug Fixes & Improvements
-- ✓ Fixed TypeScript type safety issues in Editor component with scheduledAt property handling
-- ✓ Resolved ScheduleModal prop interface mismatch (currentStatus → currentScheduledAt)
-- ✓ Fixed TutorialModal prop interface (onComplete → onClose, added required userId)
-- ✓ Improved type consistency across Post scheduling functionality
-- ✓ Enhanced code stability and reduced potential runtime errors
+### Account Management & Security
+- ✓ Added complete account deletion functionality in Settings page
+- ✓ Implemented secure password reauthentication for account deletion
+- ✓ Created comprehensive Firestore data cleanup system
+- ✓ Added clear warning dialogs with detailed data loss information
+- ✓ Automatic logout after successful account deletion
+
+### Onboarding & User Experience
+- ✓ Updated tutorial modal content with focused messaging
+- ✓ Changed tutorial icons: bell → brain for AI rating feature
+- ✓ Added encouragement banner in post editor for first-time users
+- ✓ Implemented smart detection of user onboarding completion status
+- ✓ Enhanced tutorial flow with "Create, Edit & Manage Your Posts" messaging
 
 ### Technical Improvements
-- Corrected Post type compatibility for scheduledAt field (Date | null vs undefined)
-- Standardized modal component prop interfaces for better maintainability
-- Eliminated all TypeScript compilation warnings and errors
-- Improved development experience with cleaner type checking
+- Enhanced Firebase Auth integration with deletion capabilities
+- Improved error handling for authentication edge cases
+- Better visual feedback for destructive actions
+- Loading states and progress indicators for sensitive operations

@@ -22,13 +22,55 @@ export default function ReleaseNotes() {
               </p>
             </div>
 
+            {/* Version 3.2.1 */}
+            <div className="mb-8" data-testid="version-3-2-1">
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-2xl font-semibold text-slate-800">Version 3.2.1</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  Latest
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">Released: September 3, 2025</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🗑️ Account Management</h3>
+                  <p className="text-slate-600 mb-4">
+                    Complete account deletion functionality with secure data cleanup and user protection.
+                  </p>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Secure Account Deletion:</strong> Password reauthentication required for security</li>
+                    <li><strong>Complete Data Removal:</strong> Permanent deletion of all posts, drafts, and account data</li>
+                    <li><strong>Clear User Communication:</strong> Detailed warnings about permanent data loss</li>
+                    <li><strong>Automatic Logout:</strong> Secure session termination after account deletion</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🎯 Onboarding & User Experience</h3>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li><strong>Tutorial Improvements:</strong> Updated messaging to focus on core workflows</li>
+                    <li><strong>Brain Icon for AI Features:</strong> More intuitive iconography for AI rating system</li>
+                    <li><strong>First-Time User Encouragement:</strong> Contextual banner in editor for new users</li>
+                    <li><strong>Smart Onboarding Detection:</strong> Automatic detection of user completion status</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-slate-800 mb-3">🔐 Security & Data Protection</h3>
+                  <ul className="list-disc list-inside text-slate-600 space-y-2 ml-4">
+                    <li>Enhanced authentication protocols for sensitive operations</li>
+                    <li>Comprehensive Firestore cleanup preventing orphaned data</li>
+                    <li>Improved error handling for edge cases in authentication flow</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Version 3.2.0 */}
             <div className="mb-8" data-testid="version-3-2-0">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-2xl font-semibold text-slate-800">Version 3.2.0</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                  Latest
-                </span>
               </div>
               <p className="text-sm text-slate-500 mb-6">Released: August 28, 2025</p>
               
