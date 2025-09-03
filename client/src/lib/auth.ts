@@ -6,9 +6,11 @@ import {
   signOut,
   GoogleAuthProvider,
   User,
-  AuthError
+  AuthError,
+  deleteUser as firebaseDeleteUser
 } from "firebase/auth";
-import { auth } from "../firebase";
+import { doc, deleteDoc, collection, getDocs, writeBatch } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -38,6 +40,45 @@ export const handleRedirectResult = async (): Promise<User | null> => {
 
 export const logout = async (): Promise<void> => {
   await signOut(auth);
+};
+
+export const deleteUser = async (): Promise<void> => {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error("No user is currently signed in");
+  }
+
+  const userId = user.uid;
+  const batch = writeBatch(db);
+
+  try {
+    // Delete user document
+    const userDocRef = doc(db, 'users', userId);
+    batch.delete(userDocRef);
+
+    // Delete all user posts
+    const postsCollectionRef = collection(db, 'users', userId, 'posts');
+    const postsSnapshot = await getDocs(postsCollectionRef);
+    postsSnapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    // Delete all user hashtag collections
+    const hashtagsCollectionRef = collection(db, 'users', userId, 'hashtagCollections');
+    const hashtagsSnapshot = await getDocs(hashtagsCollectionRef);
+    hashtagsSnapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    // Commit all Firestore deletions
+    await batch.commit();
+
+    // Finally, delete the Firebase Auth user
+    await firebaseDeleteUser(user);
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
 };
 
 export const getAuthErrorMessage = (error: AuthError): string => {
