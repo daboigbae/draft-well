@@ -16,6 +16,8 @@ import { createPost } from "../lib/posts";
 import { createFeedback } from "../lib/feedback";
 import { resetFiltersToDefault } from "../lib/filter-utils";
 import { PostStatus } from "../types/post";
+import { doc, updateDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 import Footer from "../components/Footer";
 import UsageIndicator from "../components/UsageIndicator";
 
@@ -59,6 +61,29 @@ export default function AppLayout({ children }: AppLayoutProps) {
         scheduledAt: null,
         aiRated: false,
       });
+
+      // Mark first draft as completed
+      const userDocRef = doc(db, 'users', user.uid);
+      try {
+        await updateDoc(userDocRef, {
+          'onboarded.firstDraft': true
+        });
+      } catch (error: any) {
+        // If document doesn't exist, create it
+        if (error.code === 'not-found') {
+          try {
+            await setDoc(userDocRef, {
+              onboarded: {
+                tutorial: false,
+                firstDraft: true
+              }
+            }, { merge: true });
+          } catch (createError) {
+            console.error('Error creating user document:', createError);
+          }
+        }
+      }
+
       setLocation(`/app/post/${postId}`);
     } catch (error) {
       toast({
