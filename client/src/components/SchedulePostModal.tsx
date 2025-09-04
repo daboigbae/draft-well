@@ -26,7 +26,7 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto overflow-x-hidden w-full max-w-[95vw]">
+      <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto overflow-x-hidden w-full max-w-[90vw] p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
@@ -65,7 +65,7 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                 Or select an existing draft:
               </div>
               
-              <div className="max-h-60 overflow-y-auto space-y-2">
+              <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
                 {draftPosts.map((post) => (
                   <Button
                     key={post.id}
@@ -74,18 +74,26 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                       onSelectDraft(post.id);
                       onClose();
                     }}
-                    className="w-full justify-start h-auto p-3 text-left overflow-hidden"
+                    className="w-full justify-start h-auto p-3 text-left overflow-hidden max-w-full"
                     data-testid={`button-select-draft-${post.id}`}
                   >
-                    <div className="flex-1 min-w-0 w-full overflow-hidden">
-                      <div className="font-medium text-slate-900 mb-1 truncate">
+                    <div className="flex-1 min-w-0 w-full overflow-hidden max-w-full">
+                      <div className="font-medium text-slate-900 mb-1 truncate max-w-full">
                         {post.title || 'Untitled Post'}
                       </div>
-                      <p className="text-sm text-slate-600 mb-2 line-clamp-2 break-words overflow-hidden">
-                        {post.body.substring(0, 120)}
-                        {post.body.length > 120 && '...'}
+                      <p className="text-sm text-slate-600 mb-2 overflow-hidden max-w-full" style={{
+                        wordWrap: 'break-word', 
+                        overflowWrap: 'anywhere', 
+                        hyphens: 'auto',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        maxWidth: '100%'
+                      }}>
+                        {post.body.substring(0, 80)}
+                        {post.body.length > 80 && '...'}
                       </p>
-                      <div className="text-xs text-slate-500 truncate">
+                      <div className="text-xs text-slate-500 truncate max-w-full">
                         {post.body.length} characters
                         {post.rating && ` • ★ ${post.rating}/10`}
                       </div>
