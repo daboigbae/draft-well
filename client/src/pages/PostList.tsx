@@ -543,29 +543,27 @@ export default function PostList() {
                 </div>
               ))}
             </div>
+          ) : currentFilter === "scheduled" ? (
+            <ScheduledPostsView 
+              posts={filteredPosts} 
+              allPosts={posts}
+              onEdit={handleEditPost}
+              onDuplicate={handleDuplicatePost}
+              onDelete={handleDeletePost}
+              onScheduleForDay={handleScheduleForDay}
+            />
           ) : filteredPosts.length > 0 ? (
-            currentFilter === "scheduled" ? (
-              <ScheduledPostsView 
-                posts={filteredPosts} 
-                allPosts={posts}
-                onEdit={handleEditPost}
-                onDuplicate={handleDuplicatePost}
-                onDelete={handleDeletePost}
-                onScheduleForDay={handleScheduleForDay}
-              />
-            ) : (
-              <div className="space-y-6">
-                {filteredPosts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    onEdit={handleEditPost}
-                    onDuplicate={handleDuplicatePost}
-                    onDelete={handleDeletePost}
-                  />
-                ))}
-              </div>
-            )
+            <div className="space-y-6">
+              {filteredPosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onEdit={handleEditPost}
+                  onDuplicate={handleDuplicatePost}
+                  onDelete={handleDeletePost}
+                />
+              ))}
+            </div>
           ) : (
             <div className="text-center py-12" data-testid="empty-state">
               {searchQuery ? (
