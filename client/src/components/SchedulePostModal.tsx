@@ -84,7 +84,7 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                           : (post.title || 'Untitled Post')
                         }
                       </div>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-slate-600 break-words">
                         {post.body.length > 140
                           ? `${post.body.substring(0, 140)}...`
                           : post.body
