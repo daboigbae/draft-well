@@ -30,6 +30,7 @@ import { Post, PostStatus } from "../types/post";
 import { getPost, updatePost, deletePost } from "../lib/posts";
 import { getRating } from "../lib/rating";
 import { useDebounce } from "@/hooks/use-debounce";
+import { format } from "date-fns";
 import EditorToolbar from "../components/EditorToolbar";
 import TagInput from "../components/TagInput";
 import CharacterCounter from "../components/CharacterCounter";
@@ -662,7 +663,7 @@ export default function Editor() {
           {post.status === 'scheduled' && post.scheduledAt && (
             <div className="flex items-center gap-2 text-sm text-orange-700">
               <Clock className="w-4 h-4" />
-              Fri, Aug 29 at 12:00 AM
+              {format(post.scheduledAt, 'EEE, MMM d')} at {format(post.scheduledAt, 'h:mm a')}
             </div>
           )}
           {rating && (
