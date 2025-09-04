@@ -240,6 +240,7 @@ export default function PostList() {
   };
 
   const handleScheduleForDay = (date: Date) => {
+    console.log(`Setting schedule date to: ${date.toISOString()}`);
     setSelectedScheduleDate(date);
     setScheduleModalOpen(true);
   };
@@ -281,6 +282,7 @@ export default function PostList() {
   const handleScheduleExistingDraft = async (postId: string) => {
     if (!user || !selectedScheduleDate) return;
 
+    console.log(`Scheduling post ${postId} for: ${selectedScheduleDate.toISOString()}`);
     try {
       await schedulePost(user.uid, postId, selectedScheduleDate);
       

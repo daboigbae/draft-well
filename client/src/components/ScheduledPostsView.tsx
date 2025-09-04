@@ -38,9 +38,11 @@ const ScheduledPostsView: React.FC<ScheduledPostsViewProps> = ({
 
     for (let i = 1; i <= 7; i++) {
       const date = addDays(today, i);
-      const dayPosts = posts.filter(post => 
-        post.scheduledAt && isSameDay(post.scheduledAt, date)
-      );
+      const dayPosts = posts.filter(post => {
+        if (!post.scheduledAt) return false;
+        console.log(`Comparing post scheduledAt: ${post.scheduledAt.toISOString()} with target date: ${date.toISOString()}`);
+        return isSameDay(post.scheduledAt, date);
+      });
 
       days.push({
         date,
