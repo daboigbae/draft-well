@@ -32,9 +32,6 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
             <Calendar className="w-5 h-5" />
             Schedule for {format(targetDate, 'EEEE, MMM d')}
           </DialogTitle>
-          <DialogDescription>
-            Choose how you'd like to schedule a post for this day
-          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
