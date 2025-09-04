@@ -77,9 +77,12 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                     className="w-full justify-start h-auto p-3 text-left bg-slate-50 hover:bg-cyan-50 border-slate-200 hover:border-cyan-300 transition-all duration-200"
                     data-testid={`button-select-draft-${post.id}`}
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-slate-900 truncate">
-                        {post.title || 'Untitled Post'}
+                    <div className="flex-1 min-w-0 pr-4">
+                      <div className="font-medium text-slate-900">
+                        {(post.title || 'Untitled Post').length > 20 
+                          ? `${(post.title || 'Untitled Post').substring(0, 20)}...`
+                          : (post.title || 'Untitled Post')
+                        }
                       </div>
                     </div>
                   </Button>
