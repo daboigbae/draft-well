@@ -74,7 +74,7 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                       onSelectDraft(post.id);
                       onClose();
                     }}
-                    className="w-full justify-start h-auto p-3 text-left"
+                    className="w-full justify-start h-auto p-3 text-left bg-slate-50 hover:bg-cyan-50 border-slate-200 hover:border-cyan-300 transition-all duration-200"
                     data-testid={`button-select-draft-${post.id}`}
                   >
                     <div className="flex-1 min-w-0">
