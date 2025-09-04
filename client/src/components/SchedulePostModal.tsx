@@ -78,18 +78,12 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                     data-testid={`button-select-draft-${post.id}`}
                   >
                     <div className="flex-1 min-w-0 pr-4">
-                      <div className="font-medium text-slate-900 mb-1">
-                        {(post.title || 'Untitled Post').length > 40 
-                          ? `${(post.title || 'Untitled Post').substring(0, 40)}...`
+                      <div className="font-medium text-slate-900">
+                        {(post.title || 'Untitled Post').length > 20 
+                          ? `${(post.title || 'Untitled Post').substring(0, 20)}...`
                           : (post.title || 'Untitled Post')
                         }
                       </div>
-                      <p className="text-sm text-slate-600 break-words">
-                        {post.body.length > 140
-                          ? `${post.body.substring(0, 140)}...`
-                          : post.body
-                        }
-                      </p>
                     </div>
                   </Button>
                 ))}
