@@ -18,7 +18,7 @@ function AuthenticatedRouter() {
   return (
     <Switch>
       <Route path="/app/post/:id" component={Editor} />
-      <Route path="/app/settings" component={Settings} />
+      <Route path="/app/account" component={Settings} />
       <Route path="/app/release-notes" component={ReleaseNotes} />
       <Route path="/app/hashtag-collections" component={HashtagCollections} />
       <Route path="/app" component={PostList} />

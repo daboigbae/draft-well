@@ -46,7 +46,7 @@ export default function Settings() {
       } else if (canceled) {
         // Clear the canceled parameter from URL after showing message briefly
         setTimeout(() => {
-          window.history.replaceState({}, '', '/app/settings');
+          window.history.replaceState({}, '', '/app/account');
         }, 3000);
       }
     }
@@ -79,7 +79,7 @@ export default function Settings() {
     setVerifyingSubscription(true);
     
     // Always clear URL parameters first to prevent loops
-    window.history.replaceState({}, '', '/app/settings');
+    window.history.replaceState({}, '', '/app/account');
     
     try {
       const response = await fetch('/api/verify-subscription', {

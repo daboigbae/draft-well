@@ -251,7 +251,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               variant="ghost"
               className="w-full justify-start"
               onClick={() => {
-                setLocation('/app/settings');
+                setLocation('/app/account');
                 setSidebarOpen(false); // Close mobile sidebar after navigation
               }}
               data-testid="button-account"
