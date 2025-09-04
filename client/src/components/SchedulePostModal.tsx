@@ -26,7 +26,7 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto overflow-x-hidden w-full max-w-[90vw] p-6">
+      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto overflow-x-hidden w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
@@ -65,7 +65,7 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                 Or select an existing draft:
               </div>
               
-              <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
+              <div className="max-h-60 overflow-y-auto space-y-2">
                 {draftPosts.map((post) => (
                   <Button
                     key={post.id}
@@ -74,18 +74,17 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                       onSelectDraft(post.id);
                       onClose();
                     }}
-                    className="w-full justify-start h-auto p-3 text-left overflow-hidden max-w-full"
+                    className="w-full justify-start h-auto p-3 text-left"
                     data-testid={`button-select-draft-${post.id}`}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-slate-900 mb-1 truncate">
                         {post.title || 'Untitled Post'}
                       </div>
-                      <div className="text-sm text-slate-600 mb-2 break-words hyphens-auto leading-tight">
-                        <div className="line-clamp-2">
-                          {post.body.length > 80 ? `${post.body.substring(0, 80)}...` : post.body}
-                        </div>
-                      </div>
+                      <p className="text-sm text-slate-600 mb-2 line-clamp-2 break-words">
+                        {post.body.substring(0, 150)}
+                        {post.body.length > 150 && '...'}
+                      </p>
                       <div className="text-xs text-slate-500 truncate">
                         {post.body.length} characters
                         {post.rating && ` • ★ ${post.rating}/10`}
