@@ -77,21 +77,16 @@ const SchedulePostModal: React.FC<SchedulePostModalProps> = ({
                     className="w-full justify-start h-auto p-3 text-left overflow-hidden max-w-full"
                     data-testid={`button-select-draft-${post.id}`}
                   >
-                    <div className="flex-1 min-w-0 w-full overflow-hidden max-w-full">
-                      <div className="font-medium text-slate-900 mb-1 truncate max-w-full">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-slate-900 mb-1 truncate">
                         {post.title || 'Untitled Post'}
                       </div>
-                      <p className="text-sm text-slate-600 mb-2" style={{
-                        wordBreak: 'break-word',
-                        whiteSpace: 'normal',
-                        overflow: 'hidden',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical'
-                      }}>
-                        {post.body.length > 100 ? `${post.body.substring(0, 100)}...` : post.body}
-                      </p>
-                      <div className="text-xs text-slate-500 truncate max-w-full">
+                      <div className="text-sm text-slate-600 mb-2 break-words hyphens-auto leading-tight">
+                        <div className="line-clamp-2">
+                          {post.body.length > 80 ? `${post.body.substring(0, 80)}...` : post.body}
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-500 truncate">
                         {post.body.length} characters
                         {post.rating && ` • ★ ${post.rating}/10`}
                       </div>
