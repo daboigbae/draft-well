@@ -101,6 +101,11 @@ const ScheduledPostsView: React.FC<ScheduledPostsViewProps> = ({
                       <div className="text-xs text-slate-500">
                         {post.scheduledAt && formatDistanceToNow(post.scheduledAt, { addSuffix: true })}
                       </div>
+                      {post.rating && (
+                        <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">
+                          ★ {post.rating}/10
+                        </Badge>
+                      )}
                     </div>
                     
                     <h4 className="font-semibold text-slate-900 mb-2 line-clamp-1">
