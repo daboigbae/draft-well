@@ -82,42 +82,24 @@ export default function Settings() {
     window.history.replaceState({}, '', '/app/account');
     
     try {
-      const response = await fetch('/api/verify-subscription', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId,
-          userId: user.uid,
-        }),
+      // TODO: Implement subscription verification using Firebase Functions
+      // This should call a Firebase Function instead of a local API endpoint
+      console.warn('Subscription verification not implemented - needs Firebase Function');
+      
+      toast({
+        title: 'Feature Not Available',
+        description: 'Subscription verification is not yet implemented. Please contact support.',
+        variant: 'destructive'
       });
-
-      if (response.ok) {
-        const result = await response.json();
-        
-        
-        toast({
-          title: 'Subscription Activated!',
-          description: `Your ${result.planType} plan is now active.`,
-        });
-        
-        // Reload subscription data to reflect changes
-        await loadSubscriptionData();
-        
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new CustomEvent('subscriptionUpdated', { 
-          detail: { planType: result.planType } 
-        }));
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to verify subscription');
-      }
+      
+      // For now, just reload subscription data
+      await loadSubscriptionData();
+      
     } catch (error) {
       console.error('Error verifying subscription:', error);
       toast({
-        title: 'Payment Successful',
-        description: 'Your payment was processed, but there was an issue activating your subscription. Please refresh the page or contact support.',
+        title: 'Verification Failed',
+        description: 'Failed to verify your subscription. Please try again or contact support.',
         variant: 'destructive'
       });
     } finally {
@@ -134,7 +116,7 @@ export default function Settings() {
     if (subscription && subscription.status === 'active' && subscription.stripeCustomerId) {
       setUpgrading(planType);
       try {
-        await createCustomerPortalSession(subscription.stripeCustomerId);
+        await createCustomerPortalSession();
       } catch (error: any) {
         toast({
           title: 'Portal Access Failed',
@@ -160,7 +142,7 @@ export default function Settings() {
     // For new subscribers, use checkout flow
     setUpgrading(planType);
     try {
-      await createCheckoutSession(planType, user.uid);
+      await createCheckoutSession();
     } catch (error: any) {
       toast({
         title: 'Upgrade failed',
@@ -183,7 +165,7 @@ export default function Settings() {
     }
 
     try {
-      await createCustomerPortalSession(subscription.stripeCustomerId);
+      await createCustomerPortalSession();
     } catch (error: any) {
       toast({
         title: 'Error',

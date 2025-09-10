@@ -23,6 +23,37 @@ A full-stack web application for writing and managing LinkedIn posts with draft/
 - **Forms**: React Hook Form with Zod validation
 - **Markdown**: Marked.js for parsing and rendering
 
+## Project Structure
+
+This is a client-side Firebase application with no backend server required:
+
+### 📁 `client/` - Frontend Application
+The React frontend application built with Vite:
+- **`src/`** - Main source code
+  - **`components/`** - Reusable React components
+    - **`ui/`** - shadcn/ui component library (buttons, dialogs, forms, etc.)
+    - Other custom components (AuthGuard, PostCard, EditorToolbar, etc.)
+  - **`pages/`** - Route-based page components (Editor, PostList, Settings, etc.)
+  - **`hooks/`** - Custom React hooks (useAuth, useDebounce, etc.)
+  - **`lib/`** - Utility libraries (auth, posts, hashtags, etc.)
+  - **`types/`** - TypeScript type definitions
+  - **`utils/`** - Helper utilities (clipboard, export, markdown)
+- **`public/`** - Static assets (favicon, etc.)
+- **`index.html`** - Main HTML entry point
+
+### 📁 `attached_assets/` - Media Files
+User-uploaded images and content files:
+- Screenshots, images, and text files uploaded by users
+- Used for post content and media attachments
+
+### 📁 Configuration Files
+- **`package.json`** - Dependencies and scripts
+- **`vite.config.ts`** - Vite build configuration
+- **`tailwind.config.ts`** - Tailwind CSS configuration
+- **`tsconfig.json`** - TypeScript configuration
+- **`components.json`** - shadcn/ui component configuration
+- **`firestore.rules`** - Firebase Firestore security rules
+
 ## Getting Started
 
 ### Prerequisites
@@ -50,3 +81,25 @@ VITE_FIREBASE_PROJECT_ID=your_project_id
 VITE_FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
+```
+
+### Installation & Development
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Build for production:
+   ```bash
+   npm run build
+   ```
+
+4. Preview production build:
+   ```bash
+   npm run preview
